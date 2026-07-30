@@ -1,0 +1,14 @@
+# Line endings are pinned at the REPOSITORY level, deliberately.
+#
+# This kit is copied between repos, edited from Windows, Linux and macOS, and
+# by agents whose local `core.autocrlf` we do not control. Without this file the
+# stored blobs and a contributor's working copy can disagree, and git then marks
+# EVERY line as changed: a 21-line edit showed up as 161 insertions / 145
+# deletions on 2026-07-29. In a repository whose whole purpose is letting a
+# human see exactly what changed in the shared protocol, an unreviewable diff
+# defeats the point - and it turns any future merge into a whole-file conflict.
+#
+# `text=auto eol=lf` normalises everything to LF in the repo AND on checkout, so
+# behaviour is identical on every machine and from every repo, with no reliance
+# on anyone's local git config or on an agent remembering a workaround.
+* text=auto eol=lf
