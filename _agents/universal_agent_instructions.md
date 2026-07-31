@@ -10,7 +10,7 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 >
 > ### The canonical home is its own repository
 >
-> **`https://github.com/Icemixx/universal_agent_files`** holds the master copy (added 2026-07-29). Its
+> **`https://github.com/Icemixx/universal_agent_kit`** holds the master copy (added 2026-07-29). Its
 > layout mirrors a consuming repo: `_agents/universal_agent_instructions.md` + `_agents/universal/*`.
 > Every project repository holds a COPY. That canonical repository is the source of truth.
 >
@@ -25,7 +25,7 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 > **copies**, not submodules or remotes — there is no `git pull` relationship with the canonical repo, so
 > "pull" here means copy-and-commit:
 >
-> 1. `git clone --depth 1 https://github.com/Icemixx/universal_agent_files` into a scratch/temp directory
+> 1. `git clone --depth 1 https://github.com/Icemixx/universal_agent_kit` into a scratch/temp directory
 >    — never inside the project repo.
 > 2. Copy its `_agents/universal_agent_instructions.md` and the ENTIRE `_agents/universal/` folder over
 >    the project's copies. **Never touch `_agents/project_*.md`** — those are project-owned and are not
@@ -39,7 +39,7 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 >
 > Therefore, whenever you modify this file or ANY file in `_agents/universal/`, you **MUST**:
 >
-> 1. **Push the identical change to `universal_agent_files` in the same turn**, then **tell the user
+> 1. **Push the identical change to `universal_agent_kit` in the same turn**, then **tell the user
 >    explicitly, in your final message of that turn**, that the shared kit changed and which repositories
 >    now need to pull. Not only in a commit message, and never buried in a list of project changes.
 > 2. **Name the exact files changed and quote the before/after of each edit**, so the change can be
@@ -48,7 +48,7 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 >    require changing the shared kit, say so and get the user's go-ahead first — a project-specific need
 >    almost always belongs in `project_instructions.md` instead (which wins on conflict anyway).
 > 4. **Verify sync rather than assuming it.** Checking is seconds:
->    `git clone --depth 1 https://github.com/Icemixx/universal_agent_files` into a scratch dir and
+>    `git clone --depth 1 https://github.com/Icemixx/universal_agent_kit` into a scratch dir and
 >    hash-compare each file against the local copy. Normalise line endings (`\r\n` → `\n`) before
 >    hashing, or a CRLF checkout difference reads as a false mismatch. Note `gh` may not be installed;
 >    plain `git` is enough.
