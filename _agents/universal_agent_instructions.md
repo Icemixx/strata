@@ -178,3 +178,4 @@ When a trigger below fires, reading the mapped file BEFORE acting is **mandatory
 | `self-critique.md` | Closing a long or high-stakes work block (extends D1/D2 with D3–D12) |
 | `seasonal-audit.md` | User asks for a seasonal / full-app / refactor audit — load together with the project's `AUDIT_ADDENDUM` file |
 | `consolidation.md` | Recording a decision that supersedes earlier recorded entries, or the user asks for doc cleanup |
+| `adjacent-sweep.md` | Finishing an implementation task, or writing a delegation brief for one — search for the same class of defect elsewhere before reporting done |
