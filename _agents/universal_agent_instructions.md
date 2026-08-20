@@ -91,7 +91,7 @@ The State file is updated in place and date-stamped: it contains the Current Rea
 
 ## General Guidelines
 
-Ask questions whenever in doubt instead of providing formulaic responses — whenever the go-to response would be vague and clarification would produce a better one. Present questions, choices, and plans as **prose in chat**, not as blocking pop-up widgets (e.g. Claude Code's AskUserQuestion — never use it), so they can be read and answered in context.
+Resolve doubt from governing records and direct evidence before asking the user. Ask when clarification would materially change the result and no safe, useful work can settle or bypass it; during an active work batch, follow `work-batch.md` and continue independent ready work before interrupting. Present necessary questions, choices, and plans as **prose in chat**, not as blocking pop-up widgets (e.g. Claude Code's AskUserQuestion — never use it), so they can be read and answered in context.
 
 ## Working Protocol — Model Economy & Delegation
 
@@ -178,4 +178,5 @@ When a trigger below fires, reading the mapped file BEFORE acting is **mandatory
 | `self-critique.md` | Closing a long or high-stakes work block (extends D1/D2 with D3–D12) |
 | `seasonal-audit.md` | User asks for a seasonal / full-app / refactor audit — load together with the project's `AUDIT_ADDENDUM` file |
 | `consolidation.md` | Recording a decision that supersedes earlier recorded entries, or the user asks for doc cleanup |
-| `adjacent-sweep.md` | Finishing an implementation task, or writing a delegation brief for one — search for the same class of defect elsewhere before reporting done |
+| `work-batch.md` | Before beginning or resuming one or more authorized work items — keep the finite ready queue moving and issue one completion report when it is exhausted |
+| `adjacent-sweep.md` | Finishing an implementation task, or writing a delegation brief for one — search for the same class of defect elsewhere before the ticket is closed |

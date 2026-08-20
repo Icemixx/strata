@@ -79,7 +79,7 @@ Note: routers stay BARE — pointers only, never rules or content. The `_agents/
 
 Claude Code does not read `AGENTS.md`; its documented bridge to shared instructions is exactly the `@`-import router above. GitHub Copilot reads `AGENTS.md` and `CLAUDE.md` in addition to its own router, so all three stay bare to keep that harmless.
 
-## Verify before reporting done
+## Verify before initialization is complete
 
 - Every router is bare and matches its template.
 - `project_instructions.md` defines all protocol parameters named in the core file, including distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE`, plus both conventions from Step 3.

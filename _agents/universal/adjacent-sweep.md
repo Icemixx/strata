@@ -6,7 +6,7 @@ Part of the universal agent set (core: `_agents/universal_agent_instructions.md`
 
 ## The rule
 
-**After the named fix passes, and BEFORE reporting done, search for the same class of defect elsewhere.** Not "review the codebase" — that is unbounded, wastes tokens, and stalls (core A4). The question is narrow and answerable:
+**After the named fix passes, and BEFORE the ticket is closed, search for the same class of defect elsewhere.** Not "review the codebase" — that is unbounded, wastes tokens, and stalls (core A4). The question is narrow and answerable:
 
 > This bug had a *shape*. Where else does that shape exist?
 
@@ -14,11 +14,11 @@ Name the shape explicitly before searching, because the name is what makes the s
 
 ## Non-negotiables
 
-- **Findings become tickets, not silent fixes.** A sweep that quietly widens the diff is worse than no sweep: it smuggles unreviewed work in under a ticket the reviewer thinks they understand. Repair only what is genuinely inside the scope you were handed; everything else is recorded and left. Where the project defines a plate-cleaning or found-but-not-fixed rule, this is that rule, applied at the moment the finding is freshest.
+- **Findings become separate tickets, not silent scope expansion and not reporting triggers.** A sweep that quietly widens the current diff is worse than no sweep: it smuggles unreviewed work in under a ticket the reviewer thinks they understand. Repair only what is genuinely inside the ticket you were handed. Record every verified sibling separately. During an active work batch, the supervisor admits an eligible sibling to that batch in its normal dependency and priority order; otherwise it remains recorded for later. A finding by itself is never a reason to issue a progress report.
 - **Check whether it is actually wrong before calling it wrong.** A sibling that *looks* like the bug is frequently deliberate, documented, or covered by a test you have not read. Verify first. A sweep that cries wolf trains the next reader to skip sweep findings.
 - **Record negative results.** "The sweep found no further instance of X, having checked Y and Z" is a real finding: it stops the next session re-searching the same ground, and it is honest about what was and was not looked at. Silence reads as "nobody looked."
-- **Delegated workers must be told to sweep.** A worker handed an exact scope implements exactly that scope and nothing looks past the edges. If the brief does not ask for a sweep, no sweep happens — so put it in the brief, along with the instruction to report findings rather than fix them.
-- **One layer, not recursive.** Sweep the shape you just fixed. Do not then sweep the shape you just found, and so on — that is how a bounded ticket becomes an unbounded audit. Ticket it and move on.
+- **Delegated workers must be told to sweep.** A worker handed an exact scope implements exactly that scope and nothing looks past the edges. If the brief does not ask for a sweep, no sweep happens — so put it in the brief. The worker returns literal sweep evidence to its supervisor; it does not repair or schedule out-of-scope siblings itself. A worker-to-supervisor result is not a user-facing progress report.
+- **One search layer, not a recursive audit.** Sweep the shape you just fixed once. Do not recursively sweep each sibling merely because the search found it. If a sibling later becomes its own implementation ticket, it receives the normal bounded sweep for the shape actually fixed, but the same search is not repeated without new evidence.
 
 ## Sweep classes worth checking by default
 
