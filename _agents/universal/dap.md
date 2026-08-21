@@ -1,10 +1,10 @@
 # Decisions & Devil's Advocate Policy (DAP)
 
-Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/dap.md`. Load for any BIG decision (architecture, schema, security-sensitive paths, anything expensive to reverse) and whenever the user explicitly asks for a critical review ("apply DAP", "DAP this", "be a critic", "suggest a plan"). Part D in the core is the lightweight every-session floor; this file is the deep process. On 2026-07-26 it absorbed the former Feature Generation Meta-Protocol (FGMP) — the Level 1 write-up below is FGMP's surviving core; the full 7-step ceremony was retired as unenforced overhead.
+Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/dap.md`. Load for a BIG decision (Level 1) or when the core's explicit Level-2 trigger fires. Part D in the core is the lightweight every-session floor; this file owns the deeper decision process.
 
-## Level 1 — Structured decision write-up (any big decision; no user prompt needed)
+## Level 1 — Supervisor self-check (any big decision; no user prompt needed)
 
-Before committing to a big decision, produce in chat — and graduate durable results to the Rationale file as a dated "Why X, not Y" entry:
+Level 1 uses no reviewer council and emits no DAP verdict stamp. Before committing to a big decision, the Supervisor produces in chat — and graduates durable results to the Rationale file as a dated "Why X, not Y" entry:
 
 1. **Context re-check** — re-read the relevant project context, constraints, and prior Rationale/Build-Log entries; state how the change integrates and what it touches across layers.
 2. **Alternatives** — at least two viable options with trade-offs, limitations, and assumptions; say why the winner wins and what is being given up.
@@ -16,13 +16,16 @@ Before committing to a big decision, produce in chat — and graduate durable re
 
 DAP's council does **not** gate routine changes; normal work proceeds without a DAP stamp.
 
-**When invoked,** spin up a **6-subagent council — 2 reviewers from each of the current harness's three tiers: highest, middle, and lowest** (per its `_agents/universal/harness-*.md` file). The supervising Architect does not count as a reviewer. Each reviewer is an independent, terminal critic; distribute the lenses below among them and use self-contained read-only prompts. Seat and batch the reviewers through the current harness's delegation mechanism and current concurrency allowance. The Architect synthesizes the independent findings; where they dissent, surface the debate and take the **most conservative** option. If subagents or a tier are unavailable, run the same lenses as a **rigorous self-review and say so explicitly** — never claim a council review that did not actually happen.
+**When invoked,** spawn exactly **six independent, terminal, read-only reviewers in addition to the active Supervisor: two from the current harness's highest tier, two from its middle tier, and two from its lowest tier.** The active Supervisor never counts, regardless of its model tier. Required reviewers may therefore be below, equal to, or above the Supervisor. Level 2 completes only if all six return successfully.
+
+Each reviewer is an independent, terminal, read-only critic with a self-contained prompt. Distribute the lenses below and batch seats only as required by current concurrency. The Supervisor synthesizes the findings; where they dissent, surface the debate and take the **most conservative** option.
+
+No replacement, tier substitution, or partial council: if any of the six cannot start or complete, Level 2 is incomplete. Report the failed seat; do not spawn a substitute, issue a DAP verdict stamp, or claim council review. An ordinary Supervisor self-review may still help the work, but it is not DAP Level 2.
 
 **Verdict stamp** (emit exactly one when DAP completes):
 
 - `DAP: no dissent — [one-line reason]`
 - `DAP: dissent on [topic] — chose [option] (most conservative)` — preceded by the full debate: counter-arguments, trade-offs, alternatives.
-- `DAP: self-review only (council unavailable) — [verdict]`
 
 **Review lenses** (plus any `DAP_EXTRA_LENSES` from the project file):
 

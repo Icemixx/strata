@@ -1,6 +1,6 @@
 # Initialize — set up `_agents/` in a repository
 
-Part of the universal agent set — see `_agents/universal_agent_instructions.md` (the always-loaded core; this folder holds its on-demand extensions). Identical across all repositories; never edit per-project. On loading this file, announce it with one visible line: `loaded: _agents/universal/initialize.md`. Load when asked to initialize, bootstrap, or set up the agent system in a repository, or when asked why the folder is laid out this way. (Renamed from `bootstrap.md` on 2026-07-27: "initialize" is the word users actually type, and the procedure now also covers a repository that already has some agent files.)
+Part of the universal agent set — see `_agents/universal_agent_instructions.md` (the always-loaded core; this folder holds startup harness adapters and on-demand procedures). Identical across all repositories; never edit per-project. On loading this file, announce it with one visible line: `loaded: _agents/universal/initialize.md`. Load when asked to initialize, bootstrap, or set up the agent system in a repository, or when asked why the folder is laid out this way.
 
 ## Why `_agents/`
 
@@ -16,7 +16,7 @@ Never migrate, and never copy into the repository: credentials or tokens, person
 
 ## Step 1 — drop in the universal set
 
-The only manual step. Copy verbatim from any repository that already carries them: `_agents/universal_agent_instructions.md` plus the whole `_agents/universal/` folder. Never edit these per project.
+Copy `_agents/universal_agent_instructions.md` plus the whole `_agents/universal/` folder from the canonical repository named in the core banner. Use a scratch clone outside the project, copy the complete unit, and never edit it per project.
 
 ## Step 2 — create what is missing
 
@@ -56,7 +56,7 @@ Before starting any work in this repository, read and follow, in order:
 
 1. `_agents/universal_agent_instructions.md` — the universal working protocol.
 2. `_agents/project_instructions.md` — this project's rules and protocol parameters.
-3. Before your first delegation, read `_agents/universal/harness-codex.md`.
+3. `_agents/universal/harness-codex.md` — Codex's harness adapter.
 
 Precedence on conflict: project file > universal file (the universal set includes `_agents/universal/`). This router carries no rules of its own.
 ```
@@ -66,7 +66,7 @@ Precedence on conflict: project file > universal file (the universal set include
 ```markdown
 # Agent Instructions Router
 
-Read and follow both (project file wins on conflict; this router carries no rules of its own):
+Read and follow all three (project file wins on conflict; this router carries no rules of its own):
 
 @_agents/universal_agent_instructions.md
 
@@ -75,9 +75,7 @@ Read and follow both (project file wins on conflict; this router carries no rule
 @_agents/universal/harness-claude-code.md
 ```
 
-Note: routers stay BARE — pointers only, never rules or content. The `_agents/universal/` files are loaded on demand by the core's file map; never `@`-import them from a router, with one deliberate exception: a router may auto-load its OWN harness's `harness-*.md` (harness files are mutually exclusive, so other harnesses pay nothing — and the delegation gate must not depend on an agent self-diagnosing that it is about to delegate).
-
-Claude Code does not read `AGENTS.md`; its documented bridge to shared instructions is exactly the `@`-import router above. GitHub Copilot reads `AGENTS.md` and `CLAUDE.md` in addition to its own router, so all three stay bare to keep that harmless.
+Note: routers stay BARE — pointers only, never rules or content. A supported delegating harness loads the core, the project file, and only its own harness adapter at chat start. It never loads another harness's adapter. On-demand procedures remain in the core's trigger map and are not imported by routers. The Copilot router has no harness adapter because this kit defines no Copilot delegation adapter.
 
 ## Verify before initialization is complete
 
@@ -85,4 +83,4 @@ Claude Code does not read `AGENTS.md`; its documented bridge to shared instructi
 - `project_instructions.md` defines all protocol parameters named in the core file, including distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE`, plus both conventions from Step 3.
 - All five project authorities exist, the Guide is one self-contained offline HTML file, and the Build Log carries a dated initialization entry.
 - Nothing personal, generated, or secret was copied into the repository.
-- If the universal set came from a sibling repository, its files are byte-identical to the source (hash them).
+- The complete universal set is content-identical to a fresh canonical clone after normalizing line endings (hash every relative path).

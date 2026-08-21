@@ -1,6 +1,6 @@
 # Seasonal Full-App Audit (command)
 
-Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/seasonal-audit.md`. Load when the user asks for a "seasonal audit", "full-app audit", or "refactor audit". This is a periodic whole-repo health check — Architect-tier work: plan and verify at the top tier, delegate the mechanical inventory sweeps down the ladder (Part B). Apply DAP (`_agents/universal/dap.md`) to every proposed change that comes out of it, and update the project's living docs for anything you change.
+Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/seasonal-audit.md`. Load when the user asks for a "seasonal audit", "full-app audit", or "refactor audit". This is a periodic whole-repo health check: the Supervisor routes planning and mechanical sweeps to the lowest capable tiers, then owns final verification. Apply DAP Level 1 (`_agents/universal/dap.md`) to every proposed change; Level 2 remains explicit-only. Update the project's living docs for anything you change.
 
 **Before starting, read the project file's `AUDIT_ADDENDUM`** — it holds the stack-specific checklists, invariants, and non-negotiable constraints. The universal protocol:
 

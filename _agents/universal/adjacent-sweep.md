@@ -12,7 +12,7 @@ Part of the universal agent set (core: `_agents/universal_agent_instructions.md`
 
 Name the shape explicitly before searching, because the name is what makes the search bounded. "A magnitude parameter documented as unsigned that silently applies `abs()`." "A widget removed while pre-existing tests still drive it." "A row written through a path that bypasses the validation every other path enforces." "State set at init that lives behind a collapsed disclosure." Then grep for that shape, and read what you find.
 
-## Non-negotiables
+## Non-negotiables when sweeping is enabled
 
 - **Findings become separate tickets, not silent scope expansion and not reporting triggers.** A sweep that quietly widens the current diff is worse than no sweep: it smuggles unreviewed work in under a ticket the reviewer thinks they understand. Repair only what is genuinely inside the ticket you were handed. Record every verified sibling separately. During an active work batch, the supervisor admits an eligible sibling to that batch in its normal dependency and priority order; otherwise it remains recorded for later. A finding by itself is never a reason to issue a progress report.
 - **Check whether it is actually wrong before calling it wrong.** A sibling that *looks* like the bug is frequently deliberate, documented, or covered by a test you have not read. Verify first. A sweep that cries wolf trains the next reader to skip sweep findings.
@@ -39,4 +39,4 @@ The counter-case is equally instructive: the same run shipped a quarantine mecha
 
 ## Cost, stated so it is chosen deliberately
 
-Sweeping makes every ticket slower and less predictable; a one-hour ticket can spawn four more. That is the mechanism working, not failing — but it means estimates degrade, and a project that needs throughput more than correctness may reasonably choose not to. Decide it once, out loud, rather than silently skipping the step under time pressure. Skipping it quietly is the failure mode: the sweep is cheapest at the exact moment it is most tempting to skip.
+Sweeping makes every ticket slower and less predictable; a one-hour ticket can spawn four more. A user or project rule may explicitly opt out when throughput matters more than this extra coverage. Otherwise the sweep applies. Never skip it silently under time pressure.
