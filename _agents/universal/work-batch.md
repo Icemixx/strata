@@ -10,9 +10,24 @@ Keep the batch in the project's authoritative queue or plan. Ensure each batch i
 
 An adjacent-sweep finding joins the active batch only when it is verified, recorded as a separate ticket, within the approved scope and risk class, supplied with its order and verification, and otherwise ready. A finding that needs new product, architecture, security, destructive-action, cost, or external authority stays recorded for later disposition. Read-only work never gains mutation authority from this rule.
 
+## Closing one ticket
+
+The kit previously delegated this entirely to each project, which left rules about *when to stop working* with nowhere to attach — so they floated in sections read once at session start and never consulted at the moment they applied. **A rule inside a procedure you are already executing gets followed; a rule on its own gets read once.** This checklist is that home. Projects add their own steps; these are the ones that generalize.
+
+1. **Retitle the ticket to what actually shipped** when the two differ. Otherwise the record preserves an intention nobody fulfilled, and every later reader plans against it.
+2. **Record the decisions taken *during* implementation**, not just the outcome — including anything found and deliberately not fixed.
+3. **Date the entry by when the work happened, not when it was noticed.** A session spanning midnight or several days keeps the original stamps; a blanket "correction" of dates is how a whole log gets falsified in one commit.
+4. **Put the literal evidence in the entry** — actual command output, counts, and the commit identifier. "Verified" is not evidence; it is a claim that the evidence existed.
+5. **Correct anything the change contradicts, now.** A stale claim left standing will be quoted back as current.
+6. **"Shipped" never implies "seen".** Passing tests prove logic, not rendering, interaction, or real-world behavior. If the change needs a look on real hardware or a real integration, say so explicitly rather than letting green tests imply it.
+7. **Anything found-but-not-fixed becomes its own queue item immediately**, not "later". A defect noticed and unrecorded is a defect discovered twice.
+8. **Return to the batch queue** — see below. Closing a ticket is not a completion milestone.
+
+**The enforcement is a check, not a resolution to be careful.** At the **start** of every ticket, verify the previous one's records are complete: its status reflects reality and its evidence entry exists. Two greps, at a fixed moment. This exists because diligence degrades exactly when throughput rises, which is when the record matters most.
+
 ## Records continuously; report once
 
-Complete and record each ticket according to the project's rules, then return to the batch queue. Completing, committing, documenting, or sweeping one ticket is not a completion milestone for the batch. A new finding is a queue event, not a chat-report event.
+Complete and record each ticket according to the project's rules **and the closing checklist below**, then return to the batch queue. Completing, committing, documenting, or sweeping one ticket is not a completion milestone for the batch. A new finding is a queue event, not a chat-report event.
 
 Do not issue a user-facing per-ticket progress report, completion summary, or sweep recap while independent ready work remains. Issue one completion report when a fresh queue check shows:
 

@@ -6,19 +6,50 @@ Part of the universal agent set — see `_agents/universal_agent_instructions.md
 
 The instruction files live in the **`_agents/`** folder (together with the five project authorities) to keep the repo root uncluttered. The folder name deliberately avoids the `.`-prefix namespace that harnesses claim for themselves (`.github/`, `.claude/`, `.codex/`, `.agents/`, ...) and avoids a leading `-` (shells parse it as a flag), so no tool ever regenerates or overwrites it; the harness entry files are BARE routers that point here.
 
-## Step 0 — look before you write
+## Step 0 — classify the repository, then take ONE path
+
+**"Initialize" is one verb with two jobs.** Do not ask the user which situation this is — read the repository and decide, then say which path you took and why. Getting this wrong in either direction is expensive: bootstrapping over an established repo destroys handwritten material, and treating an established repo as merely "already set up" leaves it paying costs a new one never incurs.
+
+Classify from evidence, not from the phrasing of the request:
+
+| Signal | EMPTY / NEW | ESTABLISHED |
+| --- | --- | --- |
+| `_agents/` exists in any form | no | **yes** |
+| Handwritten docs (`AGENTS.md`, `CLAUDE.md`, `PLAN.md`, `ROADMAP.md`, `DECISIONS.md`, `.github/instructions/`, …) | none | **any** |
+| Git history | little or none | substantial |
+| Existing State / Rationale / Build Log with real content | no | **yes** |
+
+**Any single ESTABLISHED signal makes it established.** The classification is deliberately asymmetric, because the cost of the two mistakes is not symmetric.
+
+- **EMPTY → Steps 1 to 4, in order, done.** Create the standard set and stop.
+- **ESTABLISHED → Step 1, then Step 0b below, then Steps 2 to 4 for whatever is genuinely missing.** Nothing is overwritten and nothing is discarded.
+
+## Step 0b — the established-repository path (retrofit, losing nothing)
+
+Run this in order. It is the same work a new repository gets for free, done after the fact.
+
+1. **Inventory before writing anything.** Read every file listed in "look before you write" below. Produce the inventory as a visible list, and do not create a file that already exists in some form.
+2. **Route existing content by authority, do not delete it.** Genuine project rules fold into `project_instructions.md`; current behavior and technical workflows to the Guide; current status to State; settled decisions to Rationale; dated evidence to Build Log. A harness-owned instruction file is **replaced** by a bare router only after its content has been routed. **When in doubt, keep it and report it** — an unrouted paragraph costs a line; a deleted one costs the reason a rule exists.
+3. **Create only what is missing**, per Step 3. A repository already on an older copy of this kit usually needs only the archive and any newly added files.
+4. **Retrofit the bounded-file shape,** which is the part an established repository is silently paying for: if State is dominated by closed items, or the instructions file is thick with inline narrative, run the bounding procedure in `_agents/universal/consolidation.md`. Create `_agents/project_state_archive.md` if it does not exist. **This is not optional cleanup** — a long-running repository has been paying that cost on every session, and it grows.
+5. **Re-point and RUN every mechanical check** the repository has. Verify by running them, not by reading them.
+6. **Report** what was moved, what was created, what was left alone, and anything ambiguous enough to need the user. Never report a retrofit as complete without the before/after sizes from step 4.
+
+**Refuse to guess on one thing only:** if routing a piece of handwritten material would change its meaning, stop and ask about that piece. Continue with everything else rather than blocking the whole retrofit on one paragraph.
+
+## Step 1 — look before you write
 
 Never create a file that already exists in some form. Before writing anything, check for and READ: `_agents/` (any part of it), `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, `.claude/` (rules, skills, agents, settings), `.agents/skills/`, `.codex/`, and any `PLAN.md` / `ROADMAP.md` / `TODO.md` / `DECISIONS.md` / `NOTES.md` the repo already keeps.
 
-Then, per file found: **fold** genuine project rules into `project_instructions.md`; route current behavior and technical workflows to the Guide, current status to State, settled decisions to Rationale, and dated evidence to Build Log; **replace** a harness-owned router with the bare template below. For an established repository, stop after inventory and read `_agents/universal/project-guide.md` before adopting or retiring any documentation; do not blindly move, overwrite, or delete handwritten material. Report anything ambiguous and ask. **An established repository also needs the retrofit that a new one gets for free:** if it already has a State full of closed items, or an instructions file thick with inline narrative, it is paying that cost on every session already — create the archive and run the bounding procedure in `_agents/universal/consolidation.md` as part of adoption, rather than leaving it for whoever next notices.
+Then, per file found: **fold** genuine project rules into `project_instructions.md`; route current behavior and technical workflows to the Guide, current status to State, settled decisions to Rationale, and dated evidence to Build Log; **replace** a harness-owned router with the bare template below. For an **established** repository, stop after this inventory and read `_agents/universal/project-guide.md` before adopting or retiring any documentation; do not blindly move, overwrite, or delete handwritten material, and report anything ambiguous. The inventory then feeds **Step 0b**, which owns the routing and the retrofit.
 
 Never migrate, and never copy into the repository: credentials or tokens, personal/local settings (`.claude/settings.local.json` and equivalents), transcripts, generated memory, caches, logs, or administrator-managed policy. Report them if they matter; otherwise ignore them.
 
-## Step 1 — drop in the universal set
+## Step 2 — drop in the universal set
 
 Copy `_agents/universal_agent_instructions.md` plus the whole `_agents/universal/` folder from the canonical repository named in the core banner. Use a scratch clone outside the project, copy the complete unit, and never edit it per project.
 
-## Step 2 — create what is missing
+## Step 3 — create what is missing
 
 1. **`_agents/project_instructions.md`** — this project's mandatory agent conduct, protocol parameters, enforcement rules, and pointers. Derive the initial enforcement boundaries from the codebase and the user's answers; open it with one line pointing back to the core file. Declare `REFERENCE_PLAN = _agents/project_state.md, _agents/project_rationale.md, _agents/project_build_log.md` and `TECHNICAL_GUIDE = _agents/project_guide.html`, plus the other protocol parameters listed in the core. Put the stable suite location and default invocation here. Enforce technical boundaries by linking to the Guide; do not duplicate its architecture or workflow material.
 2. **`_agents/project_guide.html`** — create the single self-contained offline Technical Guide. It owns current software architecture, behavior, operator/developer technical workflows, technical conventions, and intrinsic limitations. Follow `_agents/universal/project-guide.md` for its required structure and validation.
@@ -26,7 +57,7 @@ Copy `_agents/universal_agent_instructions.md` plus the whole `_agents/universal
 4. **`_agents/project_state_archive.md`** — State's closed-item archive, created **now, empty**, not when it is first needed. State is the one record the core requires to be read **through EOF** every session, so its finished-ticket history becomes a permanent tax on every future session; a repository that waits until that hurts pays the retrofit as well as the tax. Open it with a header stating that it is a **subordinate appendix of State, not current truth, and loses to State on any conflict**, and that it is **never read at session start** — only when a specific closed item is in question. **Do NOT list it in `REFERENCE_PLAN`**: those three files are read at startup and this one exists precisely so it is not. Name it in `project_instructions.md`'s authority table as State's appendix, and state the exclusion in that file's own startup-read rule — the core's rule alone is not enough, because an agent follows the project file.
 5. **Three BARE routers at their harness-required locations** — templates below, used verbatim.
 
-## Step 3 — establish the two conventions
+## Step 4 — establish the two conventions
 
 Set these up front so each repository does not invent its own location. Both are on-demand: create the file only when there is real content for it, but name the convention in `project_instructions.md` immediately.
 
@@ -81,7 +112,7 @@ Note: routers stay BARE — pointers only, never rules or content. A supported d
 ## Verify before initialization is complete
 
 - Every router is bare and matches its template.
-- `project_instructions.md` defines all protocol parameters named in the core file, including distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE`, plus both conventions from Step 3.
+- `project_instructions.md` defines all protocol parameters named in the core file, including distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE`, plus both conventions from Step 4.
 - All five project authorities exist, the Guide is one self-contained offline HTML file, and the Build Log carries a dated initialization entry.
 - Nothing personal, generated, or secret was copied into the repository.
 - The complete universal set is content-identical to a fresh canonical clone after normalizing line endings (hash every relative path).
