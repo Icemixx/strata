@@ -14,9 +14,13 @@ Keep the five authorities truthful without rewriting accurate history. Update cu
 - Rationale and Build Log: append new decisions/events by default; consolidate only superseded live claims, carrying forward durable lessons.
 - Preserve accurate dated historical evidence, including incident lessons and observed verification, even when the architecture later evolves. When only a clause is stale, change that clause rather than deleting accurate context.
 
-## Bounding State: the closed-item archive
+## Bounding a file that is read every session
 
-State is the one authority the core requires to be read **through EOF** at every session start. That is correct while it describes current work and becomes a standing tax once it is mostly finished tickets — the read cost is paid by every session forever and grows monotonically. Split it when the finished-work majority is large enough to notice, not on a fixed threshold.
+Two files are paid for on every session rather than when consulted: **State**, which the core requires to be read through EOF, and the **project instructions**, which the routers load into every session. Both start small and both grow monotonically, so both eventually charge every future session for material almost none of them needs. The two procedures below are the sanctioned way to bound them. A repository initialized under the current `initialize.md` already has State's archive and can skip straight to step 2.
+
+### State: the closed-item archive
+
+State is correct to be read whole while it describes current work, and becomes a standing tax once it is mostly finished tickets. Split it when the finished-work majority is large enough to notice, not on a fixed threshold.
 
 **The split, and the order matters:**
 
@@ -29,4 +33,12 @@ State is the one authority the core requires to be read **through EOF** at every
 
 **Applies to State only.** The other authorities already have bounded read rules — the Build Log is read tail-first, Rationale through its settled register, the Guide by task-relevant section — so splitting them saves nothing at startup and costs a file. Note that a Rationale file with a settled-decision register at its head is already this pattern; State is adopting a structure the model has always had elsewhere.
 
-**A related, smaller win worth checking at the same time:** the project instructions file is loaded on *every* session rather than read once, so length there is paid more often than anywhere else. Where a rule carries a long incident narrative inline, the rule stays and the narrative moves to Rationale behind a one-line pointer.
+### The project instructions: keep the rules, move the stories
+
+The instructions file is loaded into **every** session by the routers, so its length is paid more often than any other file's — more often than State's, which is read once per session. It grows for a good reason: a rule that cost something to learn gets its incident narrative written beside it, and those narratives are why the rules hold. They are not waste. They are simply in the most expensive place in the repository.
+
+**The split.** The *rule* stays where an agent reads it. The *narrative* moves to Rationale as a dated entry, and the rule keeps a one-line pointer to it.
+
+**This one takes judgment and must not be run mechanically.** Compress only where the rule is fully intelligible without the story. A narrative stays inline when it is load-bearing **in the moment of reading** — typically when the failure mode is invisible or counter-intuitive, so an agent who knows only the rule would not recognise the situation the rule is about. When in doubt, leave it: a rule nobody understands is worse than a file that is slightly too long.
+
+**Verify the same way:** record before/after byte counts, confirm no rule lost its meaning, and run whatever documentation checks the project has rather than reading them.
