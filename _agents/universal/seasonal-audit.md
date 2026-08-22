@@ -10,7 +10,7 @@ This is a periodic whole-repository health and correctness review. It answers th
 
 The goal is not maximum refactoring. "Leave this alone" is a valid and often preferable conclusion. Do not recommend a change merely because another abstraction, pattern, decomposition, or newer dependency exists.
 
-The Supervisor routes bounded planning and mechanical sweeps to the lowest capable tiers and owns final verification. Apply DAP Level 1 (`_agents/universal/dap.md`) to every proposed change; Level 2 remains explicit-only. Group coupled proposals into one decision where that is the honest decision boundary. An audit recommendation or priority label is analysis, not authorization to implement it.
+The Supervisor routes bounded planning and mechanical sweeps to the lowest capable tiers and owns final verification. Apply DAP Level 1 (`_agents/universal/dap.md`) to proposed changes that meet the core big-decision threshold: architecture, schema, security-sensitive paths, or anything expensive to reverse. Every other non-trivial recommendation follows the core decision-transparency rule; maintainability and refactor recommendations also receive the Engineering-value test. Level 2 remains explicit-only. Group coupled proposals into one decision where that is the honest decision boundary. An audit recommendation or priority label is analysis, not authorization to implement it.
 
 ## Operating boundary
 
@@ -110,7 +110,7 @@ The burden of proof is on the refactor. Prefer boring, explicit, understandable 
 - Executive assessment of structural health, behavioral-correctness confidence and limits, highest material risks, maintainability, and whether the codebase needs broad refactoring, targeted remediation, or little structural change.
 - One deduplicated finding ledger using the evidence contract above. Omit empty finding sections; include the addendum invariant ledger separately.
 - Strong areas and structures that should be preserved.
-- Prioritized remediation/refactor plan. Each proposed change is classified by tier (B6), includes verification (B7), and receives DAP Level 1; coupled changes may share one decision critique.
+- Prioritized remediation/refactor plan. Each proposed change is classified by tier (B6) and includes verification (B7). Proposals meeting the core big-decision threshold receive DAP Level 1. Other non-trivial recommendations receive normal decision transparency, and maintainability or refactor recommendations receive the Engineering-value test. Do not manufacture a full DAP decision for routine work; coupled proposals may share one decision critique when they form one honest decision boundary.
 - Qualitative prioritization that separates hard obligations from discretionary improvements, then sorts recommendations into:
   - **Fix now**
   - **Worth improving**

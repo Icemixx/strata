@@ -93,6 +93,8 @@ The State file is updated in place and date-stamped: it contains the Current Rea
 
 Resolve doubt from governing records and direct evidence before asking the user. Ask when clarification would materially change the result and no safe, useful work can settle or bypass it; during an active work batch, follow `work-batch.md` and continue independent ready work before interrupting. Present necessary questions, choices, and plans as **prose in chat**, not as blocking pop-up widgets (e.g. Claude Code's AskUserQuestion — never use it), so they can be read and answered in context.
 
+Treat commit and push as one completion operation. After creating an in-scope commit, push it to the repository's configured remote in the same work batch and verify that the remote accepted it; do not call committed work saved, published, or complete while it exists only locally. An explicit user instruction to keep work local wins. If no writable remote exists, authentication or policy blocks the push, or the remote rejects it, preserve the local commit, report its hash and the literal blocker, and leave the work visibly pending publication rather than silently stopping at commit.
+
 ## Working Protocol — Model Economy & Delegation
 
 Standing session discipline. This protocol separates the active session position from capability tiers. The terms are vendor-neutral so model lineups can change without rewriting the core.
@@ -161,7 +163,7 @@ Situational variants **D3–D12** (long-session re-checks, unstated assumptions,
 
 ## Seasonal Full-App Audit (command)
 
-Trigger: the user asks for a "seasonal audit", "full-app audit", or "refactor audit". Read `_agents/universal/seasonal-audit.md` AND the project's `AUDIT_ADDENDUM` before starting — the Supervisor routes planning and mechanical sweeps by capability tier, and DAP Level 1 applies to every proposed change that comes out of it.
+Trigger: the user asks for a "seasonal audit", "full-app audit", or "refactor audit". Read `_agents/universal/seasonal-audit.md` AND the project's `AUDIT_ADDENDUM` before starting — the Supervisor routes planning and mechanical sweeps by capability tier. DAP Level 1 applies to audit proposals that meet the core big-decision threshold; other proposals follow the audit's Engineering-value test where applicable and the core decision-transparency rule for every non-trivial choice.
 
 ## On-demand file map (`_agents/universal/`)
 
