@@ -160,6 +160,8 @@ Situational variants **D3–D12** (long-session re-checks, unstated assumptions,
 - Propose a plan and wait for approval before implementing (if user requests suggestions).
 - Always validate imports, symbol existence, and referenced resources/keys before coding.
 - Ensure all changes align with the project's architecture principles.
+- **Reuse before you write.** Before adding a function, helper, validation, constant, or sequence of steps, search for an existing one that already does it and call that instead; extend the existing implementation rather than forking it. Put shared logic in the layer that owns it. A rule enforced in two places drifts, and the copy that is not the authority is the one that silently goes stale.
+- **But never collapse two implementations that merely look alike.** Before merging near-identical code, state in writing what each copy *promises*. If the promises differ, the resemblance is a coincidence and merging destroys a real constraint. Keep them apart and pin the difference with a test beside the code itself, so the next reader who notices the resemblance fails in the file they are editing rather than several layers away. "They look the same" is not evidence either way.
 
 ## Seasonal Full-App Audit (command)
 
