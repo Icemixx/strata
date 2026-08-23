@@ -14,6 +14,12 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 > layout mirrors a consuming repo: `_agents/universal_agent_instructions.md` + `_agents/universal/*`.
 > Every project repository holds a COPY. That canonical repository is the source of truth.
 >
+> **That repository is PUBLIC and its history is permanent.** Commit to it with a GitHub `users.noreply`
+> author address, never a personal one, and keep the message about the RULE and the SHAPE of the failure
+> — never the private repository it was found in, its ticket ids, its internal tool names, or the user's
+> words. The incident that motivates a kit rule is by construction a private-repo incident; say what the
+> rule prevents, not where it was learned.
+>
 > **On ANY change to the kit, in ANY repo, that repository MUST be updated in the SAME turn.** Do not
 > leave it for later and do not leave it to the user to mirror by hand: an edit that lands only in the
 > project repo you happen to be standing in is exactly the silent drift this banner exists to prevent.
