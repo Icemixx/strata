@@ -35,10 +35,18 @@ State is correct to be read whole while it describes current work, and becomes a
 
 ### The project instructions: keep the rules, move the stories
 
-The instructions file is loaded into **every** session by the routers, so its length is paid more often than any other file's — more often than State's, which is read once per session. It grows for a good reason: a rule that cost something to learn gets its incident narrative written beside it, and those narratives are why the rules hold. They are not waste. They are simply in the most expensive place in the repository.
+The instructions file is loaded by the routers into **every session AND every spawned agent**, so its length is paid more often than any other file's — more often than State's, which is read once per session. Measured on one project: a worker spawned to do nothing at all, using no tools, still carried the whole instruction chain and cost tens of thousands of tokens before any work began. The file grows for a good reason: a rule that cost something to learn gets its incident narrative written beside it, and those narratives are why the rules hold. They are not waste. They are simply in the most expensive place in the repository.
 
-**The split.** The *rule* stays where an agent reads it. The *narrative* moves to Rationale as a dated entry, and the rule keeps a one-line pointer to it.
+**The split.** The *rule* stays where an agent reads it. The *narrative* moves to **`_agents/project_instructions_archive.md`** — a subordinate appendix of the instructions file, never read at session start, opened only when someone wants the reason behind a specific rule — and the rule keeps a **bare pointer** to the entry holding its evidence.
+
+**Not Rationale, and the distinction is worth stating because it was got wrong once.** Rationale is a file that *is* read: it holds settled decisions an agent consults to avoid re-deciding something. Spent incident evidence is inert — nobody needs it while working — so putting it there swaps one loaded file for another and saves less than it appears to. A decision with a reopening condition belongs in Rationale; the story of how a rule was learned belongs in the archive.
+
+**Keep the pointer bare.** Retaining a sentence of cost inline feels safer and is where most of the length actually is; the imperative plus a pointer is enough, because the rule is what must be obeyed and the story is what must be *findable*.
+
+**Never move a passage that IS the rule.** A quoted user ruling is the authority itself — moving it leaves a weaker rule, not a shorter one. Same for any rule whose wording is the thing being enforced.
 
 **This one takes judgment and must not be run mechanically.** Compress only where the rule is fully intelligible without the story. A narrative stays inline when it is load-bearing **in the moment of reading** — typically when the failure mode is invisible or counter-intuitive, so an agent who knows only the rule would not recognise the situation the rule is about. When in doubt, leave it: a rule nobody understands is worse than a file that is slightly too long.
 
 **Verify the same way:** record before/after byte counts, confirm no rule lost its meaning, and run whatever documentation checks the project has rather than reading them.
+
+**And check what the move did to those checks.** A check that scans for *identifiers* keeps working and fails loudly if one is dropped. A check that scans a *body* is the dangerous one: once the bodies move it finds nothing to object to and **keeps passing while no longer checking anything.** Point it at the archive as well, and **prove it can still fail** by reintroducing the defect it exists to catch.
