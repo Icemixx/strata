@@ -38,6 +38,23 @@ Harness-agnostic working protocol for AI coding agents (Claude Code, Codex, Copi
 >    part of the kit.
 > 3. Hash-compare the copies to confirm (normalise `\r\n` → `\n` first), then commit in the project repo,
 >    naming the canonical commit you synced from. Report which files actually changed.
+> 4. **Write the canonical commit SHA into `_agents/.kit-version`** (that one line, nothing else). It is
+>    **project-owned and deliberately NOT inside `_agents/universal/`**: the folder is copied wholesale,
+>    so a marker living inside it would be overwritten by the canonical copy on every sync, and the
+>    canonical repo cannot carry its own SHA anyway — the value does not exist until after the commit
+>    that would contain it. Without this step the freshness check below silently compares against
+>    nothing.
+>
+> ### Detecting a stale copy — session start
+>
+> Copies do not update themselves, and kit changes arrive in bursts, which is exactly when nobody thinks
+> to look. So at session start, read `_agents/.kit-version` and run
+> `git ls-remote <canonical> HEAD`; if they differ, **say so and carry on** — report only, never sync as
+> a side effect. The whole round trip is one command returning one line.
+>
+> **If the check cannot run — no network, no remote, missing or unreadable marker — say THAT, explicitly.**
+> A freshness check that degrades quietly into "looks fine" is worse than none, because its silence is
+> read as confirmation. Report the literal reason it could not run.
 >
 > Line endings are handled by the canonical repo's `.gitattributes` (`* text=auto eol=lf`), so the kit
 > normalises identically on every machine and in every repo. Compare CONTENT, not bytes: a project repo
