@@ -65,12 +65,25 @@ Harness adapters contain only their own model mapping and spawn mechanics. This 
 ### Part B — Automatic delegation
 
 - **B1.** Delegation is automatic standing behavior, not a per-task user option. For every safely separable task, assign the **lowest capable** available tier without asking permission. Give simpler work to simpler models.
+- **B1a. Delegation is not free, and B1 does not override arithmetic.** A spawn loads this repository's whole router chain before it does anything — measured at tens of thousands of tokens for a worker that then performed no work at all. So delegate only when **the raw material greatly exceeds that floor AND the answer is far smaller than the raw material.** Three consequences, each of which contradicts a plausible reading of B1:
+  - **Prefer a script over a spawn** wherever mechanical reduction suffices. A grep or a short filter has *zero* instruction overhead, so it beats a worker on both cost and reliability. Filtering a transcript down to 10 KB and reading it directly is cheaper than any agent that could have summarised it.
+  - **Never spawn to run a deterministic command.** A gate is a script. Running it inline costs a few hundred tokens; sending an agent to run it costs the floor plus the report.
+  - **Never delegate reading whose output you must re-verify to act on.** A2 makes worker output a claim until checked, and for anything you will make a decision from, checking means reading the source yourself — which erases the saving. A summary is lossy exactly where it matters: a worker asked to summarise a transcript reports what was decided, not that two decisions collided.
+  - **Amortise the floor.** One spawn per *class* of mechanical edit, not one per item. Ten renames in one brief pay the floor once.
 - **B2.** "Lowest capable" is independent of the Supervisor's own tier. A worker or reviewer may be below, equal to, or above the Supervisor when that is the correct capability match. Use only the current harness's in-session delegation mechanism.
 - **B3.** Delegate only work the Supervisor can understand and evaluate.
 - **B4.** One delegation layer, no deeper. Every delegated agent is terminal and performs the assigned mode directly — implementation, research, or read-only review. It MUST NOT delegate, spawn agents, or invoke another agent CLI.
 - **B5.** Make each worker prompt self-contained: identify its tier and terminal role, state whether it may edit, name every on-demand or project file it must read, define its file scope, and include verification. End with: "Perform the assigned task directly. Do not delegate, spawn agents, or invoke an external agent CLI."
 - **B5a.** If the preferred tier is unavailable, use another currently verified capable tier. If none can do the work correctly, park it and report the blocker; do not silently perform unsuitable work inline.
 - **B5b.** Never route from an unverified environment assumption. Verify model availability, quota, time, reset windows, and similar facts in the current turn when they affect the decision.
+- **B5c. Write the brief as a fixed form, not as prose.** Prose briefs omit things silently; a form with empty slots does not:
+
+  ```
+  TIER · MAY EDIT? · FILE SCOPE · READ FIRST · TASK · DONE-WHEN · GATES TO RUN · [terminal line]
+  ```
+
+  **`READ FIRST` is the slot that earns the whole form.** A worker cannot see the conversation, the codebase layout, or what a sibling found, so any navigational fact it needs must be written down — a Mechanic once searched the wrong screen for a feature because the brief never said where it lived. That was a defective brief, not a defective tier. Fifteen structured lines beat sixty prose ones on both cost and reliability.
+- **B5d. Cap what comes back.** A worker's report is pure Supervisor context and nothing currently limits its length. Require literal gate output plus a short fixed summary: files changed, decisions taken, anything found-but-not-fixed. Forbid restating the task and narrating the approach.
 - **B6.** Every implementation plan orders its work and classifies each block as Supervisor-only, Architect, Senior implementer, Implementer, or Mechanic. In `project_state.md`, use the compact ticket grammar: `### T3 · Title [tier] — depends: T1 — ✅ DONE (date)`.
 - **B7.** Every plan step includes its verification: acceptance commands, test invocations from `TEST_SUITE`, assertions, and expected outputs. A plan without a check is unfinished.
 - **B8.** Operational loops — device/browser driving, external tools, screenshot/read-modify cycles — are Mechanic-tier execution. The driver persists artifacts and reports literal observations; the Supervisor owns every pass/fail verdict. A driver cannot hand a mid-leg decision back to the Supervisor; each delegated leg reaches its defined checkpoint or fails. A driver cannot satisfy biometric, OS, or credential prompts and must pause for the human. Cut each leg at a checkpoint that returns enough evidence for the Supervisor to choose the next one.
