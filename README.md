@@ -12,7 +12,7 @@ Each consuming repository owns five separate authorities:
 | State | `_agents/project_state.md` | Current reality, scope, active backlog, priorities, approvals, unresolved work, and acceptance gates |
 | Rationale | `_agents/project_rationale.md` | Settled why, rejected alternatives, and reopening conditions |
 | Build Log | `_agents/project_build_log.md` | Dated actions, commands actually run, and exact observed evidence |
-| Instructions | `_agents/project_instructions.md` | Mandatory agent conduct, protocol parameters, enforcement rules, and pointers to the Guide |
+| Instructions | `_agents/project_instructions.md` + `_agents/project_instructions_supervisor.md` | Mandatory agent conduct, protocol parameters, enforcement rules, and pointers to the Guide, split by worker versus top-level audience |
 
 `REFERENCE_PLAN` names only State, Rationale, and Build Log. `TECHNICAL_GUIDE` names the Guide. The Guide never substitutes for State. See `_agents/universal/project-guide.md` for the routing, adoption, and self-contained HTML requirements.
 
@@ -27,6 +27,7 @@ _agents/
   universal_agent_instructions.md   ← always-loaded core; copied
   universal/                        ← on-demand procedures; copied in full
     initialize.md                   ← initialization and bare routers
+    instruction-topology.md         ← project instruction audiences, checker contract, budgets, and certification
     project-guide.md                ← Guide creation, adoption, and validation
     consolidation.md                ← authority-specific history handling
     dap.md                          ← Decisions & Devil's Advocate Policy
@@ -41,7 +42,7 @@ _agents/
 
 1. Copy only `_agents/universal_agent_instructions.md` and the complete `_agents/universal/` folder into the target repository. Do not copy the canonical root README.
 2. Before creating or changing project-owned files, follow `_agents/universal/initialize.md`. In an established repository, inventory first and then follow `_agents/universal/project-guide.md`; do not blindly move legacy documents.
-3. Create the five project authorities. In `project_instructions.md`, declare distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE` values. Create `_agents/project_guide.html` as one offline self-contained HTML file.
-4. Add bare router files only from the templates in `initialize.md`, then validate the Guide and authority boundaries through `project-guide.md`.
+3. Create the five project authorities. Instructions uses two current audience files plus one historical archive, as specified by `instruction-topology.md`; this remains one authority, not three. In `project_instructions.md`, declare distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE` values plus the literal project-native `AGENT_SYSTEM_CHECK` command. Create `_agents/project_guide.html` as one offline self-contained HTML file.
+4. Add bare router files only from the templates in `initialize.md`, implement the permanent checker tests, then validate source topology and Guide boundaries. Fresh-session worker-floor certification is a separate final gate.
 
 Project-owned files override the universal core on conflict. The core describes when to load each on-demand procedure.
