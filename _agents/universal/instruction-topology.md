@@ -76,13 +76,14 @@ manifest and verify that manifest against the routers' actual syntax.
 
 ## Context-budget measurement
 
-Declare every enabled worker route explicitly. An installed router is supported unless the project
-marks it unsupported with a reason; omission is not an opt-out. Measure each route independently from
-the files its real startup behavior loads. The standard routes are:
+Declare every supported worker route explicitly. This kit supports Codex and Claude Code. A router or
+integration for another harness does not make that harness supported and must not create a source or
+empirical certification gate; support begins only when the kit explicitly adds its router or adapter
+contract and that route completes source plus empirical certification. Measure each supported route
+independently from the files its real startup behavior loads. The standard routes are:
 
 - Codex: `AGENTS.md` + universal core + project worker instructions + Codex harness adapter;
-- Claude Code: `CLAUDE.md` + universal core + project worker instructions + Claude adapter;
-- Copilot: Copilot router + universal core + project worker instructions.
+- Claude Code: `CLAUDE.md` + universal core + project worker instructions + Claude adapter.
 
 Do not infer one route from another. Before counting, decode text as UTF-8 (an optional UTF-8 BOM is not
 content), reject invalid encoding or lone carriage returns, normalize CRLF to LF, and then count UTF-8

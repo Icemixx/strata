@@ -19,7 +19,7 @@ Classify from evidence, not from the phrasing of the request:
 | Signal | EMPTY / NEW | ESTABLISHED |
 | --- | --- | --- |
 | `_agents/` exists in any form | no | **yes** |
-| Handwritten docs (`AGENTS.md`, `CLAUDE.md`, `PLAN.md`, `ROADMAP.md`, `DECISIONS.md`, `.github/instructions/`, …) | none | **any** |
+| Handwritten docs (`AGENTS.md`, `CLAUDE.md`, `PLAN.md`, `ROADMAP.md`, `DECISIONS.md`, …) | none | **any** |
 | Git history | little or none | substantial |
 | Existing State / Rationale / Build Log with real content | no | **yes** |
 
@@ -45,7 +45,7 @@ Run this in order. It is the same work a new repository gets for free, done afte
 
 ## Step 1 — look before you write
 
-Never create a file that already exists in some form. Before writing anything, check for and READ: `_agents/` (any part of it), `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/instructions/`, `.github/skills/`, `.claude/` (rules, skills, agents, settings), `.agents/skills/`, `.codex/`, and any `PLAN.md` / `ROADMAP.md` / `TODO.md` / `DECISIONS.md` / `NOTES.md` the repo already keeps.
+Never create a file that already exists in some form. Before writing anything, check for and READ: `_agents/` (any part of it), `AGENTS.md`, `CLAUDE.md`, `.claude/` (rules, skills, agents, settings), `.agents/skills/`, `.codex/`, and any `PLAN.md` / `ROADMAP.md` / `TODO.md` / `DECISIONS.md` / `NOTES.md` the repo already keeps.
 
 Then, per file found: **fold** genuine project rules into `project_instructions.md`; route current behavior and technical workflows to the Guide, current status to State, settled decisions to Rationale, and dated evidence to Build Log; **replace** a harness-owned router with the bare template below. For an **established** repository, stop after this inventory and read `_agents/universal/project-guide.md` before adopting or retiring any documentation; do not blindly move, overwrite, or delete handwritten material, and report anything ambiguous. The inventory then feeds **Step 0b**, which owns the routing and the retrofit.
 
@@ -68,29 +68,16 @@ Copy `_agents/universal_agent_instructions.md` plus the whole `_agents/universal
    **Keep the rule, move the story.** Each rule keeps its imperative inline plus a bare pointer to the archive entry holding its evidence. **Do not move a passage that IS the rule** — a quoted user ruling is the authority itself, and removing it leaves a weaker rule, not a shorter one.
 
 8. **The repository-native agent-system checker and permanent watched-red tests** — implement the command declared by `AGENT_SYSTEM_CHECK` and its `<AGENT_SYSTEM_CHECK> --self-test` interface against the exact contract in `instruction-topology.md`. The checker is part of initialization, not optional later hardening.
-9. **Three BARE routers at their harness-required locations** — templates below, used verbatim.
+9. **Two BARE routers at their harness-required locations** — templates below, used verbatim.
 
 ## Step 4 — establish the two conventions
 
 Set these up front so each repository does not invent its own location. Both are on-demand: create the file only when there is real content for it, but name the convention in `project_instructions.md` immediately.
 
-- **Project skills** live at **`_agents/skills/<skill-name>/SKILL.md`** — ONE copy, read by every harness through the routers, invoked by **trigger phrase** ("run the X procedure"), never by copying into `.claude/skills/`, `.agents/skills/`, or `.github/skills/`. Use the Agent Skills format (`name` + `description` frontmatter, then ordered steps, inputs/outputs, failure handling, verification) so a skill can later be registered natively for `/slash` invocation by copying the directory, with no rewrite. `project_instructions.md` carries a **trigger map** table (trigger → skill file). Announce each load with `loaded: _agents/skills/<name>/SKILL.md`. All three harnesses read the same skill format; only their folders differ, which is exactly why one routed copy beats several native ones.
+- **Project skills** live at **`_agents/skills/<skill-name>/SKILL.md`** — ONE copy, read by every supported harness through the routers, invoked by **trigger phrase** ("run the X procedure"), never by copying into `.claude/skills/` or `.agents/skills/`. Use the Agent Skills format (`name` + `description` frontmatter, then ordered steps, inputs/outputs, failure handling, verification) so a skill can later be registered natively for `/slash` invocation by copying the directory, with no rewrite. `project_instructions.md` carries a **trigger map** table (trigger → skill file). Announce each load with `loaded: _agents/skills/<name>/SKILL.md`. Both supported harnesses read the same skill format; only their folders differ, which is exactly why one routed copy beats several native ones.
 - **The audit addendum** lives at **`_agents/audit_addendum.md`**, and `AUDIT_ADDENDUM` in `project_instructions.md` points there. It holds the stack-specific checklist for the Seasonal Full-App Audit; the universal procedure stays in `_agents/universal/seasonal-audit.md`. Keeping it as its own on-demand file means an audit checklist that is needed twice a year does not sit in every session's context.
 
 ## Router templates
-
-`.github/copilot-instructions.md` (GitHub Copilot — no delegation mechanism, so no harness-file pointer):
-
-```markdown
-# Agent Instructions Router
-
-Before starting any work in this repository, read and follow, in order:
-
-1. `_agents/universal_agent_instructions.md` — the universal working protocol.
-2. `_agents/project_instructions.md` — this project's rules and protocol parameters.
-
-Precedence on conflict: project file > universal file. This router carries no rules of its own.
-```
 
 `AGENTS.md` (repo root — Codex and the AGENTS.md ecosystem) — same, plus a pointer to its OWN harness file:
 
@@ -120,7 +107,7 @@ Read and follow all three (project file wins on conflict; this router carries no
 @_agents/universal/harness-claude-code.md
 ```
 
-Note: routers stay BARE — pointers only, never rules or content. A supported delegating harness loads the core, the worker-facing project file, and only its own harness adapter at chat start. It never loads another harness's adapter, the project supervisor file, or either archive. The sole project-supervisor activation edge is the conditional instruction at the top of `project_instructions.md`. On-demand procedures remain in the supervisor layer's trigger map and are not imported by routers. The Copilot router has no harness adapter because this kit defines no Copilot delegation adapter.
+Note: routers stay BARE — pointers only, never rules or content. A supported delegating harness loads the core, the worker-facing project file, and only its own harness adapter at chat start. It never loads another harness's adapter, the project supervisor file, or either archive. The sole project-supervisor activation edge is the conditional instruction at the top of `project_instructions.md`. On-demand procedures remain in the supervisor layer's trigger map and are not imported by routers. A future harness is unsupported until the kit explicitly adds its router or adapter contract and completes source plus empirical certification.
 
 ## Verify before initialization is complete
 
