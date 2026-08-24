@@ -1,6 +1,6 @@
 # Doc consolidation — current claims corrected, superseded claims folded in
 
-Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/consolidation.md`. Load when recording a decision that supersedes earlier recorded entries, or when the user asks for a doc cleanup. Adopted 2026-07-26 at the founder's direction, replacing the previous append-only rule for the Rationale and Build Log files.
+Part of the universal agent set (core: `_agents/universal_agent_instructions.md`). On loading this file, announce it with one visible line: `loaded: _agents/universal/consolidation.md`. Load when recording a decision that supersedes earlier recorded entries, or when the user asks for a doc cleanup. This procedure replaces the previous append-only rule for the Rationale and Build Log files.
 
 ## The rule
 

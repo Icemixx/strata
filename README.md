@@ -2,6 +2,10 @@
 
 This repository contains a drop-in set of living protocols for Claude Code and Codex agents working in repository-based Visual Studio Code (VS Code) harnesses. The shared protocol is harness-agnostic between them; dedicated adapter files handle their different startup and delegation mechanics. It provides a consistent, reviewable workflow for planning, delegation, audits, handoffs, and on-demand procedures. It is documentation, not runnable application code.
 
+Harness compatibility is certified once in this canonical repository; see `CERTIFICATION.md`. A consuming
+repository validates its own copied files, router edges, authorities, and context budgets without
+re-certifying Claude Code or Codex as products.
+
 ## The five project authorities
 
 Each consuming repository owns five separate authorities:
@@ -22,6 +26,7 @@ The shared kit is only `_agents/universal_agent_instructions.md` and the entire 
 
 ```
 README.md                           ← canonical-repository entry and redirect; not copied
+CERTIFICATION.md                    ← sanitized canonical harness evidence; not copied
 LICENSE                             ← license text
 _agents/
   universal_agent_instructions.md   ← always-loaded core; copied
@@ -42,7 +47,7 @@ _agents/
 
 1. Copy only `_agents/universal_agent_instructions.md` and the complete `_agents/universal/` folder into the target repository. Do not copy the canonical root README.
 2. Before creating or changing project-owned files, follow `_agents/universal/initialize.md`. In an established repository, inventory first and then follow `_agents/universal/project-guide.md`; do not blindly move legacy documents.
-3. Create the five project authorities. Instructions uses two current audience files plus one historical archive, as specified by `instruction-topology.md`; this remains one authority, not three. In `project_instructions.md`, declare distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE` values plus the literal project-native `AGENT_SYSTEM_CHECK` command. Create `_agents/project_guide.html` as one offline self-contained HTML file.
-4. Add bare router files only from the templates in `initialize.md`, implement the permanent checker tests, then validate source topology and Guide boundaries. Fresh-session worker-floor certification is a separate final gate.
+3. Create the five project authorities. Instructions uses two current audience files plus one historical archive, as specified by `instruction-topology.md`; this remains one authority, not three. In `project_instructions.md`, declare distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE` values plus the literal project-native `AGENT_SYSTEM_CHECK` command. Create `_agents/.kit-source` and `_agents/.kit-version` as project-owned provenance markers. Create `_agents/project_guide.html` as one offline self-contained HTML file.
+4. Add bare router files only from the templates in `initialize.md`, implement the permanent checker tests, then validate source topology, Guide boundaries, and every supported route's local context budget. Confirm that the canonical repository's `CERTIFICATION.md` supports those routes; do not repeat harness-product certification per project.
 
 Project-owned files override the universal core on conflict. The core describes when to load each on-demand procedure.

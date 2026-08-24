@@ -55,8 +55,8 @@ Diagnostics use stable codes so tests and humans can identify the violated contr
 explanatory prose. The checker must cover, at minimum:
 
 1. bare routers and their actual import edges;
-2. `.kit-version`, canonical file inventory, and normalized-content agreement when a canonical tree is
-   supplied for comparison;
+2. `.kit-source`, `.kit-version`, canonical file inventory, and normalized-content agreement when a
+   canonical tree is supplied for comparison;
 3. required project authorities, supervisor files, and archive headers/audience exclusions;
 4. unique ticket identifiers across State and its archive;
 5. compact closed-ticket grammar, strict status/gate consistency, and archive-body contracts;
@@ -79,7 +79,7 @@ manifest and verify that manifest against the routers' actual syntax.
 Declare every supported worker route explicitly. This kit supports Codex and Claude Code. A router or
 integration for another harness does not make that harness supported and must not create a source or
 empirical certification gate; support begins only when the kit explicitly adds its router or adapter
-contract and that route completes source plus empirical certification. Measure each supported route
+contract and the canonical repository completes route-contract plus empirical certification. Measure each supported route
 independently from the files its real startup behavior loads. The standard routes are:
 
 - Codex: `AGENTS.md` + universal core + project worker instructions + Codex harness adapter;
@@ -95,54 +95,46 @@ route passes only at `21,500` bytes or below. The maximum route governs. A proje
 the affected route, new ceiling, owner, reason, approval date, and review/removal condition; changing a
 constant or reducing the reserve is not an override.
 
-## Source verification and empirical verification are different gates
+## Project source verification and canonical harness certification are different scopes
 
-`AGENT_SYSTEM_CHECK` proves the deterministic source topology. It cannot prove which files an already
-running session actually inherited. Empirical verification is therefore recorded **per enabled route**,
-after the source commit, from a new session in that route's own harness:
+`AGENT_SYSTEM_CHECK` proves each consuming repository's deterministic source topology: its copied kit,
+project-owned routers, manifest, authorities, and route budgets. Every project runs that check and its
+self-test. It does **not** re-certify Claude Code or Codex as products.
 
-- a delegating route starts a new top-level session, then spawns one terminal worker with a zero-tool
-  prompt asking only which startup instruction files it received;
-- a non-delegating route starts a new top-level session with the equivalent zero-tool prompt and records
-  that session's startup chain directly.
+Harness compatibility is certified once in the canonical repository's root `CERTIFICATION.md`, which is
+not part of the copied payload. A supported route enters or remains in the kit only when that canonical
+record has `CANONICAL_EMPIRICAL_PASS(<route>)`. Repeat the empirical probe only when the route's router
+template, harness adapter, startup-chain contract, or relevant harness behavior changes—not for every
+initialized repository.
 
-The fresh-session supervisor—not the probe—persists the literal prompt, raw response, runtime identity,
-reported file list, and byte/token floor exposed by the harness in a dated project-owned evidence
-record, then verifies that artifact exists before judging it. This is a narrow B5e exception: the
-zero-tool probe creates no filesystem artifact and makes no source-byte claim. Exact normalized bytes
-remain the deterministic checker's job; empirical evidence proves actual startup loading and observed
-harness floor.
+Canonical recertification uses a disposable neutral fixture initialized from the kit. A fresh top-level
+session starts one terminal worker with a zero-tool prompt asking only which startup instruction files it
+received. The supervisor records the literal prompt and structural result. Before publication, normalize
+fixture and user-local roots to placeholders and remove person, machine, consuming-repository, private
+ticket, agent-id, and model-build identifiers. Disclose harness-injected files outside the repository,
+but do not count their environment-specific size as portable kit-budget evidence.
 
-Use these certification states exactly:
-
-- `SOURCE_PASS` — deterministic checker passed;
-- `EMPIRICAL_PASS(<route>)` — that route's fresh-session probe matched its declared startup chain and
-  remained compatible with the deterministic budget result;
-- `EMPIRICAL_PENDING(<route>; <reason>; <required fresh-session action>)` — that route's probe has not
-  run or the required harness capability is unavailable.
-
-A source migration may be committed while any route's empirical verification is pending, but its ticket
-remains `PARTIAL` and final certification is blocked until every enabled route has `EMPIRICAL_PASS`.
-A same-session spawn or chat is useful only as a diagnostic and must never be relabelled fresh-session
-evidence.
+Project completion therefore uses `SOURCE_PASS`; canonical route admission uses
+`CANONICAL_EMPIRICAL_PASS(<route>)`. A same-session spawn or working chat is diagnostic only and cannot
+be used for canonical admission evidence.
 
 ## Adoption transaction
 
 1. Publish and verify a project-agnostic canonical-kit commit under the hard boundary in
    `kit-editing.md`. Never place consuming-project names, paths, ticket IDs, incident text, private
    tools, user wording, stack-native commands, or project implementation choices in the public kit.
-2. In the consuming repository, record the pre-migration project commit and canonical SHA, sync the
-   complete universal set, and write the canonical SHA to `_agents/.kit-version`.
+2. In the consuming repository, record the pre-migration project commit, canonical remote, and canonical
+   SHA; sync the complete universal set, write the remote to `_agents/.kit-source`, and write the SHA to
+   `_agents/.kit-version`.
 3. Create the project supervisor and archives; split current instructions by audience; move historical
    material verbatim; repair every body-sensitive check.
 4. Implement the project-native checker and watched-red tests before bulk compaction, so the migration
    can test itself.
 5. Apply the closure transaction from `work-batch.md` to closed State items. Reclassify contradictory
    `DONE` entries before moving them.
-6. Run the source checker, `<AGENT_SYSTEM_CHECK> --self-test`, and project test suite, then commit and push the source migration. Keep its
-   certification ticket `PARTIAL` with `EMPIRICAL_PENDING`.
-7. From a new top-level session, run the empirical probe. Record and publish the certification only if
-   it passes.
+6. Confirm the canonical root certification record supports every declared route. Run the source
+   checker, `<AGENT_SYSTEM_CHECK> --self-test`, and project test suite, then commit and push the source
+   migration. Do not create a project ticket to repeat canonical harness certification.
 
 Rollback uses `git revert`, never destructive reset. Preserve archives and the pre-migration commit so
 all moved text remains recoverable. Build Log and Rationale are not split: their tail-first and

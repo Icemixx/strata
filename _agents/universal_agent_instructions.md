@@ -9,7 +9,7 @@ Harness-agnostic working protocol for supported coding-agent harnesses. The verb
 > kit must be pushed there in the SAME turn** and the user told which repos need to pull.
 >
 > **Before editing this file or anything in `_agents/universal/`, and before syncing a repo from
-> canonical, load `_agents/universal/kit-editing.md`** — it carries the canonical URL, the sync and
+> canonical, load `_agents/universal/kit-editing.md`** — it carries the canonical-source parameter, the sync and
 > verification procedure, the public-repo commit rules, and why each exists. Never make such an edit as
 > an incidental side effect of project work.
 

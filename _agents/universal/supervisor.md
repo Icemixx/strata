@@ -108,7 +108,7 @@ Situational variants **D3–D12** (long-session re-checks, unstated assumptions,
 
 ## Decisions & Devil's Advocate Policy (DAP)
 
-- **Decision transparency (every non-trivial choice):** state at least one rejected alternative and why the chosen option won; decisions worth re-finding go to the Rationale file as a dated "Why X, not Y" entry. (This rule absorbed the former FGMP, 2026-07-26.)
+- **Decision transparency (every non-trivial choice):** state at least one rejected alternative and why the chosen option won; decisions worth re-finding go to the Rationale file as a dated "Why X, not Y" entry.
 - **Big decisions** — architecture, schema, security-sensitive paths, anything expensive to reverse — get the structured decision write-up in `_agents/universal/dap.md` (Level 1) before committing to them.
 - The **full council review** (Level 2) runs ONLY when the user explicitly asks for DAP Level 2, the DAP council, or an equivalent six-reviewer council. On that trigger the FIRST action — before any research, delegation, or questions — is reading `_agents/universal/dap.md` and emitting its `loaded:` line; then follow it. Every completed council DAP emits exactly one verdict stamp as defined there. A request for a plan or ordinary critique does not invoke Level 2.
 

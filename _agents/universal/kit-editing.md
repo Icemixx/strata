@@ -10,9 +10,11 @@ every other repo keeps the old text and silently drifts.**
 
 ### The canonical home is its own repository
 
-**`https://github.com/Icemixx/universal_agent_kit`** holds the master copy (added 2026-07-29). Its
-layout mirrors a consuming repo: `_agents/universal_agent_instructions.md` + `_agents/universal/*`.
-Every project repository holds a COPY. That canonical repository is the source of truth.
+The master copy lives in a dedicated canonical repository. Its location is configuration, not universal
+payload content: the canonical repository uses its configured `origin`, and every consuming repository
+stores the source remote in project-owned `_agents/.kit-source`. The layout mirrors a consuming repo:
+`_agents/universal_agent_instructions.md` + `_agents/universal/*`. Every project repository holds a
+COPY. The configured canonical repository is the source of truth.
 
 **That repository is PUBLIC and its history is permanent.** Commit to it with a GitHub `users.noreply`
 author address, never a personal one, and keep the message about the RULE and the SHAPE of the failure
@@ -53,25 +55,26 @@ Trigger: "sync the universal kit", "update the agent files", or equivalent. Proj
 **copies**, not submodules or remotes — there is no `git pull` relationship with the canonical repo, so
 "pull" here means copy-and-commit:
 
-1. `git clone --depth 1 https://github.com/Icemixx/universal_agent_kit` into a scratch/temp directory
-   — never inside the project repo.
+1. Read `_agents/.kit-source`, then `git clone --depth 1 <canonical-kit-remote>` into a scratch/temp
+   directory — never inside the project repo. For a legacy copy with no source marker, use the remote of
+   the canonical checkout supplied for this sync; if no source was supplied, ask once and persist the
+   answer rather than guessing from an account or repository name.
 2. Copy its `_agents/universal_agent_instructions.md` and the ENTIRE `_agents/universal/` folder over
    the project's copies. **Never touch `_agents/project_*.md`** — those are project-owned and are not
    part of the kit.
 3. Hash-compare the copies to confirm (normalise `\r\n` → `\n` first), then commit in the project repo,
    naming the canonical commit you synced from. Report which files actually changed.
-4. **Write the canonical commit SHA into `_agents/.kit-version`** (that one line, nothing else). It is
-   **project-owned and deliberately NOT inside `_agents/universal/`**: the folder is copied wholesale,
-   so a marker living inside it would be overwritten by the canonical copy on every sync, and the
-   canonical repo cannot carry its own SHA anyway — the value does not exist until after the commit
-   that would contain it. Without this step the freshness check below silently compares against
-   nothing.
+4. **Write the canonical remote into `_agents/.kit-source` and the canonical commit SHA into
+   `_agents/.kit-version`**, one line each. Both are project-owned and deliberately outside
+   `_agents/universal/`: the folder is copied wholesale, and source identity is consuming-repository
+   configuration rather than universal content. The canonical repository cannot carry its own commit
+   SHA inside the commit it names. Without both markers the freshness check below reports unavailable.
 
 ### Detecting a stale copy — session start
 
 Copies do not update themselves, and kit changes arrive in bursts, which is exactly when nobody thinks
-to look. So at session start, read `_agents/.kit-version` and run
-`git ls-remote <canonicalHEAD`; if they differ, **say so and carry on** — report only, never sync as
+to look. So at session start, read `_agents/.kit-source` and `_agents/.kit-version`, then run
+`git ls-remote <canonical-kit-remote> HEAD`; if they differ, **say so and carry on** — report only, never sync as
 a side effect. The whole round trip is one command returning one line.
 
 **If the check cannot run — no network, no remote, missing or unreadable marker — say THAT, explicitly.**
@@ -84,7 +87,7 @@ may legitimately check the copies out with different endings, which is why step 
 
 Therefore, whenever you modify this file or ANY file in `_agents/universal/`, you **MUST**:
 
-1. **Push the identical change to `universal_agent_kit` in the same turn**, then **tell the user
+1. **Push the identical change to the configured canonical repository in the same turn**, then **tell the user
    explicitly, in your final message of that turn**, that the shared kit changed and which repositories
    now need to pull. Not only in a commit message, and never buried in a list of project changes.
 2. **Name the exact files changed and quote the before/after of each edit**, so the change can be
@@ -93,7 +96,7 @@ Therefore, whenever you modify this file or ANY file in `_agents/universal/`, yo
    require changing the shared kit, say so and get the user's go-ahead first — a project-specific need
    almost always belongs in `project_instructions.md` instead (which wins on conflict anyway).
 4. **Verify sync rather than assuming it.** Checking is seconds:
-   `git clone --depth 1 https://github.com/Icemixx/universal_agent_kit` into a scratch dir and
+   `git clone --depth 1 <canonical-kit-remote>` into a scratch dir and
    hash-compare each file against the local copy. Normalise line endings (`\r\n` → `\n`) before
    hashing, or a CRLF checkout difference reads as a false mismatch. Note `gh` may not be installed;
    plain `git` is enough.
@@ -101,9 +104,7 @@ Therefore, whenever you modify this file or ANY file in `_agents/universal/`, yo
    domain vocabulary, and stack-native commands or assumptions. Remove or generalize every hit not
    covered by the three narrow exceptions above before committing.
 
-Rationale, and why this warning exists at the top where it is re-read every session: on 2026-07-28 a
-session corrected a genuine self-contradiction in this file (two file descriptions still said
-"append-only" after that rule had been repealed) and reported it as one bullet inside a large
-project-cleanup summary. The fix was right; the silence was not. The user only found out by asking. A
-shared file changed in one repo and nowhere else is worse than the contradiction it fixed, because
-nothing will ever surface the divergence.
+Rationale, and why this warning is re-read every session: a correct shared-file edit reported only as an
+incidental project-cleanup detail can leave every sibling copy silently stale. A shared file changed in
+one repository and nowhere else is worse than the local defect it fixed, because nothing automatically
+surfaces the divergence.
