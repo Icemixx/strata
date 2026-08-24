@@ -20,6 +20,28 @@ author address, never a personal one, and keep the message about the RULE and th
 words. The incident that motivates a kit rule is by construction a private-repo incident; say what the
 rule prevents, not where it was learned.
 
+### Hard boundary — the universal payload is project-agnostic
+
+The defining property of this kit is that its copied payload applies unchanged to every repository.
+Universal files therefore specify only **capabilities, invariants, interfaces, audience boundaries,
+required outcomes, and verification semantics**. They must never prescribe or assume a consuming
+project's programming language, framework, runtime, package manager, test runner, database engine,
+localization scheme, business domain, source-tree layout, ticket namespace, or native checker
+implementation. Put every such realization in project-owned instructions, manifests, checkers, tests,
+and Guide material.
+
+Write universal examples as placeholders (`<project-native command>`, `<test suite>`, `<route>`) or as
+tool-neutral pseudocode. The only narrow exceptions are:
+
+- Git operations required by the kit's repository publication/sync/provenance contract;
+- a harness adapter naming the mechanics of that harness, confined to its own `harness-*.md` file; and
+- literal paths and filenames that are themselves part of the universal kit contract.
+
+Before every canonical commit, inspect the complete changed universal payload—not only the new lines—
+for consuming-project names and stack/tool assumptions. Any hit outside those exceptions blocks the
+commit. Rephrase the rule as a general contract and move the concrete implementation to the consuming
+repository; never make a growing allowlist of favored stacks.
+
 **On ANY change to the kit, in ANY repo, that repository MUST be updated in the SAME turn.** Do not
 leave it for later and do not leave it to the user to mirror by hand: an edit that lands only in the
 project repo you happen to be standing in is exactly the silent drift this banner exists to prevent.
@@ -75,6 +97,9 @@ Therefore, whenever you modify this file or ANY file in `_agents/universal/`, yo
    hash-compare each file against the local copy. Normalise line endings (`\r\n` → `\n`) before
    hashing, or a CRLF checkout difference reads as a false mismatch. Note `gh` may not be installed;
    plain `git` is enough.
+5. **Verify the project-agnostic boundary.** Inspect the full changed payload for project names,
+   domain vocabulary, and stack-native commands or assumptions. Remove or generalize every hit not
+   covered by the three narrow exceptions above before committing.
 
 Rationale, and why this warning exists at the top where it is re-read every session: on 2026-07-28 a
 session corrected a genuine self-contradiction in this file (two file descriptions still said

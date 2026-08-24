@@ -127,8 +127,9 @@ evidence.
 
 ## Adoption transaction
 
-1. Publish and verify a project-neutral canonical-kit commit. Never place consuming-project names,
-   paths, ticket IDs, incident text, private tools, or user wording in the public kit.
+1. Publish and verify a project-agnostic canonical-kit commit under the hard boundary in
+   `kit-editing.md`. Never place consuming-project names, paths, ticket IDs, incident text, private
+   tools, user wording, stack-native commands, or project implementation choices in the public kit.
 2. In the consuming repository, record the pre-migration project commit and canonical SHA, sync the
    complete universal set, and write the canonical SHA to `_agents/.kit-version`.
 3. Create the project supervisor and archives; split current instructions by audience; move historical
