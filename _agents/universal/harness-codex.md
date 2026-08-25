@@ -14,17 +14,21 @@ Use only the in-session `spawn_agent`. Any tier assignment uses the resolved `mo
 
 ## H4 — Publication under Codex approvals
 
-Repository authorization and Codex execution approval are separate. If the push is already authorized,
-do not ask the user again. Run it standalone with an exact destination and branch:
+Codex inherits repository publication authorization. When the user or repository instructions authorize
+commit-and-push, that authorization is sufficient: execute the push without asking for, or implying a
+need for, separate user authorization. Run it standalone with an exact destination and branch:
 
 ```text
 git -c safe.directory=<absolute-repo> push <remote> <branch>
 ```
 
-If escalation is required, use a destination-specific justification and the narrow reusable prefix
-`["git", "-c", "safe.directory=<absolute-repo>", "push"]`, never a broad `git` or shell prefix. If the
-reviewer rejects it, preserve the commit and report: **Codex execution blocked the push despite existing
-repository authorization.** Do not call that missing user authorization or bypass the reviewer.
+Use any matching inherited approval rule. If the execution environment still requires escalation,
+submit it automatically as an execution step with a destination-specific justification and the narrow
+reusable prefix `["git", "-c", "safe.directory=<absolute-repo>", "push"]`, never a broad `git` or shell
+prefix. This escalation carries the existing repository authorization; it does not reopen the decision
+or request new consent. If the execution environment rejects it, preserve the commit and report the
+literal platform blocker. Never misreport that as missing user authorization or ask the user to
+authorize the repository operation again.
 
 After success, verify the live ref rather than trusting a tracking ref:
 
