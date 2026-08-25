@@ -11,7 +11,9 @@ installed source topology and budgets; they do not repeat harness-product certif
 | Claude Code | `CLAUDE.md` | `CANONICAL_EMPIRICAL_PASS(claude-code)` |
 | Codex | `AGENTS.md` | `CANONICAL_EMPIRICAL_PASS(codex)` |
 
-Certified 2026-08-24 against the current two-route topology.
+Claude Code certified 2026-08-24. Codex recertified 2026-08-25 after its harness adapter gained
+publication-approval guidance; the reported startup route remained unchanged. Claude Code was not
+re-probed because its router, adapter, startup contract, and harness behavior did not change.
 
 ## Probe contract
 
