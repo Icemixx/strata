@@ -1,53 +1,81 @@
-## What this is
+# Strata
 
-This repository contains a drop-in set of living protocols for Claude Code and Codex agents working in repository-based Visual Studio Code (VS Code) harnesses. The shared protocol is harness-agnostic between them; dedicated adapter files handle their different startup and delegation mechanics. It provides a consistent, reviewable workflow for planning, delegation, audits, handoffs, and on-demand procedures. It is documentation, not runnable application code.
+Strata is a small, project-agnostic instruction and context-routing kit for repository-based Codex and
+Claude Code work. It separates always-loaded conduct from project knowledge that agents route only when
+the task needs it.
 
-Harness compatibility is certified once in this canonical repository; see `CERTIFICATION.md`. A consuming
-repository validates its own copied files, router edges, authorities, and context budgets without
-re-certifying Claude Code or Codex as products.
+## Context model
 
-## The five project authorities
+- **Instructions** govern conduct and routing. They are the only general startup context.
+- **State** records WHAT is current, using compact ticket entries and routed completed history.
+- **Rationale** records WHY decisions were made.
+- **Build Log** records HOW work was performed and the evidence observed.
+- **Guide** is a generated, self-contained HTML view over those three project authorities. It is not an
+  authority and contains no manually maintained unique content.
 
-Each consuming repository owns five separate authorities:
+Each authority is a recursively indexed Markdown tree. Every routed directory has an `index.md`, and
+only described links inside `## Contents` define ownership, traversal, and Guide order.
 
-| Authority | Default path | Owns |
-| --- | --- | --- |
-| Technical Guide | `_agents/project_guide.html` | Current software architecture, behavior, operator/developer technical workflows, technical conventions, and intrinsic limitations |
-| State | `_agents/project_state.md` | Current reality, scope, active backlog, priorities, approvals, unresolved work, and acceptance gates |
-| Rationale | `_agents/project_rationale.md` | Settled why, rejected alternatives, and reopening conditions |
-| Build Log | `_agents/project_build_log.md` | Dated actions, commands actually run, and exact observed evidence |
-| Instructions | `_agents/project_instructions.md` + `_agents/project_instructions_supervisor.md` | Mandatory agent conduct, protocol parameters, enforcement rules, and pointers to the Guide, split by worker versus top-level audience |
+## Shared payload
 
-`REFERENCE_PLAN` names only State, Rationale, and Build Log. `TECHNICAL_GUIDE` names the Guide. The Guide never substitutes for State. See `_agents/universal/project-guide.md` for the routing, adoption, and self-contained HTML requirements.
+Copy exactly:
 
-## What is copied
-
-The shared kit is only `_agents/universal_agent_instructions.md` and the entire `_agents/universal/` folder. Do not copy this root `README.md`; it is canonical-repository documentation, not a project authority or kit payload.
-
-```
-README.md                           ← canonical-repository entry and redirect; not copied
-CERTIFICATION.md                    ← sanitized canonical harness evidence; not copied
-LICENSE                             ← license text
-_agents/
-  universal_agent_instructions.md   ← always-loaded core; copied
-  universal/                        ← on-demand procedures; copied in full
-    initialize.md                   ← initialization and bare routers
-    instruction-topology.md         ← project instruction audiences, checker contract, budgets, and certification
-    project-guide.md                ← Guide creation, adoption, and validation
-    consolidation.md                ← authority-specific history handling
-    dap.md                          ← Decisions & Devil's Advocate Policy
-    harness-claude-code.md          ← Claude Code adapter
-    harness-codex.md                ← Codex adapter
-    session-pickup.md               ← session-resumption procedure
-    self-critique.md                ← end-of-session review
-    seasonal-audit.md               ← full-app audit procedure
+```text
+_strata/
+|-- universal_agent_instructions.md
+`-- universal/
+    |-- active-agent.md
+    |-- context-routing.md
+    |-- context.ps1
+    |-- initialize.md
+    |-- consolidation.md
+    |-- dap.md
+    |-- session-pickup.md
+    |-- self-critique.md
+    |-- seasonal-audit.md
+    |-- kit-editing.md
+    |-- harness-codex.md
+    |-- harness-claude-code.md
+    `-- vendor/
+        |-- marked-0.3.19.min.js
+        `-- MARKED-LICENSE.md
 ```
 
-## Install in a repository
+The payload is copied unchanged. Project rules and authorities remain project-owned. A consuming
+repository records the canonical source and synced revision in `_strata/.kit-source` and
+`_strata/.kit-version`.
 
-1. Copy only `_agents/universal_agent_instructions.md` and the complete `_agents/universal/` folder into the target repository. Do not copy the canonical root README.
-2. Before creating or changing project-owned files, follow `_agents/universal/initialize.md`. In an established repository, inventory first and then follow `_agents/universal/project-guide.md`; do not blindly move legacy documents.
-3. Create the five project authorities. Instructions uses two current audience files plus one historical archive, as specified by `instruction-topology.md`; this remains one authority, not three. In `project_instructions.md`, declare distinct `REFERENCE_PLAN` and `TECHNICAL_GUIDE` values plus the literal project-native `AGENT_SYSTEM_CHECK` command. Create `_agents/.kit-source` and `_agents/.kit-version` as project-owned provenance markers. Create `_agents/project_guide.html` as one offline self-contained HTML file.
-4. Add bare router files only from the templates in `initialize.md`, implement the permanent checker tests, then validate source topology, Guide boundaries, and every supported route's local context budget. Confirm that the canonical repository's `CERTIFICATION.md` supports those routes; do not repeat harness-product certification per project.
+## Initialize a new repository
 
-Project-owned files override the universal core on conflict. The core describes when to load each on-demand procedure.
+Read `_strata/universal/initialize.md`. It creates thin root routers, Project Instructions, the State,
+Rationale, and Build Log roots and indexes, and the first generated Guide.
+
+Established repositories do not use the empty-repository procedure. They require a separately authorized,
+project-specific archive-seeded migration that preserves and reconciles their legacy material before
+cutover.
+
+## Validate and generate Guide
+
+The dependency-free Windows PowerShell tool has three explicit modes:
+
+```powershell
+_strata/universal/context.ps1 -Check -Paths <changed paths>
+_strata/universal/context.ps1 -CheckAll
+_strata/universal/context.ps1 -GenerateGuide
+```
+
+Checks are read-only. Only `-GenerateGuide` writes `_strata/project_guide.html`, after full graph
+validation, using an atomic replacement. Markdown rendering is offline through the bundled pinned
+renderer; raw HTML and unsafe link schemes are sanitized.
+
+Canonical tool tests are outside the copied payload:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File canonical-tests/context.tests.ps1
+```
+
+## Canonical editing
+
+Read `_strata/universal/kit-editing.md` before changing or synchronizing the shared payload. Canonical
+editing, consuming-repository synchronization, commit, and publication are separate authorization
+boundaries.
