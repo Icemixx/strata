@@ -44,7 +44,7 @@ severity, scope, or coverage difference; collapsing them wastes rounds. Concede 
 requires, because an unearned concession corrupts the settled record as much as a wrong claim.
 
 A claim left uncontested for two consecutive rounds is settled and is not reopened. A claim raised and
-expressly accepted within one round settles at the end of that round. Stop at five rounds.
+expressly accepted within one round settles at the end of that round.
 
 ## Outcomes
 
@@ -83,5 +83,5 @@ authority record. Guide is not regenerated.
 ## Limits
 
 Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify the
-other's model, so tier is an attestation. Five rounds of two Architects is expensive, and that cost is the
-intended brake: use DAP when one provider's scrutiny is enough.
+other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that cost is
+the intended brake: use DAP when one provider's scrutiny is enough.

@@ -20,6 +20,10 @@ Preserve unrelated work. Audit source files and inbound references before reloca
 one normative owner per rule, run checks relevant to the shared payload, and distinguish a local edit
 from an authorized commit or publication. Publication is never implied by kit editing.
 
+Before accepting a new or changed contract, ask where two competent agents following the same text would
+produce different results, and pin every such point. Name the file, the format, and the location rather
+than the intent.
+
 After a canonical payload change, tell the user which consuming repositories still require a separate
 sync. Do not retrofit them as part of the canonical transaction.
 
