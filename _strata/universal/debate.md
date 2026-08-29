@@ -35,7 +35,16 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 ## Rounds
 
 Head each round `## Round N — <product> / <model> (Architect)`. In your first round, state in one line
-whether you can execute verification commands against the repository.
+whether you can execute verification commands against the repository. End every round with a turn marker
+on its own line:
+
+```text
+Round N complete — next: <participant>
+```
+
+Before writing, read the last turn marker. If it does not name you, say so in normal chat, name the
+participant whose turn it is, and stop. Being asked again does not make it your turn. When the file
+carries no marker yet, either participant may open.
 
 Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
