@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $Utf8 = New-Object Text.UTF8Encoding($false)
 $StagedStrata = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\_strata'))
 $TempRoot = Join-Path ([IO.Path]::GetTempPath()) ('strata-context-tests-' + [Guid]::NewGuid().ToString('N'))
@@ -319,6 +319,12 @@ try {
     Assert-Test 'public GenerateGuide is rejected' {
         $r = Invoke-PublicContext (New-Fixture 'public-generate') @('-GenerateGuide')
         Assert-True ($r.ExitCode -ne 0) 'direct user generation was not rejected'
+    }
+
+    Assert-Test 'the shipped script decodes as UTF-8 on the documented host' {
+        $bytes = [IO.File]::ReadAllBytes((Join-Path $StagedStrata 'universal\context.ps1'))
+        Assert-True ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) `
+            'context.ps1 has no UTF-8 BOM, so PowerShell 5.1 mis-decodes its Unicode literals'
     }
 }
 finally {
