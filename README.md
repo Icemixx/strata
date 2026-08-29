@@ -31,6 +31,7 @@ _strata/
     |-- initialize.md
     |-- consolidation.md
     |-- dap.md
+    |-- debate.md
     |-- session-pickup.md
     |-- self-critique.md
     |-- seasonal-audit.md
