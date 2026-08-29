@@ -40,11 +40,12 @@ whether you can execute verification commands against the repository.
 Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
 own from an earlier round. Distinguish a factual conflict from a severity, scope, or coverage difference;
-collapsing them wastes rounds. Concede only what the evidence
-requires, because an unearned concession corrupts the settled record as much as a wrong claim.
+collapsing them wastes rounds. Concede only what the evidence requires, because an unearned concession
+corrupts the settled record as much as a wrong claim.
 
-A claim left uncontested for two consecutive rounds is settled and is not reopened. A claim raised and
-expressly accepted within one round settles at the end of that round.
+A claim is settled only when the other participant expressly accepts it; silence settles nothing. An
+acceptance given in the same round the claim was raised settles it at the end of that round. A settled
+claim is not reopened.
 
 ## Outcomes
 
