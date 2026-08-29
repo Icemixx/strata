@@ -100,6 +100,21 @@ function Invoke-Context([string]$Root, [string[]]$Arguments) {
     return [pscustomobject]@{ ExitCode=$exitCode; Output=$text }
 }
 
+function Invoke-PublicContext([string]$Root, [string[]]$Arguments) {
+    # The public path: the shipped script run exactly as README documents it.
+    # The single-process contract above forbids the launch cmdlet in this file
+    # and any child launch inside context.ps1; running the script is neither.
+    $target = Join-Path $Root '_strata\universal\context.ps1'
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $target @Arguments 2>&1 }
+    finally { $ErrorActionPreference = $previous }
+    return [pscustomobject]@{
+        Output   = (($out | ForEach-Object { $_.ToString() }) -join "`n")
+        ExitCode = $LASTEXITCODE
+    }
+}
+
 function Assert-Test([string]$Name, [scriptblock]$Body) {
     try { & $Body; Write-Output "PASS $Name"; $script:Passed++ }
     catch { Write-Output "FAIL $Name :: $($_.Exception.Message) :: $($_.ScriptStackTrace)"; $script:Failed++ }
@@ -282,6 +297,28 @@ try {
         $text = ($out | ForEach-Object { $_.ToString() }) -join "`n"
         Assert-True ($text -match 'CONTEXT_FAIL') 'public run printed no CONTEXT_FAIL'
         Assert-True ($exit -eq 1) "public run exited $exit, expected 1"
+    }
+
+    Assert-Test 'public help is printed with no arguments' {
+        $r = Invoke-PublicContext (New-Fixture 'public-help') @()
+        Assert-True ($r.Output -match 'Usage:') 'no usage text on the public path'
+        Assert-True ($r.ExitCode -eq 0) "help exited $($r.ExitCode), expected 0"
+    }
+
+    Assert-Test 'public CheckAll passes a valid graph' {
+        $r = Invoke-PublicContext (New-Fixture 'public-pass') @('-CheckAll')
+        Assert-True ($r.Output -match 'CONTEXT_PASS all') 'no pass marker on the public path'
+        Assert-True ($r.ExitCode -eq 0) "pass exited $($r.ExitCode), expected 0"
+    }
+
+    Assert-Test 'public GuideStatus reports a status' {
+        $r = Invoke-PublicContext (New-Fixture 'public-status') @('-GuideStatus')
+        Assert-True ($r.Output -match 'GUIDE_(MISSING|CURRENT|STALE)') 'no guide status on the public path'
+    }
+
+    Assert-Test 'public GenerateGuide is rejected' {
+        $r = Invoke-PublicContext (New-Fixture 'public-generate') @('-GenerateGuide')
+        Assert-True ($r.ExitCode -ne 0) 'direct user generation was not rejected'
     }
 }
 finally {
