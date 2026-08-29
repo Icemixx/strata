@@ -800,6 +800,8 @@ function Invoke-StrataContext {
     return 0
 }
 
-$StrataContextExitCode = Invoke-StrataContext
+$StrataContextResult = @(Invoke-StrataContext)
+$StrataContextExitCode = [int]$StrataContextResult[-1]
+$StrataContextResult | Select-Object -SkipLast 1 | ForEach-Object { Write-Output $_ }
 if ($MyInvocation.InvocationName -eq '.') { return $StrataContextExitCode }
 exit $StrataContextExitCode

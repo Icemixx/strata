@@ -69,6 +69,12 @@ function New-Fixture([string]$Name) {
     return $root
 }
 
+function New-BrokenFixture([string]$Name) {
+    $root = New-Fixture $Name
+    Remove-Item -LiteralPath (Join-Path $root '_strata\state\index.md') -Force
+    return $root
+}
+
 function Invoke-Context([string]$Root, [string[]]$Arguments) {
     $script = Join-Path $Root '_strata\universal\context.ps1'
     $bound = @{}
@@ -266,6 +272,16 @@ try {
         $result = Invoke-Context $root @('-GuideStatus')
         Assert-True ($result.ExitCode -eq 0 -and $result.Output -match 'GUIDE_STALE') "stale status failed: $($result.Output)"
         Assert-True ([IO.File]::ReadAllText($guide) -eq $before) 'GuideStatus modified the Guide'
+    }
+
+    Assert-Test 'public invocation prints findings and exits non-zero' {
+        $root = New-BrokenFixture 'public-fail'
+        $target = Join-Path $root '_strata\universal\context.ps1'
+        $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $target -CheckAll 2>&1
+        $exit = $LASTEXITCODE
+        $text = ($out | ForEach-Object { $_.ToString() }) -join "`n"
+        Assert-True ($text -match 'CONTEXT_FAIL') 'public run printed no CONTEXT_FAIL'
+        Assert-True ($exit -eq 1) "public run exited $exit, expected 1"
     }
 }
 finally {
