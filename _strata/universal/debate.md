@@ -37,10 +37,10 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 Head each round `## Round N — <product> / <model> (Architect)`. In your first round, state in one line
 whether you can execute verification commands against the repository.
 
-Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement, and is
-dropped when repeated without new evidence. Verify a contested claim yourself instead of accepting another
-participant's measurement, including your own from an earlier round. Distinguish a factual conflict from a
-severity, scope, or coverage difference; collapsing them wastes rounds. Concede only what the evidence
+Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
+Verify a contested claim yourself instead of accepting another participant's measurement, including your
+own from an earlier round. Distinguish a factual conflict from a severity, scope, or coverage difference;
+collapsing them wastes rounds. Concede only what the evidence
 requires, because an unearned concession corrupts the settled record as much as a wrong claim.
 
 A claim left uncontested for two consecutive rounds is settled and is not reopened. A claim raised and
