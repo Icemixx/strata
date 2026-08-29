@@ -48,7 +48,8 @@ expressly accepted within one round settles at the end of that round. Stop at fi
 
 ## Outcomes
 
-- **Converged** — no unresolved HOLD and no open QUESTION remain. The next round is the settled list.
+- **Converged** — no unresolved HOLD and no open QUESTION remain. The next round is the settled list,
+  which is recorded as `settled.md`.
 - **Dissent** — a HOLD survives three exchanges without new evidence on either side. Record both positions;
   neither wins; the item becomes an open question for the user.
 - **Terminated** — the user declares a participant unreachable. Settled items stand and remain usable; open
@@ -60,7 +61,7 @@ Either participant may call void on role drift, provider identity, or absent ver
 user can call a false attestation or declare a participant unreachable; no agent can see another provider's
 runtime.
 
-Close the file with exactly one stamp:
+Close `rounds.md` with exactly one stamp:
 
 - `DEBATE: converged — [count] settled — [models] — [subject]`
 - `DEBATE: dissent on [topics] — [count] settled, [count] dissenting — [models] — [subject]`
@@ -69,7 +70,8 @@ Close the file with exactly one stamp:
 
 ## Recording
 
-Keep the debate in the project's git-ignored working location while it runs. On close, move it to
+Keep every artifact, from the first report onward, in the project's git-ignored working location while
+the debate runs. On close, move it to
 `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index entry in the same transaction. The
 branch holds `index.md`, one `report-<model>.md` and one `cross-<model>.md` per participant, `rounds.md`,
 and `settled.md`. Model names in leaf filenames identify who wrote what.
