@@ -10,6 +10,8 @@ Its purpose is one clear current truth, not shorter files at any cost.
    - superseded: retain the newer governing claim and remove the obsolete live claim;
    - narrowed or corrected: retain the precise formulation and remove the misleading broad one;
    - complementary: retain both without forcing a merge;
+   - a still-true description of current behavior: record it as a dated observed snapshot in Build Log
+     rather than leaving it in a retired document;
    - unresolved conflict: surface the competing claims and ask the user rather than choosing precedence.
 4. Preserve useful evolution as a compact Rationale explanation or Build Log history when it still helps
    future decisions. Historical context must not remain as a competing current rule.

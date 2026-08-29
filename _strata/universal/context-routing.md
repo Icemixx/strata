@@ -113,7 +113,10 @@ requirement and acceptance gate is complete. Remaining implementation, validatio
 `IN PROGRESS`. An agent may not move an unfinished owned gate into another ticket to manufacture `DONE`;
 that requires an explicit user-approved scope redefinition.
 
-Every State ticket has a globally unique ID, one status, and a short contextual description:
+Every State ticket has a globally unique ID, one status, and a short contextual description. An ID is an
+uppercase letter followed by any uppercase letters or digits, a hyphen, then digits: `BUG-110`, `TA-8`,
+`R-8`. An identifier of any other shape is a validation finding. When migrating, keep a legacy identifier
+in the description rather than minting a second ID:
 
 ```markdown
 - BUG-110 — IN PROGRESS — Retry behavior is implemented; device verification remains.
@@ -142,7 +145,9 @@ context.ps1 -CheckAll
 context.ps1 -GuideStatus
 ```
 
-No arguments displays help and changes nothing. Every user-callable mode is read-only. Guide generation
+The graph modes target an initialized repository. A checkout holding only the shared payload reports the
+missing project surfaces rather than a benign result; a missing project graph is never assumed to be a kit
+checkout. No arguments displays help and changes nothing. Every user-callable mode is read-only. Guide generation
 is an internal agent operation: it validates the complete graph first and atomically replaces
 `_strata/project_guide.html` only after success. Direct user invocation of the internal generation mode
 is rejected. Validation and rendering do not open child console windows.

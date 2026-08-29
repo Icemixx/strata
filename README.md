@@ -55,13 +55,18 @@ cutover.
 
 ## Validate and generate Guide
 
-The dependency-free Windows PowerShell tool exposes three read-only modes:
+The dependency-free tool runs on Windows PowerShell 5.1 and PowerShell 7. It exposes three read-only
+modes:
 
 ```powershell
 _strata/universal/context.ps1 -Check -Paths <changed paths>
 _strata/universal/context.ps1 -CheckAll
 _strata/universal/context.ps1 -GuideStatus
 ```
+
+These modes validate an initialized consuming repository. In this canonical source checkout, which has no
+Project Instructions, routers, or authority roots, `-CheckAll` reports those as missing and exits non-zero.
+Validate the kit itself with `.\canonical-tests\context.tests.ps1`.
 
 All public modes are read-only. Guide generation is agent-internal and direct user invocation is rejected.
 It writes `_strata/project_guide.html` only after full graph validation, using an atomic replacement.
