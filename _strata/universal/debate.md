@@ -15,6 +15,10 @@ Check your own model before anything else. If you are not Architect, or cannot d
 in normal chat, name the required role and that the other participant needs it too, and stop. A refusal
 creates no files and is not a void debate.
 
+Do not spawn an Architect to take a round when the session is a lower tier. A spawned participant
+reports to the session, which places a lower tier between the argument and the record, and a round written
+cold is weaker than one written by a seated participant. Switch the session instead, or do not debate.
+
 The user carries every exchange between providers. No agent invokes, polls, or notifies the other. This is
 load-bearing rather than a limitation: it is what keeps each participant's framing its own.
 
@@ -67,7 +71,7 @@ Close the file with exactly one stamp:
 ## Recording
 
 Keep the debate in the project's git-ignored working location while it runs. On close, move it to
-`_strata/build-log/debate-<subject>-<date>/` and add its parent index entry in the same transaction. The
+`_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index entry in the same transaction. The
 branch holds `index.md`, one `report-<model>.md` and one `cross-<model>.md` per participant, `rounds.md`,
 and `settled.md`. Model names in leaf filenames identify who wrote what.
 
