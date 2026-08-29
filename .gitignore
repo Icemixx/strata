@@ -1,2 +1,13 @@
 SIMPLIFICATION_DECISIONS.md
 retrofit_prompt.txt
+
+# Audit, debate, sweep and repair artifacts. The kit is public and deliberately
+# project-agnostic; these describe private consuming repositories, including
+# unremediated security findings, and must never be published here.
+claude_report.md
+codex_report.md
+claude_v_codex.md
+codex_v_claude.md
+c_&_c.md
+sweep-*.md
+*-plan.md
