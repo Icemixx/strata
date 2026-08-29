@@ -407,7 +407,7 @@ function Convert-MarkdownInline([string]$Text) {
         param($m)
         $index = $tokens.Count
         $tokens.Add('<code>' + $m.Groups[1].Value + '</code>')
-        return "@@STRATA_INLINE_$index@@"
+        return "@@STRATAINLINE$index@@"
     })
     $encoded = [regex]::Replace($encoded, '!\[([^\]]*)\]\(([^)]+)\)', '[Image: $1]($2)')
     $encoded = [regex]::Replace($encoded, '\[([^\]]+)\]\(([^)]+)\)', {
@@ -421,7 +421,7 @@ function Convert-MarkdownInline([string]$Text) {
     $encoded = [regex]::Replace($encoded, '(?<!_)__([^_]+)__', '<strong>$1</strong>')
     $encoded = [regex]::Replace($encoded, '(?<!\*)\*([^*]+)\*', '<em>$1</em>')
     $encoded = [regex]::Replace($encoded, '(?<!_)_([^_]+)_', '<em>$1</em>')
-    for ($i = 0; $i -lt $tokens.Count; $i++) { $encoded = $encoded.Replace("@@STRATA_INLINE_$i@@", $tokens[$i]) }
+    for ($i = 0; $i -lt $tokens.Count; $i++) { $encoded = $encoded.Replace("@@STRATAINLINE$i@@", $tokens[$i]) }
     return $encoded
 }
 
