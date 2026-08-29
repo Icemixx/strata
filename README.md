@@ -27,6 +27,7 @@ _strata/
     |-- active-agent.md
     |-- context-routing.md
     |-- context.ps1
+    |-- guide-shell.html
     |-- initialize.md
     |-- consolidation.md
     |-- dap.md
@@ -35,10 +36,7 @@ _strata/
     |-- seasonal-audit.md
     |-- kit-editing.md
     |-- harness-codex.md
-    |-- harness-claude-code.md
-    `-- vendor/
-        |-- marked-0.3.19.min.js
-        `-- MARKED-LICENSE.md
+    `-- harness-claude-code.md
 ```
 
 The payload is copied unchanged. Project rules and authorities remain project-owned. A consuming
@@ -56,22 +54,30 @@ cutover.
 
 ## Validate and generate Guide
 
-The dependency-free Windows PowerShell tool has three explicit modes:
+The dependency-free Windows PowerShell tool exposes three read-only modes:
 
 ```powershell
 _strata/universal/context.ps1 -Check -Paths <changed paths>
 _strata/universal/context.ps1 -CheckAll
-_strata/universal/context.ps1 -GenerateGuide
+_strata/universal/context.ps1 -GuideStatus
 ```
 
-Checks are read-only. Only `-GenerateGuide` writes `_strata/project_guide.html`, after full graph
-validation, using an atomic replacement. Markdown rendering is offline through the bundled pinned
-renderer; raw HTML and unsafe link schemes are sanitized.
+All public modes are read-only. Guide generation is agent-internal and direct user invocation is rejected.
+It writes `_strata/project_guide.html` only after full graph validation, using an atomic replacement.
+Rendering is offline; raw HTML and unsafe link schemes are sanitized. The generated page includes its
+source digest and available commit snapshot information so `-GuideStatus` can report whether current
+authorities have moved ahead.
+
+Guide refresh is user-triggered. When the user asks to update Guide, the agent reviews concise human-language
+descriptions in the owning authority indexes and introductions, then regenerates the snapshot. Ordinary
+code and authority changes do not regenerate it, and users do not run the internal generator themselves.
+After an authorized commit, the Active Agent checks Guide status once and includes one reminder in the
+handoff if the snapshot is stale.
 
 Canonical tool tests are outside the copied payload:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File canonical-tests/context.tests.ps1
+.\canonical-tests\context.tests.ps1
 ```
 
 ## Canonical editing

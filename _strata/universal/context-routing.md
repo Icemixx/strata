@@ -83,9 +83,9 @@ ceiling applies to Rationale, Build Log, and completed-State leaf files, not tic
 lowercase hyphenated subject name such as `drive-sync/`.
 
 Create the branch and its index, add the parent entry, move the records, repair inbound links and affected
-checks, validate routing, and regenerate Guide as one authority transaction. Then notify the user that
-the ten-record ceiling was reached, naming the branch and moved records. The notice is informational, not
-an approval request.
+checks, and validate routing as one authority transaction. Then notify the user that the ten-record
+ceiling was reached, naming the branch and moved records. The notice is informational, not an approval
+request.
 
 There is no other universal byte, line, entry, or depth ceiling. Split based on cohesion and scanability.
 
@@ -139,24 +139,36 @@ project paths relative to itself and requires exactly one explicit mode:
 ```powershell
 context.ps1 -Check -Paths <changed paths>
 context.ps1 -CheckAll
-context.ps1 -GenerateGuide
+context.ps1 -GuideStatus
 ```
 
-No arguments displays help and changes nothing. `-Check` and `-CheckAll` are read-only. Only
-`-GenerateGuide` may write `_strata/project_guide.html`; it validates the complete graph first and
-atomically replaces Guide only after success.
+No arguments displays help and changes nothing. Every user-callable mode is read-only. Guide generation
+is an internal agent operation: it validates the complete graph first and atomically replaces
+`_strata/project_guide.html` only after success. Direct user invocation of the internal generation mode
+is rejected. Validation and rendering do not open child console windows.
 
 Discovery begins at the three authority root indexes and follows `## Contents` in declared order.
 Filesystem records absent from that graph are validation findings, not implicitly included content.
 
 Guide is a committed, visibly generated, self-contained HTML snapshot with no server, network resource,
-or manually maintained unique content. It mirrors authority hierarchy, gives State tickets stable
-ID-derived anchors, combines their typed WHY and HOW targets, and embeds offline search. Empty Rationale
-or Build Log sections display `No records yet`.
+or manually maintained unique content. It mirrors authority hierarchy, includes the short descriptions
+owned by indexes and authority introductions, gives State tickets stable ID-derived anchors, combines
+their typed WHY and HOW targets, and embeds offline search. Empty Rationale or Build Log sections display
+`No records yet`.
 
-Guide embeds a deterministic digest of routed source content and generator version. Authority records use
-ordinary Markdown. A bundled dependency-free GitHub-style renderer disables raw HTML; unexpected
-HTML-like text is displayed rather than executed.
+Guide embeds a deterministic digest of routed source content, generator version, generation date, and
+available Git snapshot information. Its permanent notice says which commit supplied the snapshot and
+that it may be behind current authorities. `-GuideStatus` compares the embedded digest with the current
+routed authorities and reports `GUIDE_MISSING`, `GUIDE_CURRENT`, or `GUIDE_STALE` without writing.
+
+Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
+unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
+
+Guide refresh is intentionally user-triggered. When the user asks to update Guide, first review the owning index
+descriptions and authority introductions and improve their concise human-language summaries where the
+authoritative meaning warrants it. Do not invent project facts. Then perform the internal generation and
+verification. Do not regenerate Guide merely because code or an authority changed. Users do not invoke
+the internal generation mode directly.
 
 ## Validation and authority updates
 
@@ -175,7 +187,8 @@ old location, update only the affected check and demonstrate that it can still d
 
 Update only authorities that gained information: status changes update State; decisions update Rationale;
 implementation and evidence update Build Log; completion finalizes and moves the State entry. Add typed
-State links when corresponding records exist. Regenerate Guide after any authority change.
+State links when corresponding records exist. Guide remains the last explicitly requested snapshot until
+the user requests another refresh.
 
 This format applies directly to new repositories. An established repository requires a separately
 authorized, project-specific migration. Preserve its legacy material until reconciliation is verified

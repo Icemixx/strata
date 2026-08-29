@@ -60,7 +60,12 @@ Update each authority in the same meaningful transaction that changes its inform
 - status and remaining work update State;
 - decisions update Rationale;
 - implementation and evidence update Build Log; and
-- an authority change regenerates Guide.
+- Guide regenerates only when the user explicitly asks to update Guide.
+
+When Guide refresh is requested, improve concise human-language descriptions in their owning indexes or
+authority introductions where needed, without inventing project facts, then invoke the internal generator
+in a child scope with `& { . .\_strata\universal\context.ps1 -GenerateGuide }` and verify the result. Do
+not expose `-GenerateGuide` as a user command or regenerate after ordinary code or authority changes.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
 next meaningful step, or exact blocker. A temporary handoff is needed only for important transient state
@@ -80,6 +85,9 @@ handoff file.
   commit.
 - Permission to edit or implement never implies publication authority.
 - Preserve the user's configured authorship and add agent co-author attribution.
+- After each authorized commit, run `_strata/universal/context.ps1 -GuideStatus` once. If it reports
+  `GUIDE_STALE`, remind the user once in that commit handoff that Guide may be behind and can be
+  explicitly regenerated. Do not regenerate it automatically and do not persist separate reminder state.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state.
 - Run applicable implementation verification locally. Do not create, enable, dispatch, wait for, or

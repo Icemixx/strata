@@ -71,21 +71,46 @@ function New-Fixture([string]$Name) {
 
 function Invoke-Context([string]$Root, [string[]]$Arguments) {
     $script = Join-Path $Root '_strata\universal\context.ps1'
-    $out = Join-Path $Root ('result-' + [Guid]::NewGuid().ToString('N') + '.txt')
-    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$script) + $Arguments
-    $process = Start-Process -FilePath "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList $argList -RedirectStandardOutput $out -RedirectStandardError ($out + '.err') -Wait -PassThru
-    $text = ''
-    if (Test-Path -LiteralPath $out) { $text += [IO.File]::ReadAllText($out) }
-    if (Test-Path -LiteralPath ($out + '.err')) { $text += [IO.File]::ReadAllText($out + '.err') }
-    return [pscustomobject]@{ ExitCode=$process.ExitCode; Output=$text }
+    $bound = @{}
+    for ($i = 0; $i -lt $Arguments.Count; $i++) {
+        switch ($Arguments[$i]) {
+            '-Check' { $bound.Check = $true }
+            '-CheckAll' { $bound.CheckAll = $true }
+            '-GenerateGuide' { $bound.GenerateGuide = $true }
+            '-GuideStatus' { $bound.GuideStatus = $true }
+            '-Paths' {
+                $bound.Paths = @($Arguments[($i + 1)..($Arguments.Count - 1)])
+                $i = $Arguments.Count
+            }
+            default { throw "Unsupported in-process context argument: $($Arguments[$i])" }
+        }
+    }
+    $result = @(& {
+        param([string]$ContextScript, [hashtable]$ContextParameters)
+        . $ContextScript @ContextParameters
+    } $script $bound 2>&1)
+    $exitCode = [int]$result[-1]
+    $text = (($result | Select-Object -SkipLast 1 | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine)
+    return [pscustomobject]@{ ExitCode=$exitCode; Output=$text }
 }
 
 function Assert-Test([string]$Name, [scriptblock]$Body) {
     try { & $Body; Write-Output "PASS $Name"; $script:Passed++ }
-    catch { Write-Output "FAIL $Name :: $($_.Exception.Message)"; $script:Failed++ }
+    catch { Write-Output "FAIL $Name :: $($_.Exception.Message) :: $($_.ScriptStackTrace)"; $script:Failed++ }
 }
 
 function Assert-True([bool]$Condition, [string]$Message) { if (-not $Condition) { throw $Message } }
+
+function Assert-GuideIntegrity([string]$Html) {
+    $ids = @([regex]::Matches($Html, '\bid="([^"]+)"', 'IgnoreCase') | ForEach-Object { $_.Groups[1].Value })
+    Assert-True ((@($ids | Sort-Object -Unique)).Count -eq $ids.Count) 'Guide contains duplicate IDs'
+    foreach ($fragment in @([regex]::Matches($Html, 'href="#([^"]+)"', 'IgnoreCase') | ForEach-Object { [Net.WebUtility]::HtmlDecode($_.Groups[1].Value) })) {
+        Assert-True ($fragment -in $ids) "Guide contains unresolved fragment: #$fragment"
+    }
+    Assert-True ($Html -notmatch '(?is)<(?:script|img|iframe|frame|link|audio|video|source)\b[^>]*(?:src|href)\s*=') 'Guide loads an external resource'
+    Assert-True ($Html -notmatch '(?i)url\s*\(') 'Guide contains a CSS url() resource'
+    Assert-True ([regex]::Matches($Html, '<script\b', 'IgnoreCase').Count -eq 1) 'Guide does not contain exactly one canonical script'
+}
 
 try {
     New-Item -ItemType Directory -Path $TempRoot | Out-Null
@@ -95,7 +120,37 @@ try {
         $result = Invoke-Context $root @()
         Assert-True ($result.ExitCode -eq 0) "exit=$($result.ExitCode) $($result.Output)"
         Assert-True ($result.Output -match 'Usage:') 'usage was not shown'
+        Assert-True ($result.Output -notmatch 'GenerateGuide') 'internal generation mode was exposed in user help'
         Assert-True (-not (Test-Path -LiteralPath (Join-Path $root '_strata\project_guide.html'))) 'Guide was written'
+    }
+
+    Assert-Test 'context execution stays in one PowerShell process' {
+        $launchToken = 'Start-' + 'Process'
+        $powershellToken = 'power' + 'shell.exe'
+        $scriptHostToken = 'c' + 'script.exe'
+        $contextSource = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\context.ps1'), [Text.Encoding]::UTF8)
+        $testSource = [IO.File]::ReadAllText($PSCommandPath, [Text.Encoding]::UTF8)
+        Assert-True ($contextSource -notmatch [regex]::Escape($launchToken)) 'context.ps1 starts a child process'
+        Assert-True ($contextSource -notmatch [regex]::Escape($powershellToken)) 'context.ps1 starts child PowerShell'
+        Assert-True ($contextSource -notmatch [regex]::Escape($scriptHostToken)) 'context.ps1 starts Windows Script Host'
+        Assert-True ($testSource -notmatch [regex]::Escape($launchToken)) 'canonical tests start a child process'
+    }
+
+    Assert-Test 'direct user Guide generation is rejected' {
+        $root = New-Fixture 'user-generation-rejected'
+        $contextScript = Join-Path $root '_strata\universal\context.ps1'
+        $escapedScript = $contextScript.Replace("'", "''")
+        $runspace = [PowerShell]::Create()
+        try {
+            [void]$runspace.AddScript("& '$escapedScript' -GenerateGuide")
+            $invokeError = ''
+            try { [void]$runspace.Invoke() }
+            catch { $invokeError = $_.Exception.Message }
+            $errorText = @($invokeError) + @($runspace.Streams.Error | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine
+            Assert-True ($errorText -match 'agent-internal') "direct generation rejection missing: $errorText"
+            Assert-True (-not (Test-Path -LiteralPath (Join-Path $root '_strata\project_guide.html'))) 'direct user invocation wrote Guide'
+        }
+        finally { $runspace.Dispose() }
     }
 
     Assert-Test 'valid full graph passes' {
@@ -119,7 +174,10 @@ try {
         @{ Name='DONE in current'; Code='DONE_IN_CURRENT'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\state\current.md') 'IN PROGRESS' 'DONE' } },
         @{ Name='router imports harness'; Code='ROUTER_NOT_THIN'; Mutate={ param($r) $p=Join-Path $r 'AGENTS.md'; Write-Utf8 $p ([IO.File]::ReadAllText($p,[Text.Encoding]::UTF8) + "`n_strata/universal/harness-codex.md`n") } },
         @{ Name='Contents lacks description'; Code='CONTENTS_ENTRY'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\build-log\index.md') ' — How the fixture was built.' '' } },
-        @{ Name='typed Why targets HOW'; Code='TYPED_LINK_TARGET'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\state\current.md') '../rationale/R1.md' '../build-log/BUG-1.md' } }
+        @{ Name='typed Why targets HOW'; Code='TYPED_LINK_TARGET'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\state\current.md') '../rationale/R1.md' '../build-log/BUG-1.md' } },
+        @{ Name='missing Guide shell'; Code='MISSING_REQUIRED_FILE'; Mutate={ param($r) Remove-Item -LiteralPath (Join-Path $r '_strata\universal\guide-shell.html') -Force } },
+        @{ Name='duplicate Guide shell placeholder'; Code='GUIDE_SHELL_PLACEHOLDER'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\universal\guide-shell.html') '<!--STRATA_CONTENT-->' '<!--STRATA_CONTENT--><!--STRATA_CONTENT-->' } },
+        @{ Name='external Guide shell resource'; Code='GUIDE_SHELL_EXTERNAL'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\universal\guide-shell.html') '<body ' '<img src="https://example.invalid/a.png"><body ' } }
     )
     foreach ($case in $redCases) {
         Assert-Test ("watched red: " + $case.Name) {
@@ -160,7 +218,9 @@ try {
         Assert-True ($result.ExitCode -eq 0) "exit=$($result.ExitCode) $($result.Output)"
         $html = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'))
         Assert-True ($html -match 'data-source-digest="[0-9a-f]{64}"') 'digest missing'
-        Assert-True ($html -match 'Generated from routed State') 'generated marker missing'
+        Assert-True ($html -match 'Guide snapshot generated from commit') 'snapshot marker missing'
+        Assert-True ($html -match 'data-generator="strata-context-2"') 'generator version missing'
+        Assert-True ($html -match 'data-generation-commit="[^"]+"') 'generation commit missing'
         Assert-True ($html -match 'id="ticket-BUG-1"') 'stable ticket anchor missing'
         Assert-True ($html -match '<h3>Why</h3>') 'ticket-linked WHY section missing'
         Assert-True ($html -match '<h3>How</h3>') 'ticket-linked HOW section missing'
@@ -168,6 +228,44 @@ try {
         Assert-True ($html -notmatch 'href="javascript:') 'unsafe link survived'
         Assert-True ($html -notmatch '<img') 'remote image was embedded'
         Assert-True ($html -match '<table>') 'table was not rendered'
+        Assert-True ($html -match 'id="search"' -and $html -match 'id="themeToggle"' -and $html -match 'id="toTop"') 'Guide shell controls missing'
+        Assert-GuideIntegrity $html
+    }
+
+    Assert-Test 'Guide mirrors nested routing and plain-language descriptions' {
+        $root = New-Fixture 'nested-guide'
+        Replace-Utf8 (Join-Path $root '_strata\state\index.md') "## Contents`n" "## Contents`n`n- [Operations](operations/index.md) - Day-to-day workflows in plain language.`n"
+        Write-Utf8 (Join-Path $root '_strata\state\operations\index.md') "# Operations`n`nHow people use the project in normal operation.`n`n## Contents`n`n- [Work orders](work-orders.md) - Create and review work orders safely.`n"
+        Write-Utf8 (Join-Path $root '_strata\state\operations\work-orders.md') "# Work orders`n`nUse this workflow to create and review work orders.`n`n## Shared heading`n`n[This section](#shared-heading) and [the decision section](../../rationale/R1.md#shared-heading) must resolve.`n"
+        $rationale = Join-Path $root '_strata\rationale\R1.md'
+        Write-Utf8 $rationale ([IO.File]::ReadAllText($rationale,[Text.Encoding]::UTF8) + "`n## Shared heading`n`nThe routed decision remains readable.`n")
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "exit=$($result.ExitCode) $($result.Output)"
+        $html = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'))
+        Assert-True ($html -match 'Day-to-day workflows in plain language\.') 'branch description missing'
+        Assert-True ($html -match 'Create and review work orders safely\.') 'leaf description missing'
+        Assert-True ($html -match 'class="topic-card"') 'topic cards missing'
+        Assert-True ($html.IndexOf('>Operations<') -lt $html.IndexOf('>Current work<')) 'declared State order was not preserved'
+        Assert-True ($html -match 'href="#doc-state-operations-work-orders-md-heading-shared-heading"') 'same-file fragment was not rewritten'
+        Assert-True ($html -match 'href="#doc-rationale-r1-md-heading-shared-heading"') 'cross-file fragment was not rewritten'
+        Assert-GuideIntegrity $html
+    }
+
+    Assert-Test 'Guide status is read-only and detects stale authorities' {
+        $root = New-Fixture 'guide-status'
+        $result = Invoke-Context $root @('-GuideStatus')
+        Assert-True ($result.ExitCode -eq 0 -and $result.Output -match 'GUIDE_MISSING') "missing status failed: $($result.Output)"
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "generation failed: $($result.Output)"
+        $guide = Join-Path $root '_strata\project_guide.html'
+        $before = [IO.File]::ReadAllText($guide)
+        $result = Invoke-Context $root @('-GuideStatus')
+        Assert-True ($result.ExitCode -eq 0 -and $result.Output -match 'GUIDE_CURRENT') "current status failed: $($result.Output)"
+        $record = Join-Path $root '_strata\rationale\R1.md'
+        Write-Utf8 $record ([IO.File]::ReadAllText($record,[Text.Encoding]::UTF8) + "`nChanged after generation.`n")
+        $result = Invoke-Context $root @('-GuideStatus')
+        Assert-True ($result.ExitCode -eq 0 -and $result.Output -match 'GUIDE_STALE') "stale status failed: $($result.Output)"
+        Assert-True ([IO.File]::ReadAllText($guide) -eq $before) 'GuideStatus modified the Guide'
     }
 }
 finally {
@@ -180,4 +278,5 @@ finally {
 }
 
 Write-Output "RESULT passed=$Passed failed=$Failed"
-if ($Failed -ne 0) { exit 1 }
+if ($Failed -ne 0) { throw "Canonical context tests failed: $Failed" }
+$global:LASTEXITCODE = 0

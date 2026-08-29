@@ -13,7 +13,8 @@ Its purpose is one clear current truth, not shorter files at any cost.
    - unresolved conflict: surface the competing claims and ask the user rather than choosing precedence.
 4. Preserve useful evolution as a compact Rationale explanation or Build Log history when it still helps
    future decisions. Historical context must not remain as a competing current rule.
-5. Repair inbound references, affected checks, and indexes; regenerate Guide when an authority changed.
+5. Repair inbound references, affected checks, and indexes. Regenerate Guide only when the user
+   explicitly asks to update it.
 
 Before deleting text, confirm every substantive statement either survives at one named destination or
 has an explicit removal reason. When moved content was mechanically checked, repoint the affected check

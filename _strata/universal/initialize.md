@@ -35,10 +35,12 @@ independently in its owning authority, but the protected source material itself 
        `-- index.md
    ```
 
-   Every index has `## Contents`. Empty indexes keep that heading with no invented records.
-4. Run `_strata/universal/context.ps1 -CheckAll`, then
-   `_strata/universal/context.ps1 -GenerateGuide` to create the initial generated
-   `_strata/project_guide.html`.
+   Every index has `## Contents`. Each routed entry includes a concise human-language description that
+   helps a reader judge relevance without inventing project facts. Empty indexes keep that heading with
+   no invented records.
+4. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
+   create the initial `_strata/project_guide.html`. Do not instruct the user to invoke the internal
+   generation mode.
 5. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
    `_strata/.kit-version`.
 
