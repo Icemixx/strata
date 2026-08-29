@@ -15,9 +15,8 @@ Check your own model before anything else. If you are not Architect, or cannot d
 in normal chat, name the required role and that the other participant needs it too, and stop. A refusal
 creates no files and is not a void debate.
 
-Do not spawn an Architect to take a round when the session is a lower tier. A spawned participant
-reports to the session, which places a lower tier between the argument and the record, and a round written
-cold is weaker than one written by a seated participant. Switch the session instead, or do not debate.
+Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
+not debate.
 
 The user carries every exchange between providers. No agent invokes, polls, or notifies the other. This is
 load-bearing rather than a limitation: it is what keeps each participant's framing its own.
