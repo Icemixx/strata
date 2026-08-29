@@ -50,22 +50,22 @@ expressly accepted within one round settles at the end of that round.
 
 - **Converged** — no unresolved HOLD and no open QUESTION remain. The next round is the settled list,
   which is recorded as `settled.md`.
-- **Dissent** — a HOLD survives three exchanges without new evidence on either side. Record both positions;
-  neither wins; the item becomes an open question for the user.
-- **Terminated** — the user declares a participant unreachable. Settled items stand and remain usable; open
-  items return to the user.
+- **Terminated** — the user declares the debate over. Settled items stand and remain usable. Every
+  unresolved HOLD and open QUESTION returns to the user with both positions preserved and neither winning.
 - **Void** — the premise failed: one provider on both sides, role drift, or no shared verifiable ground.
   Nothing produced is usable.
 
+A debate ends only by convergence or by the user declaring it terminated. No count of rounds or exchanges
+closes it, and no disagreement resolves itself by lasting.
+
 Either participant may call void on role drift, provider identity, or absent verifiable ground. Only the
-user can call a false attestation or declare a participant unreachable; no agent can see another provider's
+user can call a false attestation or declare a debate terminated; no agent can see another provider's
 runtime.
 
 Close `rounds.md` with exactly one stamp:
 
 - `DEBATE: converged — [count] settled — [models] — [subject]`
-- `DEBATE: dissent on [topics] — [count] settled, [count] dissenting — [models] — [subject]`
-- `DEBATE: terminated — [participant] unreachable — [count] settled, [count] open — [models] — [subject]`
+- `DEBATE: terminated — [reason] — [count] settled, [count] open — [models] — [subject]`
 - `DEBATE: void — [reason] — [models] — [subject]`
 
 ## Recording
