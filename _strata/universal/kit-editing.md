@@ -23,6 +23,20 @@ from an authorized commit or publication. Publication is never implied by kit ed
 After a canonical payload change, tell the user which consuming repositories still require a separate
 sync. Do not retrofit them as part of the canonical transaction.
 
+## The payload is copied, never described
+
+Updating the kit is a pull and overwrite, every time and in every repository. A consuming repository must
+never require an edit because the canonical payload gained, lost, or renamed a file.
+
+A project check may require by name the few payload files its routers depend on, and may compare the
+installed payload against a canonical checkout. It must not declare the payload inventory, enumerate the
+on-demand procedures, or hardcode a procedure filename in a rule or test fixture. Derive the inventory
+from the payload directory and let the canonical comparison own set equality: a declared list is a stale
+copy of the directory it claims to describe, so it fails on the next release instead of on a real defect.
+
+Express router rules as what a router may import - the shared core and project-owned files - rather than
+as a list of payload files it may not.
+
 ## Consuming-copy sync
 
 Verify the configured source and target revision. Replace only the complete shared payload; preserve all
