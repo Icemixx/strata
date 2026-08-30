@@ -81,8 +81,8 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 1. **Reports.** Both participants receive the same brief and work independently. Neither sees the other's
    output until both are finished. Skip this phase when the artifacts already exist.
-2. **Cross-analysis.** Each participant reads both reports and writes its own comparison without seeing the
-   other's comparison. This blindness is mandatory. Without it the first writer frames the comparison and
+2. **Cross-analysis.** Each participant reads both reports and writes its own comparison without seeing
+   the other's comparison. This blindness is mandatory. Without it the first writer frames the comparison and
    the second answers that framing instead of the evidence.
 3. **Rounds.** Each participant reads everything, verifies contested claims against the repository, and
    appends one round. Never edit an earlier round, including your own; correct it by writing a new entry
@@ -188,9 +188,9 @@ filename that moves is a filename the other side cannot find.
 On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
 entry in the same transaction.
 
-The branch is Build Log evidence. Write settled conclusions into the authority that owns them -
-decisions to Rationale, status and remaining work to State - and link them to `settled.md`. A void debate produces no
-authority record. Guide is not regenerated.
+The branch is Build Log evidence. Write settled conclusions into the authority that owns them - decisions
+to Rationale, status and remaining work to State - and link them to `settled.md`. A void debate produces
+no authority record. Guide is not regenerated.
 
 ## Limits
 
@@ -201,5 +201,5 @@ what catches this, because it records the model per assistant message after the 
 covers the boundary between prompts, the durable record covers what happens inside one. Cite both.
 
 Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify
-the other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that cost is
-the intended brake: use DAP when one provider's scrutiny is enough.
+the other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that
+cost is the intended brake: use DAP when one provider's scrutiny is enough.
