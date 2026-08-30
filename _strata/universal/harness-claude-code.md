@@ -16,7 +16,7 @@ are now; the transcript answers what you have been.
 
 The environment context names the family and the exact model id, and it is re-stated to you on every turn.
 It is the live value and the only one that describes the turn you are currently executing, so it is what a
-procedure re-determining tier per round must read.
+procedure re-determining tier per prompt must read.
 
 The session transcript at `<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl` records
 `message.model` on each assistant message, but records are written as a turn completes: the newest entry
@@ -24,6 +24,13 @@ is the previous turn, and the turn in flight is absent. It therefore cannot tell
 right now, and a procedure that relies on it alone detects a switch only after a round was already written
 under the wrong tier. Use it for the switch history and because a third party can check it, not to
 determine the current turn.
+
+It has one job nothing else can do. `message.model` is recorded per assistant message, so it is the only
+place a model change *inside* a single prompt becomes visible: capacity fallback can serve part of one
+response from a lower tier, and no live check sits between an agent's own tool calls. An Opus session
+running a debate evidence pass was served its final write by Sonnet as it hit a session limit, and the
+transcript is where that shows. The environment context covers the boundary between prompts; this covers
+what happened inside one, after the fact.
 
 **Select the transcript by `CLAUDE_CODE_SESSION_ID`, never by recency.** That directory also holds child
 and sidechain sessions running other models, so the newest file is frequently not yours: an agent that
