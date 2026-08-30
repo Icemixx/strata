@@ -12,13 +12,9 @@ the task needs it.
 - **Build Log** records HOW work was performed and the evidence observed.
 - **Guide** is a generated, self-contained HTML view over those three project authorities. It is not an
   authority and contains no manually maintained unique content.
-
-`_strata/` holds the shared payload and the project's own authorities, and nothing else. Project material
-that is not an authority lives in `_sediment/` at the repository root: deliberation — discussions,
-decision trails, plans, open questions — at its root, and stable domain material such as evidence
-ledgers, external specifications and source data under `_sediment/reference/`. It is not routed, has no
-index, and is not validated. Every file there that still matters is named by the record it serves, so
-nothing is reachable from nothing.
+- **`_sediment/`** holds project material that is not an authority: deliberation at its root, stable
+  domain material under `reference/`. It is not routed, and every file a record still needs is named by
+  that record.
 
 Each authority is a recursively indexed Markdown tree. Every routed directory has an `index.md`, and
 only described links inside `## Contents` define ownership, traversal, and Guide order.
