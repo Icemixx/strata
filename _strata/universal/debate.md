@@ -45,9 +45,8 @@ The user carries every exchange between providers. No agent invokes, polls, or n
 
 ## The brief
 
-A brief says which phase, the subject, the question, and nothing about tier; the check reaches the
-participant through the on-demand trigger in `universal_agent_instructions.md`. Do not open a brief with
-an instruction to read a file.
+A brief says which phase, the subject, the question, and nothing about tier. Do not open a brief with an
+instruction to read a file.
 
 ## Phases
 
