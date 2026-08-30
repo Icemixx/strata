@@ -27,6 +27,15 @@ fallback can serve a later request in the same turn from a different model. A ga
 certifies only the work already done. The live source is restated on every request, so this costs no tool
 call and no round trip; there is no efficiency argument for checking less often.
 
+**Re-read this file at the start of every round.** A debate spans hours and many turns, and the copy in
+your context is a memory of the procedure rather than the procedure. Read it from disk before each round,
+for the same reason you re-check the model: the contract is the file, not your recollection of it. This
+has already happened - a participant continued under a branch that had been removed from the file it named
+as its authority, having read that file before the change.
+
+Whoever is editing the procedure stops while a debate is running. A contract revised mid-execution leaves
+the two participants following different texts, and neither can see that it happened.
+
 **On drift, stop where you are.** Do not complete the action in hand. If it dropped below Architect, take
 no further action, leave no partial round, and say in normal chat what you determined and where you
 stopped; the user decides whether to reseat or end. If it changed but remains Architect, disclose the
