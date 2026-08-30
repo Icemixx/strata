@@ -11,6 +11,12 @@ handoff for a Claude Code session. It is not a startup import.
 | Engineer | Sonnet |
 | Technician | Haiku |
 
+**Model self-identification.** A Claude Code session is told its own model in its environment context,
+which names both the family and the exact model id. That statement is authoritative for the session and
+needs no file inspection. Report the id verbatim rather than inferring a family from behaviour, and map it
+to a role by family above. When a procedure asks for your model, this is the source; if the environment
+does not state it, say "cannot determine" rather than guessing.
+
 Use Claude Code's native Agent mechanism and request the mapped model for each independent assignment.
 Give delegated agents a self-contained brief because their usable context is determined by that
 assignment and harness behavior, not by the Active Agent's assumptions. Treat each assignment as
