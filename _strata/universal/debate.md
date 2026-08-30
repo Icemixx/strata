@@ -14,14 +14,16 @@ same-role model means the procedure cannot run.
 Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
 verify the other's model and not every harness tells an agent its own.
 
-**Gate on entry.** Determine your model from the live source your dossier names before anything else.
+**Gate on entry.** Determine your model from the live source your dossier names before anything else. If
+it maps below Architect, name the model the user must switch to - Opus for Claude Code, Sol for Codex -
+say the other participant needs Architect too, and stop. A refusal creates nothing and is not a void
+debate.
+
 Reading this file and your own harness dossier is part of that determination rather than work performed
-under it; the brief, repository files, searches and commands all wait until the gate has passed. An
-earlier wording forbade opening any file before the check, which the check itself cannot satisfy - both
-participants had to break its letter to perform it, and each then drew its own line about what else it
-could read on the way. One read three files unrelated to the brief. If it maps below Architect, name the model the user must switch
-to - Opus for Claude Code, Sol for Codex - say the other participant needs Architect too, and stop. A
-refusal creates nothing and is not a void debate.
+under it; the brief, repository files, searches and commands wait until the gate has passed. An earlier
+wording forbade opening any file at all, which the check itself cannot satisfy: both participants had to
+break its letter to perform it, and each then drew its own line about what else it could read on the way.
+One read three files unrelated to the brief.
 
 **Then check again at the start of every prompt, for the whole debate.** Not once on entry and not once
 per round. A prompt is the boundary because the live source is restated with each one: the check costs no
@@ -90,18 +92,20 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 Head each round `## Round N — <product> / <model> (<tier>)`. Both fields record what you determined this
 round, never what the procedure requires. Write the model id you determined, or `model-undisclosed` when
-you could not and the user attested the tier instead. Write `Architect` when the id maps to it, or `Architect (user-attested)` when you
-could not determine the model and the user confirmed the tier — stamping a bare `Architect` on a round
-whose participant could not confirm its model asserts the one thing that was not established. In your first round, also state in one line whether
-you can execute verification commands against the repository.
+you could not and the user attested the tier instead. Write `Architect` when the id maps to it, or
+`Architect (user-attested)` when you could not determine the model and the user confirmed the tier -
+stamping a bare `Architect` on a round whose participant could not confirm its model asserts the one thing
+that was not established. In your first round, also state in one line whether you can execute
+verification commands against the repository.
 
 **The test is what the value describes, not where it is stored.** Use whatever reports the model
-executing the turn you are in. A record qualifies when it is written as a turn begins - Codex's
-`turn_context` is such a record and is its authoritative source. A record does not qualify when it is
-written as a turn ends, because the newest entry is then the previous turn and the turn in flight is
-absent; Claude Code's `message.model` is that shape, which is why its dossier sends you to the environment
-context for the current turn and to the transcript only for history. Your dossier names your source: if it
-names one, you have one.
+executing the prompt you are in. A record qualifies when it is written as a turn begins - Codex's
+`turn_context` is such a record and is its authoritative source. A record does not qualify as the live
+value when it is written as a turn ends, because its newest entry is then the previous turn and the one in
+flight is absent; Claude Code's `message.model` is that shape, which is why its dossier sends you to the
+environment context. That transcript still does something the live source cannot - recording the model per
+assistant message, it is where a mid-prompt fallback becomes visible - but that is evidence after the
+fact, not the determination. Your dossier names your source: if it names one, you have one.
 
 **Cite the determination so it can be falsified.** Under the heading, give the source you read and the
 exact value it returned. Where a durable record also exists, add the figure that lets a reader confirm you
@@ -184,8 +188,8 @@ filename that moves is a filename the other side cannot find.
 On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
 entry in the same transaction.
 
-The branch is Build Log evidence. Write settled conclusions into the authority that owns them — decisions to
-Rationale, status and remaining work to State — and link them to `settled.md`. A void debate produces no
+The branch is Build Log evidence. Write settled conclusions into the authority that owns them -
+decisions to Rationale, status and remaining work to State - and link them to `settled.md`. A void debate produces no
 authority record. Guide is not regenerated.
 
 ## Limits
@@ -196,6 +200,6 @@ work was served its final write by Sonnet as it hit a session limit, and nothing
 what catches this, because it records the model per assistant message after the fact - live checking
 covers the boundary between prompts, the durable record covers what happens inside one. Cite both.
 
-Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify the
-other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that cost is
+Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify
+the other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that cost is
 the intended brake: use DAP when one provider's scrutiny is enough.
