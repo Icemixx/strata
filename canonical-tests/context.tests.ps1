@@ -244,6 +244,33 @@ try {
         Assert-True ($html -match 'data-generation-commit="[^"]+"') 'generation commit missing'
         Assert-True ($html -match 'id="ticket-BUG-1"') 'stable ticket anchor missing'
         Assert-True ($html -match '<h3>What State says</h3>') 'ticket State prose missing'
+
+        # Watched red: prove each citation check fails on a planted defect before trusting a pass.
+        $composed = Join-Path $root '_sediment\guide'
+        [void][IO.Directory]::CreateDirectory($composed)
+        $guideMd = Join-Path $composed 'project_guide.md'
+        Write-Utf8 $guideMd "# How it works`n`nThe fixture is under test. [code: _strata/state/current.md:BUG-1] [authority: _strata/rationale/R1.md]`n"
+        $ok = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($ok.ExitCode -eq 0) "valid citations should generate: $($ok.Output)"
+        $composedHtml = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'))
+        Assert-True ($composedHtml -match 'id="how-it-works"') 'composed section missing'
+        Assert-True ($composedHtml -match 'class="cite cite-code"') 'code reference not rendered'
+        Assert-True ($composedHtml -match 'class="cite cite-authority"') 'authority reference not rendered'
+
+        # A generation refusal surfaces as a terminating error here, not an exit code, because the
+        # harness runs with ErrorActionPreference Stop. Assert on the refusal and its reason.
+        function Assert-GuideRefused([string]$Root, [string]$Markdown, [string]$Expected, [string]$Why) {
+            Write-Utf8 (Join-Path $Root '_sediment\guide\project_guide.md') $Markdown
+            $refused = $false; $message = ''
+            try { $null = Invoke-Context $Root @('-GenerateGuide') }
+            catch { $refused = $true; $message = $_.Exception.Message }
+            Assert-True $refused $Why
+            Assert-True ($message -match $Expected) "expected '$Expected', got: $message"
+        }
+        Assert-GuideRefused $root "# How it works`n`nInvented. [code: _strata/state/current.md:NO_SUCH_SYMBOL]`n" 'locator not found' 'a locator absent from its cited file must fail generation'
+        Assert-GuideRefused $root "# How it works`n`nInvented. [code: nope/missing.py:thing]`n" 'cited file not found' 'a missing cited file must fail generation'
+        Assert-GuideRefused $root "# How it works`n`nInvented. [authority: _sediment/guide/project_guide.md]`n" 'not routed|not found' 'an unrouted authority target must fail generation'
+        [IO.File]::Delete($guideMd)
         Assert-True ($html -match '<h3>Why[^<]*what Rationale says</h3>') 'ticket-linked WHY section missing'
         Assert-True ($html -match '<h3>How[^<]*what the Build Log says</h3>') 'ticket-linked HOW section missing'
         Assert-True ($html -notmatch '<script>alert') 'raw script executed'

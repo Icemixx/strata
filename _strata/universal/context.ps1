@@ -427,6 +427,10 @@ function Convert-MarkdownInline([string]$Text) {
 
 function Convert-Markdown([string]$Markdown, [string]$HeaderPrefix = 'source-heading-') {
     $safePrefix = [regex]::Replace($HeaderPrefix, '[^a-zA-Z0-9_-]', '-')
+    # Heading text repeats inside a record - "Files", "Notes", "Verification" once per section is
+    # normal prose, not a mistake - so a slug alone is not an id. Number the repeats rather than
+    # emitting a duplicate id, which fails generation closed and blocks the whole Guide.
+    $usedSlugs = @{}
     $lines = @($Markdown -replace "`r`n?", "`n" -split "`n")
     $html = [Text.StringBuilder]::new()
     $paragraph = [Collections.Generic.List[string]]::new()
@@ -465,6 +469,11 @@ function Convert-Markdown([string]$Markdown, [string]$HeaderPrefix = 'source-hea
             $level = $Matches[1].Length
             $heading = $Matches[2]
             $slug = ([regex]::Replace($heading.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
+            if ($usedSlugs.ContainsKey($slug)) {
+                $usedSlugs[$slug] = $usedSlugs[$slug] + 1
+                $slug = $slug + '-' + $usedSlugs[$slug]
+            }
+            else { $usedSlugs[$slug] = 1 }
             [void]$html.Append('<h').Append($level).Append(' id="').Append($safePrefix).Append($slug).Append('">').Append((Convert-MarkdownInline $heading)).Append('</h').Append($level).AppendLine('>')
             continue
         }
@@ -626,7 +635,12 @@ function Get-RecordTopics([string]$Markdown, [string]$HeadingPrefix) {
     # navigation and content agree without rendering twice.
     $safePrefix = [regex]::Replace($HeadingPrefix, '[^a-zA-Z0-9_-]', '-')
     $topics = New-Object System.Collections.ArrayList
+    $inCode = $false
     foreach ($line in @($Markdown -split "`n")) {
+        # Track fences exactly as Convert-Markdown does. A "## " inside a code block is sample
+        # text, not a topic: navigating to one links at a heading the renderer never emitted.
+        if ($line -match '^```') { $inCode = -not $inCode; continue }
+        if ($inCode) { continue }
         if ($line -match '^##\s+(.+?)\s*#*$') {
             $title = $Matches[1]
             $slug = ([regex]::Replace($title.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
@@ -652,6 +666,74 @@ function Expand-RecordTopics([string]$Html) {
         [void]$builder.Append(('<details class="topic" id="{0}"{1}><summary>{2}</summary><div class="topic-body">{3}</div></details>' -f $heading.Groups[1].Value, $open, $heading.Groups[2].Value, $inner))
     }
     return $builder.ToString()
+}
+
+function Test-GuideCitation([string]$Kind, [string]$Target, [string]$RepoRoot, [object]$Graphs) {
+    # Two reference kinds resolve at different strengths, because they can. An authority target is
+    # present in the routed graph or it is not. A code locator can only be checked textually: deciding
+    # which declaration a token denotes is static analysis, which universal tooling must not attempt.
+    $parts = $Target -split '(?<!^[A-Za-z]):', 2
+    $relative = $parts[0]
+    $locator = if ($parts.Count -gt 1) { $parts[1] } else { '' }
+    if ($Kind -eq 'authority') {
+        $pieces = $Target -split '#', 2
+        $path = $pieces[0]
+        $anchor = if ($pieces.Count -gt 1) { $pieces[1] } else { '' }
+        if ($path -match '[<>"|*?]') { return "authority target has illegal path characters: $Target" }
+        $full = Join-Path $RepoRoot $path
+        if (-not (Test-Path -LiteralPath $full)) { return "authority file not found: $path" }
+        $routed = $false
+        foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) {
+            foreach ($known in @($graph.Ordered)) {
+                if ([IO.Path]::GetFullPath($known) -eq [IO.Path]::GetFullPath($full)) { $routed = $true }
+            }
+        }
+        if (-not $routed) { return "authority target is not routed: $path" }
+        if ($anchor) {
+            $slugs = @()
+            foreach ($line in @((Read-Utf8 $full) -split "`n")) {
+                if ($line -match '^#{1,6}\s+(.+?)\s*#*$') {
+                    $slugs += ([regex]::Replace($Matches[1].ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
+                }
+            }
+            if ($slugs -notcontains $anchor.ToLowerInvariant()) { return "authority anchor not found: $Target" }
+        }
+        return ''
+    }
+    if ($relative -match '[<>"|*?]') { return "code target has illegal path characters: $Target" }
+    $full = Join-Path $RepoRoot $relative
+    if (-not (Test-Path -LiteralPath $full)) { return "cited file not found: $relative" }
+    if ([string]::IsNullOrWhiteSpace($locator)) { return '' }
+    $content = Read-Utf8 $full
+    if ($null -eq $content) { return "cited file unreadable: $relative" }
+    # Delimiter-aware for a simple identifier; literal for compound tokens carrying punctuation.
+    $found = if ($locator -match '^[A-Za-z_][A-Za-z0-9_]*$') {
+        [regex]::IsMatch($content, '(?<![A-Za-z0-9_])' + [regex]::Escape($locator) + '(?![A-Za-z0-9_])')
+    } else { $content.Contains($locator) }
+    if (-not $found) { return "locator not found in cited file: $Target" }
+    return ''
+}
+
+function Convert-GuideCitations([string]$Markdown, [string]$RepoRoot, [object]$Graphs, [object]$Problems, [object]$CitedFiles, [object]$Chips) {
+    # Harvest references from the Markdown, before rendering. A path like `_strata/state/current.md`
+    # carries underscores that inline conversion reads as emphasis, so a reference validated after
+    # rendering is validated against `<em>strata/...` and fails for a reason that is not its own.
+    $index = 0
+    return [regex]::Replace($Markdown, '\[(code|authority):\s*([^\]]+)\]', {
+        param($m)
+        $kind = $m.Groups[1].Value
+        $target = $m.Groups[2].Value.Trim()
+        $problem = Test-GuideCitation $kind $target $RepoRoot $Graphs
+        if ($problem) { [void]$Problems.Add($problem) }
+        if ($kind -eq 'code') { [void]$CitedFiles.Add((($target -split '(?<!^[A-Za-z]):', 2)[0])) }
+        $token = '@@STRATACITE' + $script:GuideCiteCounter + '@@'
+        $script:GuideCiteCounter++
+        [void]$Chips.Add([pscustomobject]@{
+            Token = $token
+            Html  = ('<span class="cite cite-{0}" title="{0}">{1}</span>' -f $kind,[Net.WebUtility]::HtmlEncode($target))
+        })
+        return $token
+    })
 }
 
 function Render-GuideNode([object]$Node, [int]$Depth, [hashtable]$Anchors) {
@@ -732,11 +814,38 @@ function New-Guide([object]$Graphs, [string]$Digest) {
 
     $navigation = New-Object Text.StringBuilder
     [void]$navigation.Append('<ul>')
+    if (Test-Path -LiteralPath (Join-Path $ProjectRoot '_sediment/guide/project_guide.md')) { [void]$navigation.Append('<li data-nav-item data-target="how-it-works"><a href="#how-it-works">How it works</a><span class="nav-description">What the application does and how it behaves, composed from the code and the authorities.</span></li>') }
     if ($tickets.Count -gt 0) { [void]$navigation.Append('<li data-nav-item data-target="work-overview"><a href="#work-overview">Work overview</a><span class="nav-description">Current work with its linked reasons and evidence.</span></li>') }
     foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) { [void]$navigation.Append((Render-GuideNavigationNode $graph.Tree $anchors)) }
     [void]$navigation.Append('</ul>')
 
     $body = New-Object Text.StringBuilder
+
+    # The composed explanation leads the Guide. It is the part a person reads; the authorities behind it
+    # are the working material. Read one exact conventional path - `_sediment/` stays unrouted,
+    # untraversed and unvalidated, and a direct read of a known file is not traversal.
+    $compositionPath = Join-Path $ProjectRoot '_sediment/guide/project_guide.md'
+    $citationProblems = New-Object System.Collections.ArrayList
+    $citedFiles = New-Object System.Collections.ArrayList
+    if (Test-Path -LiteralPath $compositionPath) {
+        $composed = Read-Utf8 $compositionPath
+        if (-not [string]::IsNullOrWhiteSpace($composed)) {
+            $chips = New-Object System.Collections.ArrayList
+            $script:GuideCiteCounter = 0
+            $marked = Convert-GuideCitations (Remove-ContentsSection $composed) $ProjectRoot $Graphs $citationProblems $citedFiles $chips
+            $rendered = Convert-Markdown $marked 'guide-heading-'
+            foreach ($chip in @($chips)) { $rendered = $rendered.Replace($chip.Token, $chip.Html) }
+            $rendered = Expand-RecordTopics $rendered
+            [void]$body.AppendLine('<section class="guide-section" id="how-it-works" data-nav-target><h1>How it works</h1>')
+            [void]$body.AppendLine('<article class="record" id="doc-guide-composition" data-depth="0" data-search-item data-nav-target>')
+            [void]$body.AppendLine('<div class="source">_sediment/guide/project_guide.md &mdash; composed explanation, not an authority</div>')
+            [void]$body.Append($rendered)
+            [void]$body.AppendLine('</article></section>')
+        }
+        if ($citationProblems.Count -gt 0) {
+            throw ("Guide composition has unresolvable references: " + (($citationProblems | Select-Object -Unique) -join '; '))
+        }
+    }
     if ($tickets.Count -gt 0) {
         [void]$body.AppendLine('<section class="guide-section" id="work-overview" data-nav-target><h1>Work overview</h1><p class="authority-intro">Current work with its linked reasons and implementation evidence.</p>')
         foreach ($ticket in $tickets) {
