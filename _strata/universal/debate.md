@@ -14,8 +14,12 @@ same-role model means the procedure cannot run.
 Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
 verify the other's model and not every harness tells an agent its own.
 
-**Gate on entry.** Before reading the brief, opening a file, or creating anything, determine your model
-from the live source your dossier names. If it maps below Architect, name the model the user must switch
+**Gate on entry.** Determine your model from the live source your dossier names before anything else.
+Reading this file and your own harness dossier is part of that determination rather than work performed
+under it; the brief, repository files, searches and commands all wait until the gate has passed. An
+earlier wording forbade opening any file before the check, which the check itself cannot satisfy - both
+participants had to break its letter to perform it, and each then drew its own line about what else it
+could read on the way. One read three files unrelated to the brief. If it maps below Architect, name the model the user must switch
 to - Opus for Claude Code, Sol for Codex - say the other participant needs Architect too, and stop. A
 refusal creates nothing and is not a void debate.
 
@@ -40,6 +44,16 @@ the two participants following different texts, and neither can see that it happ
 no further action, leave no partial round, and say in normal chat what you determined and where you
 stopped; the user decides whether to reseat or end. If it changed but remains Architect, disclose the
 change and continue - same role, disclosed, which is the DAP substitution rule.
+
+**Report the stop from what you did, not from what a stop usually looks like.** Name the files you opened
+and the work you finished before the gate fired, by checking rather than by recalling. A stop statement
+describes this turn and is as falsifiable as the model citation, so it is written the same way: a
+participant reused the wording of an earlier clean refusal and reported opening no files, having just
+opened five.
+
+Evidence gathered below Architect does not enter the debate. Disclose it so the user can see what
+happened, then leave it for an Architect to gather again - a finding produced by a Technician and quoted
+into a round is laundered through the chat rather than earned.
 
 **If you cannot determine it, ask the user; never certify yourself.** Not knowing is not a refusal of the
 debate, and it is not permission to act as an Architect either. Say what you tried and what it returned,
