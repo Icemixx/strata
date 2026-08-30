@@ -1,13 +1,27 @@
-SIMPLIFICATION_DECISIONS.md
-retrofit_prompt.txt
+# Default deny. The kit is public and deliberately project-agnostic, while this
+# working tree also holds audit, debate, sweep and repair artifacts that describe
+# private consuming repositories, including unremediated security findings. Those
+# must never be published here.
+#
+# This file previously listed the artifacts to exclude, which fails open: any new
+# artifact whose name matched no pattern became publishable, and a `git add -A` did
+# once commit nine private files. It now ignores everything and re-admits only what
+# the kit actually publishes, so a new file is private unless someone deliberately
+# adds it below.
+#
+# Published: the shared payload under _strata/, its canonical tests, README, LICENSE,
+# and the two git control files. Everything else — reports, plans, ledgers, fixtures,
+# tooling, scratch — stays local.
 
-# Audit, debate, sweep and repair artifacts. The kit is public and deliberately
-# project-agnostic; these describe private consuming repositories, including
-# unremediated security findings, and must never be published here.
-claude_report.md
-codex_report.md
-claude_v_codex.md
-codex_v_claude.md
-c_&_c.md
-sweep-*.md
-*-plan.md
+*
+
+!.gitattributes
+!.gitignore
+!LICENSE
+!README.md
+
+!_strata/
+!_strata/**
+
+!canonical-tests/
+!canonical-tests/**
