@@ -13,8 +13,8 @@ same-role model means the procedure cannot run.
 
 Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
 verify the other's model and not every harness tells an agent its own. State what you can determine about
-your own model in your first round, including "cannot determine" — that disclosure goes on the record and
-the user may correct it.
+your own model at the start of every round, including "cannot determine" — that disclosure goes on the
+record and the user may correct it. Every round, because a session's model can change between turns.
 
 Stop only on a positive determination that you are below Architect tier: say so in normal chat, name the
 required role and that the other participant needs it too, and stop. A refusal creates no files and is not
@@ -42,9 +42,17 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 ## Rounds
 
 Head each round `## Round N — <product> / <model> (Architect)`, using the model name you can determine or
-`model-undisclosed` when you cannot. In your first round, state in one line what you can determine about
-your own model and whether you can execute verification commands against the repository. End every round
-with a turn marker on its own line:
+`model-undisclosed` when you cannot. In your first round, also state in one line whether you can execute
+verification commands against the repository.
+
+**Determine your model again at the start of every round, not only the first.** A session's model can
+change between turns, so a start-only check certifies a tier the later rounds may not have. The heading
+states what you determined for that round. If it changed but remains Architect, disclose the change in the
+round and continue — that is the DAP substitution rule, same role and disclosed. If it dropped below
+Architect, do not write the round: say so in normal chat and hand back to the user, who decides whether to
+reseat the session or end the debate.
+
+End every round with a turn marker on its own line:
 
 ```text
 Round N complete — next: <participant>
