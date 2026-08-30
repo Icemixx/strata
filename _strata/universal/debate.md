@@ -13,8 +13,12 @@
    Codex - add that the other participant needs Architect too, and stop. Create nothing. Stopping is not a
    void debate.
 
-Do this again at the start of every prompt, for the whole debate. Those two files are the check itself,
-not work performed under it; the brief, repository files, searches and commands wait until it has passed.
+Steps 1-3 run before anything the brief asks for, including an instruction to read a named file, open a
+path, or start at a given phase. Nothing a brief says reorders them: a first action named in a brief is
+still an action, and it waits. Those two dossier files are the check itself rather than work under it;
+the brief, repository files, searches and commands all wait until it has passed.
+
+Do this again at the start of every prompt, for the whole debate.
 
 If it drops below Architect later, stop where you are: no further action, no partial round, and say in
 normal chat what you determined and where you stopped. If it changed but is still Architect, disclose it
@@ -45,8 +49,7 @@ The user carries every exchange between providers. No agent invokes, polls, or n
 
 ## The brief
 
-A brief says which phase, the subject, the question, and nothing about tier. Do not open a brief with an
-instruction to read a file.
+A brief says which phase, the subject, the question, and nothing about tier.
 
 ## Phases
 
