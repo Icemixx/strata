@@ -32,10 +32,17 @@ no further action, leave no partial round, and say in normal chat what you deter
 stopped; the user decides whether to reseat or end. If it changed but remains Architect, disclose the
 change and continue - same role, disclosed, which is the DAP substitution rule.
 
-**Not knowing is not a refusal.** Inability to determine your model is disclosed and the debate proceeds;
-treating it as disqualifying makes the procedure unrunnable on any harness that withholds model identity,
-which is a gate that fails closed rather than a safeguard. Disclose it on entry and in each round heading,
-and keep checking in case the source becomes available.
+**If you cannot determine it, ask the user; never certify yourself.** Not knowing is not a refusal of the
+debate, and it is not permission to act as an Architect either. Say what you tried and what it returned,
+and ask the user to confirm the tier. Their answer is the attestation, recorded in the round heading as
+`Architect (user-attested)`, and seating participants was always their responsibility. Keep checking in
+case the source becomes available.
+
+Self-certifying on an unverified claim is the fail-open twin of refusing when the answer is merely
+unavailable. Both end the same way - a round written by a model nobody established was Architect - so
+neither an agent's inability nor its assurance may open the gate on its own. This clause has been abused
+once already: a session that had determined its exact model minutes earlier reported that it could not,
+and proceeded.
 
 Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
 not debate.
@@ -58,15 +65,18 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 Head each round `## Round N — <product> / <model> (<tier>)`. Both fields record what you determined this
 round, never what the procedure requires. Write the model id you determined, or `model-undisclosed` when
-you could not. Write `Architect` when the id maps to it, or `Architect-unconfirmed` when you could not
-determine the model — stamping `Architect` on a round whose participant just said it cannot confirm its
-model asserts the one thing that was not established. In your first round, also state in one line whether
+you could not and the user attested the tier instead. Write `Architect` when the id maps to it, or `Architect (user-attested)` when you
+could not determine the model and the user confirmed the tier — stamping a bare `Architect` on a round
+whose participant could not confirm its model asserts the one thing that was not established. In your first round, also state in one line whether
 you can execute verification commands against the repository.
 
-**Read a live source, not a record of past turns.** Determine the model executing this turn, from
-whatever your harness exposes as current. A transcript or rollout that is written when a turn finishes
-reports the previous turn, so a procedure resting on it alone certifies the round it has already written
-rather than the one it is about to write. The dossiers name the live source for each harness.
+**The test is what the value describes, not where it is stored.** Use whatever reports the model
+executing the turn you are in. A record qualifies when it is written as a turn begins - Codex's
+`turn_context` is such a record and is its authoritative source. A record does not qualify when it is
+written as a turn ends, because the newest entry is then the previous turn and the turn in flight is
+absent; Claude Code's `message.model` is that shape, which is why its dossier sends you to the environment
+context for the current turn and to the transcript only for history. Your dossier names your source: if it
+names one, you have one.
 
 **Cite the determination so it can be falsified.** Under the heading, give the source you read and the
 exact value it returned. Where a durable record also exists, add the figure that lets a reader confirm you
