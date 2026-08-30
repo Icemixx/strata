@@ -50,8 +50,8 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 A brief says which phase, the subject, the question, and nothing about tier. The check reaches the
 participant through the on-demand trigger in `universal_agent_instructions.md`, loaded at session start,
-so the user never has to type it. Do not open a brief with an instruction to read a file: a brief that
-named a first action got that action, and the check waited behind it.
+so the user never has to type it. Do not open a brief with an instruction to read a file; a brief that
+names a first action gets that action, ahead of the check.
 
 ## Phases
 
@@ -92,11 +92,8 @@ Model: <id> - live source: <what you read>
 History: <path> (<n> records) - <first> -> <last>
 ```
 
-Nothing can mechanically stop a participant writing a heading it did not earn, and no agent can read
-another provider's runtime. A citation does not close that gap; it changes what a false claim costs. An
-unsupported assertion is invisible, while a cited one is checkable by the user, who holds both sides, and
-by anyone with the file. The count matters: an agent that read a 10-record sidechain instead of its own
-1,793-record session was caught by that number alone.
+The record count is not optional. It is what lets a reader confirm the session cited is the session that
+ran.
 
 End every round with a turn marker on its own line:
 
@@ -158,8 +155,8 @@ meet. An unfinished debate is deliberation, which is what `_sediment/` is for.
 
 The branch holds `index.md`, one `report-<product>.md` and one `cross-<product>.md` per participant,
 `rounds.md`, and `settled.md`. Name leaf files by product - `report-codex.md`, `report-claude-code.md` -
-never by model: a participant may legitimately change model mid-debate while remaining Architect, and a
-filename that moves is a filename the other side cannot find.
+never by model. A participant may change model mid-debate while remaining Architect, and a filename that
+moves is one the other side cannot find.
 
 On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
 entry in the same transaction.
@@ -171,10 +168,8 @@ no authority record. Guide is not regenerated.
 ## Limits
 
 A model change inside a single prompt is not detected. Capacity fallback can serve part of one response
-from a lower tier, and no live check sits between an agent's own tool calls: an Opus session doing Phase 1
-work was served its final write by Sonnet as it hit a session limit, and nothing fired. The transcript is
-what catches this, because it records the model per assistant message after the fact - live checking
-covers the boundary between prompts, the durable record covers what happens inside one. Cite both.
+from a lower tier, and no live check sits between an agent's own tool calls. The transcript catches this
+after the fact, recording the model per assistant message. Cite both sources.
 
 Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify
 the other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that

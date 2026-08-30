@@ -26,17 +26,13 @@ under the wrong tier. Use it for the switch history and because a third party ca
 determine the current turn.
 
 It has one job nothing else can do. `message.model` is recorded per assistant message, so it is the only
-place a model change *inside* a single prompt becomes visible: capacity fallback can serve part of one
-response from a lower tier, and no live check sits between an agent's own tool calls. An Opus session
-running a debate evidence pass was served its final write by Sonnet as it hit a session limit, and the
-transcript is where that shows. The environment context covers the boundary between prompts; this covers
-what happened inside one, after the fact.
+place a model change *inside* a single prompt becomes visible, which capacity fallback can cause. The
+environment context covers the boundary between prompts; this covers what happened inside one, after the
+fact.
 
 **Select the transcript by `CLAUDE_CODE_SESSION_ID`, never by recency.** That directory also holds child
-and sidechain sessions running other models, so the newest file is frequently not yours: an agent that
-guessed by modification time read a 10-record sidechain, reported a third model that was neither its
-previous nor its current one, and would have certified the wrong tier. Ignore `<synthetic>`, which marks
-generated records rather than a model. If the variable is unset, say so rather than picking a candidate.
+and sidechain sessions running other models, so the newest file is frequently not yours. Ignore
+`<synthetic>`, which marks generated records rather than a model. If the variable is unset, say so rather than picking a candidate.
 
 Report the id verbatim rather than inferring a family from behaviour, and map it to a role by family
 above. If neither source is available, say "cannot determine" rather than guessing.
