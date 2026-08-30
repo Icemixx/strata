@@ -11,9 +11,16 @@ Both participants are Architect. `active-agent.md` and the harness dossiers own 
 this procedure does not restate it. Substitution follows the DAP rule: same role only, disclosed, and no
 same-role model means the procedure cannot run.
 
-Check your own model before anything else. If you are not Architect, or cannot determine your model, say so
-in normal chat, name the required role and that the other participant needs it too, and stop. A refusal
-creates no files and is not a void debate.
+Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
+verify the other's model and not every harness tells an agent its own. State what you can determine about
+your own model in your first round, including "cannot determine" — that disclosure goes on the record and
+the user may correct it.
+
+Stop only on a positive determination that you are below Architect tier: say so in normal chat, name the
+required role and that the other participant needs it too, and stop. A refusal creates no files and is not
+a void debate. **Not knowing is not a refusal.** Inability to determine your own model is disclosed and
+the debate proceeds; treating it as disqualifying makes the procedure unrunnable on any harness that
+withholds model identity, which is a gate that fails closed rather than a safeguard.
 
 Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
 not debate.
@@ -34,9 +41,10 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 ## Rounds
 
-Head each round `## Round N — <product> / <model> (Architect)`. In your first round, state in one line
-whether you can execute verification commands against the repository. End every round with a turn marker
-on its own line:
+Head each round `## Round N — <product> / <model> (Architect)`, using the model name you can determine or
+`model-undisclosed` when you cannot. In your first round, state in one line what you can determine about
+your own model and whether you can execute verification commands against the repository. End every round
+with a turn marker on its own line:
 
 ```text
 Round N complete — next: <participant>

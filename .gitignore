@@ -25,3 +25,4 @@
 
 !canonical-tests/
 !canonical-tests/**
+linkcheck.py
