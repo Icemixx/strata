@@ -89,9 +89,18 @@ End every round with a turn marker on its own line:
 Round N complete — next: <participant>
 ```
 
+`<participant>` is the product - `Claude Code` or `Codex` - never a model or a person. The model can
+change mid-debate while the participant does not, so a marker naming a model stops addressing anyone the
+moment a legitimate Architect-to-Architect switch happens.
+
+Number rounds sequentially across the whole file, not per participant: read the highest N present and
+write N+1. The file is shared, so two participants numbering their own sequences produce two Round 2s that
+append-only forbids correcting.
+
 Before writing, read the last turn marker. If it does not name you, say so in normal chat, name the
 participant whose turn it is, and stop. Being asked again does not make it your turn. When the file
-carries no marker yet, either participant may open.
+carries no marker yet, the participant asked first opens; if both were asked, the one whose report is
+alphabetically first by product opens, so neither waits for the other.
 
 Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
@@ -127,11 +136,18 @@ Close `rounds.md` with exactly one stamp:
 
 ## Recording
 
-Keep every artifact, from the first report onward, in the project's git-ignored working location while
-the debate runs. On close, move it to
-`_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index entry in the same transaction. The
-branch holds `index.md`, one `report-<model>.md` and one `cross-<model>.md` per participant, `rounds.md`,
-and `settled.md`. Model names in leaf filenames identify who wrote what.
+While the debate runs, every artifact lives in `_sediment/debate-<subject>/` at the repository root. Both
+participants read and write that exact path: a rendezvous both sides must find is a path, not a
+description, and two participants who each pick their own scratch location run two monologues that never
+meet. An unfinished debate is deliberation, which is what `_sediment/` is for.
+
+The branch holds `index.md`, one `report-<product>.md` and one `cross-<product>.md` per participant,
+`rounds.md`, and `settled.md`. Name leaf files by product - `report-codex.md`, `report-claude-code.md` -
+never by model: a participant may legitimately change model mid-debate while remaining Architect, and a
+filename that moves is a filename the other side cannot find.
+
+On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
+entry in the same transaction.
 
 The branch is Build Log evidence. Write settled conclusions into the authority that owns them — decisions to
 Rationale, status and remaining work to State — and link them to `settled.md`. A void debate produces no
