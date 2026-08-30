@@ -27,9 +27,7 @@ below Architect out of the debate: disclose it, then let an Architect gather it 
 ## Purpose
 
 Use this procedure to reconcile independently-derived work with an Architect from a different provider.
-A DAP council's seats share one provider and therefore one prior: it scrutinizes reasoning well and shared
-blind spots poorly. Debate breaks that correlation. Two participants from the same provider are a council,
-not a debate.
+Two participants from the same provider are a council, not a debate; use `dap.md` for those.
 
 ## Preconditions
 
@@ -37,21 +35,19 @@ Both participants are Architect, and seating them is the user's responsibility: 
 other's model. Substitution follows the DAP rule - same role only, disclosed, and no same-role model means
 the procedure cannot run.
 
-Re-read this file at the start of every round. A debate spans hours, and the copy in your context is a
-memory of the procedure rather than the procedure. Whoever is editing it stops while a debate is running.
+Re-read this file from disk at the start of every round; do not work from the copy in your context.
+Whoever is editing it stops while a debate is running.
 
 Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
 not debate.
 
-The user carries every exchange between providers. No agent invokes, polls, or notifies the other. This is
-load-bearing rather than a limitation: it is what keeps each participant's framing its own.
+The user carries every exchange between providers. No agent invokes, polls, or notifies the other.
 
 ## The brief
 
-A brief says which phase, the subject, the question, and nothing about tier. The check reaches the
-participant through the on-demand trigger in `universal_agent_instructions.md`, loaded at session start,
-so the user never has to type it. Do not open a brief with an instruction to read a file; a brief that
-names a first action gets that action, ahead of the check.
+A brief says which phase, the subject, the question, and nothing about tier; the check reaches the
+participant through the on-demand trigger in `universal_agent_instructions.md`. Do not open a brief with
+an instruction to read a file.
 
 ## Phases
 
@@ -74,14 +70,9 @@ stamping a bare `Architect` on a round whose participant could not confirm its m
 that was not established. In your first round, also state in one line whether you can execute
 verification commands against the repository.
 
-**The test is what the value describes, not where it is stored.** Use whatever reports the model
-executing the prompt you are in. A record qualifies when it is written as a turn begins - Codex's
-`turn_context` is such a record and is its authoritative source. A record does not qualify as the live
-value when it is written as a turn ends, because its newest entry is then the previous turn and the one in
-flight is absent; Claude Code's `message.model` is that shape, which is why its dossier sends you to the
-environment context. That transcript still does something the live source cannot - recording the model per
-assistant message, it is where a mid-prompt fallback becomes visible - but that is evidence after the
-fact, not the determination. Your dossier names your source: if it names one, you have one.
+Use the source your dossier names as live: it reports the model executing the prompt you are in. A record
+written as a turn ends is not that source; it reports the previous turn. Where your dossier also names a
+durable record, cite it as evidence after the fact, never as the determination.
 
 **Cite the determination so it can be falsified.** Under the heading, give the source you read and the
 exact value it returned. Where a durable record also exists, add the figure that lets a reader confirm you
@@ -117,8 +108,7 @@ alphabetically first by product opens, so neither waits for the other.
 Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
 own from an earlier round. Distinguish a factual conflict from a severity, scope, or coverage difference;
-collapsing them wastes rounds. Concede only what the evidence requires, because an unearned concession
-corrupts the settled record as much as a wrong claim.
+collapsing them wastes rounds. Concede only what the evidence requires.
 
 A claim is settled only when the other participant expressly accepts it; silence settles nothing. An
 acceptance given in the same round the claim was raised settles it at the end of that round. A settled

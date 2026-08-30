@@ -22,8 +22,7 @@ The session transcript at `<user-home>/.claude/projects/<encoded-project-path>/<
 `message.model` on each assistant message, but records are written as a turn completes: the newest entry
 is the previous turn, and the turn in flight is absent. It therefore cannot tell you what you are running
 right now, and a procedure that relies on it alone detects a switch only after a round was already written
-under the wrong tier. Use it for the switch history and because a third party can check it, not to
-determine the current turn.
+under the wrong tier. Use it for the switch history, not to determine the current turn.
 
 It has one job nothing else can do. `message.model` is recorded per assistant message, so it is the only
 place a model change *inside* a single prompt becomes visible, which capacity fallback can cause. The
@@ -38,8 +37,8 @@ Report the id verbatim rather than inferring a family from behaviour, and map it
 above. If neither source is available, say "cannot determine" rather than guessing.
 
 Use Claude Code's native Agent mechanism and request the mapped model for each independent assignment.
-Give delegated agents a self-contained brief because their usable context is determined by that
-assignment and harness behavior, not by the Active Agent's assumptions. Treat each assignment as
+Give delegated agents a self-contained brief: their usable context comes from that assignment and harness
+behavior, not from the Active Agent's assumptions. Treat each assignment as
 terminal and retrieve its final report before relying on it.
 
 If a mapped model is unavailable, inspect current callable capability evidence and disclose any
