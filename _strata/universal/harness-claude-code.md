@@ -11,11 +11,22 @@ handoff for a Claude Code session. It is not a startup import.
 | Engineer | Sonnet |
 | Technician | Haiku |
 
-**Model self-identification.** A Claude Code session is told its own model in its environment context,
-which names both the family and the exact model id. That statement is authoritative for the session and
-needs no file inspection. Report the id verbatim rather than inferring a family from behaviour, and map it
-to a role by family above. When a procedure asks for your model, this is the source; if the environment
-does not state it, say "cannot determine" rather than guessing.
+**Model self-identification.** Two sources, and prefer the second when a procedure needs the model for the
+current turn rather than for the session.
+
+The environment context names the family and the exact model id. It is immediate and needs no file
+inspection, but it is a statement in your own prompt: nobody else can check it, and it does not show
+whether the model changed earlier in the session.
+
+The session transcript records the model on every assistant message, at
+`<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl`. The latest real `message.model`
+is the model executing now; the sequence of distinct values across the file is the switch history. Ignore
+`<synthetic>`, which marks generated records rather than a model. This source is independently checkable
+and is the only one that detects a mid-session switch, so use it when a procedure re-determines tier per
+turn.
+
+Report the id verbatim rather than inferring a family from behaviour, and map it to a role by family
+above. If neither source is available, say "cannot determine" rather than guessing.
 
 Use Claude Code's native Agent mechanism and request the mapped model for each independent assignment.
 Give delegated agents a self-contained brief because their usable context is determined by that
