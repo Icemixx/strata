@@ -25,19 +25,17 @@ wording forbade opening any file at all, which the check itself cannot satisfy: 
 break its letter to perform it, and each then drew its own line about what else it could read on the way.
 One read three files unrelated to the brief.
 
-**Then check before every action, for the whole debate.** Not once on entry and not once per round:
-before each search, file read, command, edit, and before writing anything. Every action taken under this
-procedure is taken by an Architect or it is not taken. A round spans many prompts and the model can change
-between any two of them, so a gate that runs once certifies only the work already done. The live source is
-restated on every request, so this costs no tool call and no round trip; there is no efficiency argument
-for checking less often.
+**Then check again at the start of every prompt, for the whole debate.** Not once on entry and not once
+per round. A prompt is the boundary because the live source is restated with each one: the check costs no
+tool call and lands exactly where the model can have changed. A round spans many prompts and the user
+switches between them, so a gate that runs once certifies only the work already done.
 
-This rule was once weakened to a check per prompt, on the reasoning that no agent re-reads anything
-between tool calls. The record said otherwise: a Codex session on Luna quoted this paragraph as its reason
-for stopping - "model identity must be checked before every action" - and stopped twice, cleanly, on
-consecutive briefs. It was removed on the strength of a different failure entirely, a capacity fallback
-inside one response that no live check of any cadence could have caught. Not catching one case is not the
-same as being followed by nobody.
+An earlier version demanded a check before each search, file read, command and edit. No agent ever
+performed one - every clean stop on record happened at the start of a turn, before any work, which is what
+this rule asks for. One participant did quote the stricter sentence as its reason for stopping, and that
+quotation was later mistaken for evidence that the stricter rule was doing the work; it was not, and a
+cadence with no moment to execute at buys nothing over one that lands where the model can actually
+change.
 
 **Re-read this file at the start of every round.** A debate spans hours and many turns, and the copy in
 your context is a memory of the procedure rather than the procedure. Read it from disk before each round,
