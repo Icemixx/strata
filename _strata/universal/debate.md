@@ -12,15 +12,30 @@ this procedure does not restate it. Substitution follows the DAP rule: same role
 same-role model means the procedure cannot run.
 
 Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
-verify the other's model and not every harness tells an agent its own. State what you can determine about
-your own model at the start of every round, including "cannot determine" — that disclosure goes on the
-record and the user may correct it. Every round, because a session's model can change between turns.
+verify the other's model and not every harness tells an agent its own.
 
-Stop only on a positive determination that you are below Architect tier: say so in normal chat, name the
-required role and that the other participant needs it too, and stop. A refusal creates no files and is not
-a void debate. **Not knowing is not a refusal.** Inability to determine your own model is disclosed and
-the debate proceeds; treating it as disqualifying makes the procedure unrunnable on any harness that
-withholds model identity, which is a gate that fails closed rather than a safeguard.
+**Gate on entry.** Before reading the brief, opening a file, or creating anything, determine your model
+from the live source your dossier names. If it maps below Architect, name the model the user must switch
+to - Opus for Claude Code, Sol for Codex - say the other participant needs Architect too, and stop. A
+refusal creates nothing and is not a void debate.
+
+**Then check before every action, for the whole debate.** Not once on entry and not once per round: before
+each search, file read, command, edit, and before writing anything. Every action taken under this
+procedure is taken by an Architect or it is not taken. A round spans many turns and a turn spans many
+requests, and the model can change at either boundary - the user switches between turns, and capacity
+fallback can serve a later request in the same turn from a different model. A gate that runs once
+certifies only the work already done. The live source is restated on every request, so this costs no tool
+call and no round trip; there is no efficiency argument for checking less often.
+
+**On drift, stop where you are.** Do not complete the action in hand. If it dropped below Architect, take
+no further action, leave no partial round, and say in normal chat what you determined and where you
+stopped; the user decides whether to reseat or end. If it changed but remains Architect, disclose the
+change and continue - same role, disclosed, which is the DAP substitution rule.
+
+**Not knowing is not a refusal.** Inability to determine your model is disclosed and the debate proceeds;
+treating it as disqualifying makes the procedure unrunnable on any harness that withholds model identity,
+which is a gate that fails closed rather than a safeguard. Disclose it on entry and in each round heading,
+and keep checking in case the source becomes available.
 
 Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
 not debate.
@@ -48,10 +63,6 @@ determine the model — stamping `Architect` on a round whose participant just s
 model asserts the one thing that was not established. In your first round, also state in one line whether
 you can execute verification commands against the repository.
 
-**Determine your model again at the start of every round, not only the first.** A session's model can
-change between turns, so a start-only check certifies a tier the later rounds may not have. The heading
-states what you determined for that round.
-
 **Read a live source, not a record of past turns.** Determine the model executing this turn, from
 whatever your harness exposes as current. A transcript or rollout that is written when a turn finishes
 reports the previous turn, so a procedure resting on it alone certifies the round it has already written
@@ -70,10 +81,7 @@ Nothing can mechanically stop a participant writing a heading it did not earn, a
 another provider's runtime. A citation does not close that gap; it changes what a false claim costs. An
 unsupported assertion is invisible, while a cited one is checkable by the user, who holds both sides, and
 by anyone with the file. The count matters: an agent that read a 10-record sidechain instead of its own
-1,793-record session was caught by that number alone. If it changed but remains Architect, disclose the change in the
-round and continue — that is the DAP substitution rule, same role and disclosed. If it dropped below
-Architect, do not write the round: say so in normal chat and hand back to the user, who decides whether to
-reseat the session or end the debate.
+1,793-record session was caught by that number alone.
 
 End every round with a turn marker on its own line:
 
