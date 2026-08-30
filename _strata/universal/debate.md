@@ -70,7 +70,8 @@ claim is not reopened.
 ## Outcomes
 
 - **Converged** — no unresolved HOLD and no open QUESTION remain. The next round is the settled list,
-  which is recorded as `settled.md`.
+  recorded as `settled.md`. That list is the input to the close procedure below, which distils it into a
+  spec and distributes it; it is not the lasting record.
 - **Terminated** — the user declares the debate over. Settled items stand and remain usable. Every
   unresolved HOLD and open QUESTION returns to the user with both positions preserved and neither winning.
 - **Void** — the premise failed: one provider on both sides, or no shared verifiable ground. Nothing
@@ -98,11 +99,29 @@ The branch holds `index.md`, one `report-<product>.md` and one `cross-<product>.
 never by model. A participant may change model mid-debate, and a filename that moves is one the other
 side cannot find.
 
-On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
-entry in the same transaction.
+## On close
 
-The branch is Build Log evidence. Write settled conclusions into the authority that owns them and link
-them to `settled.md`. A void debate produces no authority record.
+A converged debate is consumed, not archived. Write the spec, place every settled item in the authority
+that owns it, then delete the branch.
+
+**Write the spec.** One document at `_sediment/<subject>-spec.md`, written to be implemented by someone
+who was not in the debate: what is being built, how, what it deliberately does not do, and the order to
+build it in. It carries the reasoning that decided each position and the measurements that settled the
+contested ones. It does not carry who held what, who conceded, or in which round - that is process
+residue, and a reader implementing the result has no use for it.
+
+**Place every settled item.** Decisions and their reasons go to Rationale. Remaining work goes to State as
+tickets. A dated entry goes to Build Log recording that the debate ran, between which products, over how
+many rounds, and **what it measured** - counts, verified figures, defects found. Those measurements are
+dated evidence and are the part of a debate worth keeping.
+
+**Then delete the branch**: the reports, the cross-analyses, `rounds.md`, `settled.md` and `index.md`.
+
+**Nothing is deleted until every settled item has a home.** An item with no destination was not settled;
+it was agreed and forgotten. Check the placements before removing anything, because the branch is the only
+copy.
+
+A void debate produces no spec and no authority record.
 
 ## Limits
 
