@@ -14,6 +14,23 @@ The canonical repository is the source. Consuming repositories hold copies ident
 project work. A canonical change or a consuming-repository sync requires deliberate authorization for
 that scope.
 
+Each `harness-<product>.md` is owned by an agent running that product. **Do not write a claim about
+another harness's runtime into its dossier.** How it identifies its model, where its sessions live, what
+its delegation and permission mechanisms do - only an agent running it can test any of that, and an agent
+reasoning from the outside produces text that reads as authoritative and is wrong. When another harness's
+dossier needs a runtime claim added or corrected, write the prompt and give it to the user, who carries it
+to that agent; the same rule that keeps a debate's framings independent applies here, for the same reason.
+
+Both directions have failed already. A Claude Code session inferred Codex's tier from a configuration
+default, announced the wrong answer, and was corrected by the Codex-authored text that replaced it - which
+named the per-turn source the outside reading had missed entirely. In the other direction the same session
+wrote its own dossier by analogy to Codex's mechanism and got its own runtime backwards, because it
+reasoned about a timing property instead of measuring it.
+
+You may still read any dossier, correct a path or format the kit itself changed, and record that a claim
+is unverified or disputed. Flagging a claim is not asserting one, and a dossier nobody can currently reach
+should carry the doubt rather than keep the error silently.
+
 ## Canonical change
 
 Preserve unrelated work. Audit source files and inbound references before relocation or removal. Update
