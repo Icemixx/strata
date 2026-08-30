@@ -50,7 +50,21 @@ you can execute verification commands against the repository.
 
 **Determine your model again at the start of every round, not only the first.** A session's model can
 change between turns, so a start-only check certifies a tier the later rounds may not have. The heading
-states what you determined for that round. If it changed but remains Architect, disclose the change in the
+states what you determined for that round.
+
+**Cite the determination so it can be falsified.** Under the heading, give the source you read, the exact
+value it returned, and one figure that lets a reader confirm you read the right thing - the transcript or
+rollout path, the model id verbatim, and the record count or turn index:
+
+```text
+Model: <id> - source: <path> (<n> records, latest <field>)
+```
+
+Nothing can mechanically stop a participant writing a heading it did not earn, and no agent can read
+another provider's runtime. A citation does not close that gap; it changes what a false claim costs. An
+unsupported assertion is invisible, while a cited one is checkable by the user, who holds both sides, and
+by anyone with the file. The count matters: an agent that read a 10-record sidechain instead of its own
+1,793-record session was caught by that number alone. If it changed but remains Architect, disclose the change in the
 round and continue — that is the DAP substitution rule, same role and disclosed. If it dropped below
 Architect, do not write the round: say so in normal chat and hand back to the user, who decides whether to
 reseat the session or end the debate.

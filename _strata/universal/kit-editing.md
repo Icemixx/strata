@@ -24,6 +24,17 @@ Before accepting a new or changed contract, ask where two competent agents follo
 produce different results, and pin every such point. Name the file, the format, and the location rather
 than the intent.
 
+Then stop imagining the other agent and run it. **A contract another harness must execute is not accepted
+until that harness has executed it.** Asking yourself how someone else would read your text tests your
+model of them, and your model of them is written in the same prior that wrote the defect. Three contracts
+were accepted on that basis in one day and all three broke on first contact: a precondition requiring
+self-knowledge one harness has and another does not, a round heading asserting the tier it was supposed to
+report, and a file path with no rule for selecting which file. Each was found by another agent running the
+text, none by its author rereading it.
+
+The test costs one round-trip through the user. Pay it for anything a second harness must execute; a
+change only your own harness runs does not need it.
+
 After a canonical payload change, tell the user which consuming repositories still require a separate
 sync. Do not retrofit them as part of the canonical transaction.
 

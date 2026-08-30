@@ -19,11 +19,17 @@ inspection, but it is a statement in your own prompt: nobody else can check it, 
 whether the model changed earlier in the session.
 
 The session transcript records the model on every assistant message, at
-`<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl`. The latest real `message.model`
-is the model executing now; the sequence of distinct values across the file is the switch history. Ignore
-`<synthetic>`, which marks generated records rather than a model. This source is independently checkable
-and is the only one that detects a mid-session switch, so use it when a procedure re-determines tier per
-turn.
+`<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl`. **Select the file by
+`CLAUDE_CODE_SESSION_ID`, never by recency.** That directory also holds child and sidechain sessions
+running other models, so the newest file is frequently not yours: an agent that guessed by modification
+time read a 10-record sidechain, reported a third model that was neither its previous nor its current
+one, and would have certified the wrong tier. If the variable is unset, say "cannot determine" rather
+than picking a candidate.
+
+In the selected file, the latest real `message.model` is the model executing now; the sequence of distinct
+values across the file is the switch history. Ignore `<synthetic>`, which marks generated records rather
+than a model. This source is independently checkable and is the only one that detects a mid-session
+switch, so use it when a procedure re-determines tier per turn.
 
 Report the id verbatim rather than inferring a family from behaviour, and map it to a role by family
 above. If neither source is available, say "cannot determine" rather than guessing.
