@@ -52,12 +52,18 @@ you can execute verification commands against the repository.
 change between turns, so a start-only check certifies a tier the later rounds may not have. The heading
 states what you determined for that round.
 
-**Cite the determination so it can be falsified.** Under the heading, give the source you read, the exact
-value it returned, and one figure that lets a reader confirm you read the right thing - the transcript or
-rollout path, the model id verbatim, and the record count or turn index:
+**Read a live source, not a record of past turns.** Determine the model executing this turn, from
+whatever your harness exposes as current. A transcript or rollout that is written when a turn finishes
+reports the previous turn, so a procedure resting on it alone certifies the round it has already written
+rather than the one it is about to write. The dossiers name the live source for each harness.
+
+**Cite the determination so it can be falsified.** Under the heading, give the source you read and the
+exact value it returned. Where a durable record also exists, add the figure that lets a reader confirm you
+read the right one - its path and record count - alongside the live value:
 
 ```text
-Model: <id> - source: <path> (<n> records, latest <field>)
+Model: <id> - live source: <what you read>
+History: <path> (<n> records) - <first> -> <last>
 ```
 
 Nothing can mechanically stop a participant writing a heading it did not earn, and no agent can read

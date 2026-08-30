@@ -11,25 +11,25 @@ handoff for a Claude Code session. It is not a startup import.
 | Engineer | Sonnet |
 | Technician | Haiku |
 
-**Model self-identification.** Two sources, and prefer the second when a procedure needs the model for the
-current turn rather than for the session.
+**Model self-identification.** Two sources with different jobs. The environment context answers what you
+are now; the transcript answers what you have been.
 
-The environment context names the family and the exact model id. It is immediate and needs no file
-inspection, but it is a statement in your own prompt: nobody else can check it, and it does not show
-whether the model changed earlier in the session.
+The environment context names the family and the exact model id, and it is re-stated to you on every turn.
+It is the live value and the only one that describes the turn you are currently executing, so it is what a
+procedure re-determining tier per round must read.
 
-The session transcript records the model on every assistant message, at
-`<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl`. **Select the file by
-`CLAUDE_CODE_SESSION_ID`, never by recency.** That directory also holds child and sidechain sessions
-running other models, so the newest file is frequently not yours: an agent that guessed by modification
-time read a 10-record sidechain, reported a third model that was neither its previous nor its current
-one, and would have certified the wrong tier. If the variable is unset, say "cannot determine" rather
-than picking a candidate.
+The session transcript at `<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl` records
+`message.model` on each assistant message, but records are written as a turn completes: the newest entry
+is the previous turn, and the turn in flight is absent. It therefore cannot tell you what you are running
+right now, and a procedure that relies on it alone detects a switch only after a round was already written
+under the wrong tier. Use it for the switch history and because a third party can check it, not to
+determine the current turn.
 
-In the selected file, the latest real `message.model` is the model executing now; the sequence of distinct
-values across the file is the switch history. Ignore `<synthetic>`, which marks generated records rather
-than a model. This source is independently checkable and is the only one that detects a mid-session
-switch, so use it when a procedure re-determines tier per turn.
+**Select the transcript by `CLAUDE_CODE_SESSION_ID`, never by recency.** That directory also holds child
+and sidechain sessions running other models, so the newest file is frequently not yours: an agent that
+guessed by modification time read a 10-record sidechain, reported a third model that was neither its
+previous nor its current one, and would have certified the wrong tier. Ignore `<synthetic>`, which marks
+generated records rather than a model. If the variable is unset, say so rather than picking a candidate.
 
 Report the id verbatim rather than inferring a family from behaviour, and map it to a role by family
 above. If neither source is available, say "cannot determine" rather than guessing.
