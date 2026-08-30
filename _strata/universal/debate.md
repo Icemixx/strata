@@ -2,9 +2,12 @@
 
 ## Check your model first
 
-1. Read `harness-claude-code.md` or `harness-codex.md`, beside this file. That one file, directly - do not
-   search for it and do not consult `active-agent.md`, memory, or the debate branch to find out who you
-   are.
+1. Read your own harness dossier, at this exact path in the repository you were pointed at:
+   - Codex: `_strata/universal/harness-codex.md`
+   - Claude Code: `_strata/universal/harness-claude-code.md`
+
+   That path, directly. Do not search for the file, do not look for it at the workspace root, and do not
+   consult `active-agent.md`, memory, or the debate branch to find out who you are.
 2. Determine your model the way it says, and map the id to a role.
 3. If it is not Architect, tell the user which model to switch to - **Opus** for Claude Code, **Sol** for
    Codex - add that the other participant needs Architect too, and stop. Create nothing. Stopping is not a
