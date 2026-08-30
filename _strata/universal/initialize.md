@@ -38,10 +38,14 @@ independently in its owning authority, but the protected source material itself 
    Every index has `## Contents`. Each routed entry includes a concise human-language description that
    helps a reader judge relevance without inventing project facts. Empty indexes keep that heading with
    no invented records.
-4. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
+4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
+   discussion, plan or open question at its root, or an evidence ledger, external specification or source
+   data file under `_sediment/reference/`. In an established repository, existing deliberation and
+   reference material moves there during migration rather than into `_strata/`.
+5. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
    create the initial `_strata/project_guide.html`. Do not instruct the user to invoke the internal
    generation mode.
-5. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
+6. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
    `_strata/.kit-version`.
 
 Project-owned or harness-native procedures may be routed from Project Instructions. Do not create a

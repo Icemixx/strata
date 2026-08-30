@@ -37,6 +37,33 @@ State, Rationale, and Build Log roots and their `index.md` files always exist. D
 project-defined. The shared canonical payload remains `_strata/universal_agent_instructions.md` plus
 `_strata/universal/`.
 
+## Supporting material: `_sediment/`
+
+`_strata/` holds the shared payload and the project's own authorities, and nothing else. Project material
+that is not an authority lives in `_sediment/` at the repository root:
+
+```text
+_sediment/
+|-- <deliberation>.md      # discussions, decision trails, plans, open questions
+`-- reference/             # evidence ledgers, external specifications, source data
+```
+
+**Deliberation goes in the `_sediment/` root.** Discussions, decision trails, brainstorming, plans and
+undecided questions are not current truth, settled reason, or dated evidence. Placing them in an
+authority makes provisional thinking read as decided. A discussion stays after its outcome ships: the
+authority records what was decided, the discussion records how it was reached.
+
+**Stable domain material goes in `_sediment/reference/`.** Evidence ledgers, external and vendor
+specifications, and source data are consulted and maintained, but never decided. Files a build or test
+loads at runtime are code, not reference, and stay where the toolchain expects them.
+
+**Nothing may be reachable from nothing.** Every file here that still matters is named by the record it
+serves — the State ticket whose work it belongs to, the Rationale record it produced, or the Instructions
+clause governing its use. A file no record names is lost whether or not it exists.
+
+`_sediment/` is not an authority. It has no `index.md`, is not routed, is not traversed for Guide
+generation, and is not validated by `context.ps1`. Records link into it by ordinary relative path.
+
 ## Instruction audiences
 
 Every agent loads common Universal Instructions and common Project Instructions. The user-facing Active
