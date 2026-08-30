@@ -34,6 +34,8 @@ delegated agent reports such a discovery to the Active Agent.
 
 - Prefer direct evidence and governing project records over assumptions.
 - Distinguish what was observed, what was inferred, and what remains unverified.
+- Treat another agent's, transcript's, or report's claim as unverified until you confirm the artifact or
+  literal result yourself.
 - Use checks relevant to the files and behavior changed. A passing unrelated check is not evidence.
 - Do not report a required gate complete without its literal applicable result.
 - When a moved file or heading has inbound references, repair every surviving reference. Remove a

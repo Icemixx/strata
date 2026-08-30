@@ -1,7 +1,7 @@
 # Claude Code interoperability
 
 Load this dossier when Claude Code mechanics are needed or when examining, continuing, or preparing a
-handoff for a Claude Code session. It is not a startup import.
+handoff for a Claude Code session.
 
 ## Roles and delegation
 
@@ -37,13 +37,9 @@ Report the id verbatim rather than inferring a family from behaviour, and map it
 above. If neither source is available, say "cannot determine" rather than guessing.
 
 Use Claude Code's native Agent mechanism and request the mapped model for each independent assignment.
-Give delegated agents a self-contained brief: their usable context comes from that assignment and harness
-behavior, not from the Active Agent's assumptions. Treat each assignment as
-terminal and retrieve its final report before relying on it.
 
-If a mapped model is unavailable, inspect current callable capability evidence and disclose any
-same-role substitution. Do not replace Opus with Fable or substitute across roles for a DAP seat unless
-the user explicitly reopens the accepted mapping.
+Do not replace Opus with Fable or substitute across roles for a DAP seat unless the user explicitly
+reopens the mapping above.
 
 ## Native sessions and continuity
 
@@ -53,8 +49,7 @@ belong to delegated work, not the main conversation. Match normalized repository
 sidechains, metadata-only, empty, and bootstrap-only candidates.
 
 Main-session records and compaction summaries may be needed to reconstruct continuity. Recover only the
-portion needed for the task and verify all claimed artifacts in the live repository. Background agents
-or artifact files are incomplete evidence until their result is retrieved and checked.
+portion needed for the task and verify all claimed artifacts in the live repository.
 
 ## Permissions, artifacts, and publication
 

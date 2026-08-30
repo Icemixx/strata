@@ -9,8 +9,7 @@ trigger before starting.
 Re-read relevant context and prior reasoning. Compare viable alternatives and trade-offs. Separate
 evidence from assumptions, revisit relevant prior mistakes, identify risks and reversibility, map the
 affected scope, and surface open questions. Apply coding-specific lenses only to code-affecting
-decisions. Record the settled result in Rationale; update State or Build Log only if their information
-also changed.
+decisions. Record the settled result in Rationale.
 
 ## Level 2 council
 
@@ -20,10 +19,7 @@ Create exactly six independent, terminal, read-only reviewers in addition to the
 - two Engineers: Sonnet or Terra; and
 - two Technicians: Haiku or Luna.
 
-The Active Agent never occupies a seat. Failure of any seat invalidates the council. A mapped model may
-be replaced only by a currently available model in the same role, with the substitution disclosed; if
-no same-role model exists, the council is invalid. Claude's accepted mapping remains
-Opus/Sonnet/Haiku unless the user explicitly reopens it.
+The Active Agent never occupies a seat. Failure of any seat invalidates the council.
 
 Give every seat the same decision, evidence, constraints, and candidate options, while assigning useful
 independent review lenses. Reviewers do not edit or coordinate with one another. The Active Agent

@@ -16,8 +16,7 @@ independently in its owning authority, but the protected source material itself 
 
 ## Create the topology
 
-1. Copy the complete shared payload: `_strata/universal_agent_instructions.md` and every file under
-   `_strata/universal/`.
+1. Copy the complete shared payload as `_strata/universal/kit-editing.md` defines it.
 2. Create `_strata/project_instructions.md` with only project-specific conduct, constraints, and routes.
    Create `_strata/project_instructions_active_agent.md` only for genuinely Active-Agent-only rules.
 3. Create these mandatory authority roots and indexes:
@@ -35,16 +34,14 @@ independently in its owning authority, but the protected source material itself 
        `-- index.md
    ```
 
-   Every index has `## Contents`. Each routed entry includes a concise human-language description that
-   helps a reader judge relevance without inventing project facts. Empty indexes keep that heading with
-   no invented records.
+   Indexes follow the index contract in `_strata/universal/context-routing.md`. An empty index keeps its
+   `## Contents` heading with no invented records.
 4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
    data file under `_sediment/reference/`. In an established repository, existing deliberation and
    reference material moves there during migration rather than into `_strata/`.
 5. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
-   create the initial `_strata/project_guide.html`. Do not instruct the user to invoke the internal
-   generation mode.
+   create the initial `_strata/project_guide.html`.
 6. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
    `_strata/.kit-version`.
 

@@ -1,7 +1,7 @@
 # Codex interoperability
 
 Load this dossier when Codex mechanics are needed or when examining, continuing, or preparing a handoff
-for a Codex session. It is not a startup import.
+for a Codex session.
 
 ## Roles and delegation
 
@@ -28,11 +28,7 @@ state the exact available fact and what cannot be determined; if no source is av
 
 Use Codex's in-session delegation tools. A full-history fork inherits the parent model; select a model
 only with an isolated or bounded-history assignment. Delegated agents work in the shared workspace, so
-their file edits are immediately visible. Treat each assignment as terminal and retrieve its final
-report before relying on it.
-
-If a mapped model is unavailable, inspect current callable capability evidence and disclose any
-same-role substitution. Do not substitute across roles for a DAP seat.
+their file edits are immediately visible.
 
 ## Native sessions and continuity
 
@@ -43,8 +39,7 @@ thread. Exclude subagent and approval-review rollouts. A session index, when pre
 top-level sessions, but content and timestamps still require validation.
 
 Rollouts contain structured messages, tool calls, results, and compaction records. Recover only the
-portion needed for continuity and verify all claimed artifacts in the live repository. Background or
-delegated work is incomplete until its result is retrieved and verified.
+portion needed for continuity and verify all claimed artifacts in the live repository.
 
 ## Permissions, artifacts, and publication
 

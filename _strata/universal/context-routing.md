@@ -2,7 +2,6 @@
 
 Part of the universal agent set. Load this procedure when creating or changing authority structure,
 instruction audiences, routed indexes, State lifecycle storage, Guide generation, or context validation.
-Loading is silent.
 
 ## Authority model
 
@@ -34,8 +33,7 @@ _strata/
 ```
 
 State, Rationale, and Build Log roots and their `index.md` files always exist. Deeper branches are
-project-defined. The shared canonical payload remains `_strata/universal_agent_instructions.md` plus
-`_strata/universal/`.
+project-defined.
 
 ## Supporting material: `_sediment/`
 
@@ -196,11 +194,11 @@ routed authorities and reports `GUIDE_MISSING`, `GUIDE_CURRENT`, or `GUIDE_STALE
 Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
 unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
 
-Guide refresh is intentionally user-triggered. When the user asks to update Guide, first review the owning index
-descriptions and authority introductions and improve their concise human-language summaries where the
-authoritative meaning warrants it. Do not invent project facts. Then perform the internal generation and
-verification. Do not regenerate Guide merely because code or an authority changed. Users do not invoke
-the internal generation mode directly.
+Guide refresh is intentionally user-triggered. When the user asks to update Guide, first review the owning
+index descriptions and authority introductions and improve their concise human-language summaries where
+the authoritative meaning warrants it. Do not invent project facts. Then perform the internal generation
+and verification. Do not regenerate Guide merely because code or an authority changed, and never present
+the internal generation mode to the user as a command.
 
 ## Validation and authority updates
 
@@ -213,15 +211,8 @@ and fresh Guide do not prove that human-authored claims are correct.
 Use the smallest check relevant to touched paths. Run full validation for topology, shared validation or
 generation logic, migration, or an explicit full audit.
 
-When moving a file or stable heading, search inbound references and repoint every surviving link. Remove
-a reference only when its underlying claim was deliberately deleted. If an existing check inspected the
-old location, update only the affected check and demonstrate that it can still detect its target failure.
+Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
-Update only authorities that gained information: status changes update State; decisions update Rationale;
-implementation and evidence update Build Log; completion finalizes and moves the State entry. Add typed
-State links when corresponding records exist. Guide remains the last explicitly requested snapshot until
-the user requests another refresh.
-
-This format applies directly to new repositories. An established repository requires a separately
-authorized, project-specific migration. Preserve its legacy material until reconciliation is verified
-and ask the user about conflicting claims; no legacy source wins automatically.
+An established repository's separately authorized migration preserves its legacy material until
+reconciliation is verified and asks the user about conflicting claims; no legacy source wins
+automatically.

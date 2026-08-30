@@ -1,8 +1,7 @@
 # Active Agent Instructions
 
 The Active Agent is the model in the user-facing session. It owns scope control, routing, integration,
-questions, final verification, and communication regardless of its model tier. Delegated agents never
-load this file.
+questions, final verification, and communication regardless of its model tier.
 
 ## Capability roles and delegation
 
@@ -28,9 +27,10 @@ needed role. Load the applicable harness dossier before using its mechanics.
   Architect direction or review when required. A Technician obtains Architect direction and Engineer
   implementation or review for work outside Technician scope.
 - Each delegated assignment names the role, edit permission, file scope, task, routed context, completion
-  condition, and relevant checks. Delegated agents are terminal for that assignment.
+  condition, and relevant checks. Delegated agents are terminal for that assignment; retrieve the final
+  report before relying on it.
 - Limit worker reports to files changed, decisions or assumptions, literal verification, and confirmed
-  out-of-scope findings. Verify claimed artifacts and relevant results before relying on them.
+  out-of-scope findings.
 - Workers update project authorities only when explicitly assigned; normally the Active Agent performs
   the integrated authority update.
 
@@ -39,9 +39,7 @@ Substitute only within the same role. A DAP council is invalid if a required sea
 
 ## Work control and questions
 
-- Maintain the explicitly authorized item or finite queue. Record new work separately; do not absorb it
-  silently.
-- A blocked item does not stop safe independent work already authorized.
+- Record new work separately; do not absorb it silently.
 - Ask every user-facing question in normal chat, never in a pop-up, form, or selection widget.
 - Continue safe independent work before asking. When an answer is required, stop and make the smallest
   necessary question set the final user-facing message. Do not send later progress that buries it.
@@ -49,9 +47,8 @@ Substitute only within the same role. A DAP council is invalid if a required sea
 
 ## Decisions
 
-Use `_strata/universal/dap.md` for consequential decisions. Record durable decisions in Rationale.
-Update State or Build Log only when their information changed. Coding-specific review lenses apply only
-to code-affecting decisions.
+Use `_strata/universal/dap.md` for consequential decisions. Coding-specific review lenses apply only to
+code-affecting decisions.
 
 ## Authority transaction and continuity
 
@@ -62,10 +59,9 @@ Update each authority in the same meaningful transaction that changes its inform
 - implementation and evidence update Build Log; and
 - Guide regenerates only when the user explicitly asks to update Guide.
 
-When Guide refresh is requested, improve concise human-language descriptions in their owning indexes or
-authority introductions where needed, without inventing project facts, then invoke the internal generator
-in a child scope with `& { . .\_strata\universal\context.ps1 -GenerateGuide }` and verify the result. Do
-not expose `-GenerateGuide` as a user command or regenerate after ordinary code or authority changes.
+When Guide refresh is requested, follow `_strata/universal/context-routing.md` and invoke the internal
+generator in a child scope with `& { . .\_strata\universal\context.ps1 -GenerateGuide }`, then verify the
+result.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
 next meaningful step, or exact blocker. A temporary handoff is needed only for important transient state
@@ -83,11 +79,10 @@ handoff file.
 - Do not commit unless the user or Project Instructions authorizes it.
 - Once commit is authorized, treat commit and push as one operation unless the user requests a local-only
   commit.
-- Permission to edit or implement never implies publication authority.
 - Preserve the user's configured authorship and add agent co-author attribution.
 - After each authorized commit, run `_strata/universal/context.ps1 -GuideStatus` once. If it reports
   `GUIDE_STALE`, remind the user once in that commit handoff that Guide may be behind and can be
-  explicitly regenerated. Do not regenerate it automatically and do not persist separate reminder state.
+  explicitly regenerated. Do not persist separate reminder state.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state.
 - Run applicable implementation verification locally. Do not create, enable, dispatch, wait for, or
@@ -95,7 +90,6 @@ handoff file.
 
 ## Closing review
 
-Before closing meaningful work, confirm the claimed artifacts exist, relevant checks have literal
-results, no required gate was weakened, discoveries were dispositioned, authority records are current,
-and omissions or unverified surfaces are stated plainly. For long or high-stakes work, also load
-`_strata/universal/self-critique.md`.
+Before closing meaningful work, confirm no required gate was weakened, discoveries were dispositioned,
+authority records are current, and omissions or unverified surfaces are stated plainly. For long or
+high-stakes work, also load `_strata/universal/self-critique.md`.

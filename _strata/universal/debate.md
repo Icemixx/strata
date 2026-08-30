@@ -77,10 +77,8 @@ claim is not reopened.
   produced is usable.
 
 A debate ends only by convergence or by the user declaring it terminated. No count of rounds or exchanges
-closes it, and no disagreement resolves itself by lasting.
-
-Either participant may call void on provider identity or absent verifiable ground. Only the user can
-declare a debate terminated.
+closes it, and no disagreement resolves itself by lasting. Either participant may call void on provider
+identity or absent verifiable ground.
 
 Close `rounds.md` with exactly one stamp:
 
@@ -103,12 +101,10 @@ side cannot find.
 On close, move the branch to `_strata/build-log/debate-<subject>-<YYYY-MM-DD>/` and add its parent index
 entry in the same transaction.
 
-The branch is Build Log evidence. Write settled conclusions into the authority that owns them - decisions
-to Rationale, status and remaining work to State - and link them to `settled.md`. A void debate produces
-no authority record. Guide is not regenerated.
+The branch is Build Log evidence. Write settled conclusions into the authority that owns them and link
+them to `settled.md`. A void debate produces no authority record.
 
 ## Limits
 
-Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify
-the other's runtime. Two capable models exchanging rounds is expensive: use DAP when one provider's
-scrutiny is enough.
+Nothing detects a stalled debate; only the user can restart or close one. Two capable models exchanging
+rounds is expensive: use DAP when one provider's scrutiny is enough.
