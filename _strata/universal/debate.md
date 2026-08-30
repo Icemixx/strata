@@ -77,6 +77,21 @@ not debate.
 The user carries every exchange between providers. No agent invokes, polls, or notifies the other. This is
 load-bearing rather than a limitation: it is what keeps each participant's framing its own.
 
+## The brief
+
+Whoever composes a debate prompt puts the check into the prompt. The gate is defined here, but a
+participant meets the brief first, and a brief that names a first action gets that action: a Phase 3
+brief opening "read this file from disk now" produced four commands run by a Technician that never
+determined its model, in a session that had refused the same work cleanly twice when asked without that
+line. A rule stated only where it is read second loses to an instruction read first.
+
+Open every debate brief with this line, before the phase, subject, question, rendezvous path and turn
+marker:
+
+```text
+Before anything else, determine your model per _strata/universal/debate.md and stop if it is below Architect.
+```
+
 ## Phases
 
 1. **Reports.** Both participants receive the same brief and work independently. Neither sees the other's
