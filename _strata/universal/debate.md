@@ -14,7 +14,11 @@ same-role model means the procedure cannot run.
 Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
 verify the other's model and not every harness tells an agent its own.
 
-**Gate on entry.** Determine your model from the live source your dossier names before anything else. If
+**Gate on entry.** Determine your model before anything else, using the live source named in your own
+harness dossier - `harness-codex.md` or `harness-claude-code.md`, beside this file. Read that one file and
+do what it says; do not go looking for it, and do not consult `active-agent.md`, memory, or the debate
+branch to find out who you are. A participant told only that "your dossier" names the source spent six
+commands hunting for it before running a two-command lookup. If
 it maps below Architect, name the model the user must switch to - Opus for Claude Code, Sol for Codex -
 say the other participant needs Architect too, and stop. A refusal creates nothing and is not a void
 debate.
