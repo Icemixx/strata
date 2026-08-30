@@ -23,13 +23,15 @@ could read on the way. One read three files unrelated to the brief. If it maps b
 to - Opus for Claude Code, Sol for Codex - say the other participant needs Architect too, and stop. A
 refusal creates nothing and is not a void debate.
 
-**Then check before every action, for the whole debate.** Not once on entry and not once per round: before
-each search, file read, command, edit, and before writing anything. Every action taken under this
-procedure is taken by an Architect or it is not taken. A round spans many turns and a turn spans many
-requests, and the model can change at either boundary - the user switches between turns, and capacity
-fallback can serve a later request in the same turn from a different model. A gate that runs once
-certifies only the work already done. The live source is restated on every request, so this costs no tool
-call and no round trip; there is no efficiency argument for checking less often.
+**Then check again at the start of every prompt, for the whole debate.** Not once on entry and not once
+per round. A prompt is the boundary because the live source is restated with each one: the check costs no
+tool call and lands exactly where the model can have changed. A round spans many prompts and the user
+switches between them, so a gate that runs once certifies only the work already done.
+
+An earlier version demanded a check before each search, file read, command and edit. There is no moment
+between tool calls where an agent naturally re-reads anything, so that rule was followed by nobody and
+quietly licensed the assumption that entry was enough. A procedure that asks for what cannot be executed
+buys less than one that asks for what can.
 
 **Re-read this file at the start of every round.** A debate spans hours and many turns, and the copy in
 your context is a memory of the procedure rather than the procedure. Read it from disk before each round,
@@ -187,6 +189,12 @@ Rationale, status and remaining work to State — and link them to `settled.md`.
 authority record. Guide is not regenerated.
 
 ## Limits
+
+A model change inside a single prompt is not detected. Capacity fallback can serve part of one response
+from a lower tier, and no live check sits between an agent's own tool calls: an Opus session doing Phase 1
+work was served its final write by Sonnet as it hit a session limit, and nothing fired. The transcript is
+what catches this, because it records the model per assistant message after the fact - live checking
+covers the boundary between prompts, the durable record covers what happens inside one. Cite both.
 
 Nothing detects a stalled debate; only the user can restart or close one. Neither participant can verify the
 other's model, so tier is an attestation. Two Architects exchanging rounds is expensive, and that cost is
