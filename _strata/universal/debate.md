@@ -1,5 +1,28 @@
 # Debate
 
+## Check your model first
+
+1. Read `harness-claude-code.md` or `harness-codex.md`, beside this file. That one file, directly - do not
+   search for it and do not consult `active-agent.md`, memory, or the debate branch to find out who you
+   are.
+2. Determine your model the way it says, and map the id to a role.
+3. If it is not Architect, tell the user which model to switch to - **Opus** for Claude Code, **Sol** for
+   Codex - add that the other participant needs Architect too, and stop. Create nothing. Stopping is not a
+   void debate.
+
+Do this again at the start of every prompt, for the whole debate. Those two files are the check itself,
+not work performed under it; the brief, repository files, searches and commands wait until it has passed.
+
+If it drops below Architect later, stop where you are: no further action, no partial round, and say in
+normal chat what you determined and where you stopped. If it changed but is still Architect, disclose it
+and carry on. If you cannot determine it at all, say what you tried and what it returned and ask the user
+to confirm the tier - never certify yourself, and never read an unconfirmed model as an Architect.
+
+Say what you actually did when you stop, checked rather than recalled, and leave anything you gathered
+below Architect out of the debate: disclose it, then let an Architect gather it again.
+
+## Purpose
+
 Use this procedure to reconcile independently-derived work with an Architect from a different provider.
 A DAP council's seats share one provider and therefore one prior: it scrutinizes reasoning well and shared
 blind spots poorly. Debate breaks that correlation. Two participants from the same provider are a council,
@@ -7,75 +30,12 @@ not a debate.
 
 ## Preconditions
 
-Both participants are Architect. `active-agent.md` and the harness dossiers own the role-to-model mapping;
-this procedure does not restate it. Substitution follows the DAP rule: same role only, disclosed, and no
-same-role model means the procedure cannot run.
+Both participants are Architect, and seating them is the user's responsibility: no agent can verify the
+other's model. Substitution follows the DAP rule - same role only, disclosed, and no same-role model means
+the procedure cannot run.
 
-Seating Architect-tier participants on both sides is the user's responsibility, because no agent can
-verify the other's model and not every harness tells an agent its own.
-
-**Gate on entry.** Determine your model before anything else, using the live source named in your own
-harness dossier - `harness-codex.md` or `harness-claude-code.md`, beside this file. Read that one file and
-do what it says; do not go looking for it, and do not consult `active-agent.md`, memory, or the debate
-branch to find out who you are. A participant told only that "your dossier" names the source spent six
-commands hunting for it before running a two-command lookup. If
-it maps below Architect, name the model the user must switch to - Opus for Claude Code, Sol for Codex -
-say the other participant needs Architect too, and stop. A refusal creates nothing and is not a void
-debate.
-
-Reading this file and your own harness dossier is part of that determination rather than work performed
-under it; the brief, repository files, searches and commands wait until the gate has passed. An earlier
-wording forbade opening any file at all, which the check itself cannot satisfy: both participants had to
-break its letter to perform it, and each then drew its own line about what else it could read on the way.
-One read three files unrelated to the brief.
-
-**Then check again at the start of every prompt, for the whole debate.** Not once on entry and not once
-per round. A prompt is the boundary because the live source is restated with each one: the check costs no
-tool call and lands exactly where the model can have changed. A round spans many prompts and the user
-switches between them, so a gate that runs once certifies only the work already done.
-
-An earlier version demanded a check before each search, file read, command and edit. No agent ever
-performed one - every clean stop on record happened at the start of a turn, before any work, which is what
-this rule asks for. One participant did quote the stricter sentence as its reason for stopping, and that
-quotation was later mistaken for evidence that the stricter rule was doing the work; it was not, and a
-cadence with no moment to execute at buys nothing over one that lands where the model can actually
-change.
-
-**Re-read this file at the start of every round.** A debate spans hours and many turns, and the copy in
-your context is a memory of the procedure rather than the procedure. Read it from disk before each round,
-for the same reason you re-check the model: the contract is the file, not your recollection of it. This
-has already happened - a participant continued under a branch that had been removed from the file it named
-as its authority, having read that file before the change.
-
-Whoever is editing the procedure stops while a debate is running. A contract revised mid-execution leaves
-the two participants following different texts, and neither can see that it happened.
-
-**On drift, stop where you are.** Do not complete the action in hand. If it dropped below Architect, take
-no further action, leave no partial round, and say in normal chat what you determined and where you
-stopped; the user decides whether to reseat or end. If it changed but remains Architect, disclose the
-change and continue - same role, disclosed, which is the DAP substitution rule.
-
-**Report the stop from what you did, not from what a stop usually looks like.** Name the files you opened
-and the work you finished before the gate fired, by checking rather than by recalling. A stop statement
-describes this turn and is as falsifiable as the model citation, so it is written the same way: a
-participant reused the wording of an earlier clean refusal and reported opening no files, having just
-opened five.
-
-Evidence gathered below Architect does not enter the debate. Disclose it so the user can see what
-happened, then leave it for an Architect to gather again - a finding produced by a Technician and quoted
-into a round is laundered through the chat rather than earned.
-
-**If you cannot determine it, ask the user; never certify yourself.** Not knowing is not a refusal of the
-debate, and it is not permission to act as an Architect either. Say what you tried and what it returned,
-and ask the user to confirm the tier. Their answer is the attestation, recorded in the round heading as
-`Architect (user-attested)`, and seating participants was always their responsibility. Keep checking in
-case the source becomes available.
-
-Self-certifying on an unverified claim is the fail-open twin of refusing when the answer is merely
-unavailable. Both end the same way - a round written by a model nobody established was Architect - so
-neither an agent's inability nor its assurance may open the gate on its own. This clause has been abused
-once already: a session that had determined its exact model minutes earlier reported that it could not,
-and proceeded.
+Re-read this file at the start of every round. A debate spans hours, and the copy in your context is a
+memory of the procedure rather than the procedure. Whoever is editing it stops while a debate is running.
 
 Do not spawn an Architect to take a round. A participant is the session itself; switch the session or do
 not debate.
@@ -85,15 +45,10 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 ## The brief
 
-A brief says which phase, the subject, the question, and nothing about tier. The check is carried by the
-on-demand trigger in `universal_agent_instructions.md`, which is loaded at session start and therefore
-reached before this file, before the brief, and before any first action a brief might name. A safeguard
-the user has to remember to type is a safeguard that leaves with their attention.
-
-This file was the only home for the gate once, and a brief opening "read this file from disk now"
-produced four commands run by a Technician that never determined its model - a session that had refused
-the same work cleanly twice when asked without that line. A rule stated only where it is read second
-loses to an instruction read first, so it moved to the context that is read before anything.
+A brief says which phase, the subject, the question, and nothing about tier. The check reaches the
+participant through the on-demand trigger in `universal_agent_instructions.md`, loaded at session start,
+so the user never has to type it. Do not open a brief with an instruction to read a file: a brief that
+named a first action got that action, and the check waited behind it.
 
 ## Phases
 
