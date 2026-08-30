@@ -83,6 +83,17 @@
     .topic-card:hover { border-color: var(--accent); }
     .topic-card strong, .topic-card span { display: block; }
     .topic-card span { margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .topic { margin: 14px 0; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
+    .topic > summary { padding: 11px 14px; font-size: 17px; font-weight: 650; cursor: pointer; list-style: none; }
+    .topic > summary::-webkit-details-marker { display: none; }
+    .topic > summary::before { content: "B8"; display: inline-block; width: 1em; color: var(--muted); transition: transform .15s; }
+    .topic[open] > summary::before { transform: rotate(90deg); }
+    .topic > summary:hover { color: var(--accent); }
+    .topic-body { padding: 0 14px 12px; }
+    .topic-body > :first-child { margin-top: 0; }
+    .nav-topics { margin: 2px 0 6px; padding-left: 14px; border-left: 1px solid var(--line); }
+    .nav-topics a { font-size: 13px; color: var(--muted); }
+    .nav-topics a:hover, .nav-topics a.active { color: var(--text); background: var(--accent-soft); }
     .source { margin-bottom: 10px; color: var(--muted); font: 12px/1.4 ui-monospace,"Cascadia Code",Consolas,monospace; }
     .linked-record { margin: 12px 0; padding: 14px; background: var(--surface-soft); border-left: 3px solid var(--accent); border-radius: 6px; }
     .empty { padding: 16px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }
@@ -112,11 +123,13 @@
       .js .sidebar:not(.open) { display: none; }
       .record, .ticket { padding: 18px; }
     }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .topic > summary::before { transition: none; } }
     @media print {
       .topbar, .sidebar, #toTop, .copy-code { display: none !important; }
       .layout { display: block; max-width: none; padding: 0; }
       .record, .ticket { break-inside: avoid; box-shadow: none; }
+      .topic { border: 0; background: none; }
+      .topic > summary::before { content: ""; }
       [hidden] { display: block !important; }
     }
   </style>
@@ -151,6 +164,30 @@
       root.setAttribute("data-theme", next);
       try { localStorage.setItem("strata-guide-theme", next); } catch (e) {}
     });
+    // A link into a folded topic must open it, or the anchor lands on nothing.
+    function revealTarget() {
+      var id = decodeURIComponent((location.hash || "").slice(1));
+      if (!id) return;
+      var el = document.getElementById(id);
+      if (!el) return;
+      var node = el;
+      while (node) {
+        if (node.tagName === "DETAILS" && !node.open) node.open = true;
+        node = node.parentElement;
+      }
+      el.scrollIntoView({ block: "start" });
+    }
+    window.addEventListener("hashchange", revealTarget);
+    if (location.hash) revealTarget();
+    // Search must look inside folded topics too, and open the ones that match.
+    document.addEventListener("strata:search", function (event) {
+      var term = String(event.detail || "").toLowerCase();
+      if (!term) return;
+      var topics = document.querySelectorAll("details.topic");
+      for (var i = 0; i < topics.length; i++) {
+        topics[i].open = topics[i].textContent.toLowerCase().indexOf(term) !== -1;
+      }
+    });
     navToggle.addEventListener("click", function () {
       var open = sidebar.classList.toggle("open"); navToggle.setAttribute("aria-expanded", String(open));
     });
@@ -165,6 +202,7 @@
     });
     search.addEventListener("input", function () {
       var query = search.value.trim().toLowerCase(), visible = {};
+      document.dispatchEvent(new CustomEvent("strata:search", { detail: query }));
       document.querySelectorAll("[data-search-item]").forEach(function (item) {
         var show = !query || item.textContent.toLowerCase().indexOf(query) >= 0;
         item.hidden = !show;

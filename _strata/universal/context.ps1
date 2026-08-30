@@ -590,6 +590,15 @@ function Render-GuideNavigationNode([object]$Node, [hashtable]$Anchors) {
     else {
         [void]$builder.Append("<a href=`"#$anchor`">$label</a>")
         if (-not [string]::IsNullOrWhiteSpace($description)) { [void]$builder.Append("<span class=`"nav-description`">$description</span>") }
+        # Topics inside the record, so a reader can navigate to a subject by name.
+        $topics = @(Get-RecordTopics (Remove-ContentsSection (Read-Utf8 $Node.Path)) ($anchor + '-heading-'))
+        if ($topics.Count -gt 0) {
+            [void]$builder.Append('<ul class="nav-topics">')
+            foreach ($topic in $topics) {
+                [void]$builder.Append(("<li data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a></li>" -f $topic.Anchor,[Net.WebUtility]::HtmlEncode($topic.Title)))
+            }
+            [void]$builder.Append('</ul>')
+        }
     }
     [void]$builder.Append('</li>')
     return $builder.ToString()
@@ -611,6 +620,40 @@ function Render-TopicCards([object]$Node, [hashtable]$Anchors) {
     return $builder.ToString()
 }
 
+function Get-RecordTopics([string]$Markdown, [string]$HeadingPrefix) {
+    # The archived project guides navigated by topic, not by file: every "## " in a record is a
+    # subject a reader looks for by name. Compute the same anchors Convert-Markdown will emit so
+    # navigation and content agree without rendering twice.
+    $safePrefix = [regex]::Replace($HeadingPrefix, '[^a-zA-Z0-9_-]', '-')
+    $topics = New-Object System.Collections.ArrayList
+    foreach ($line in @($Markdown -split "`n")) {
+        if ($line -match '^##\s+(.+?)\s*#*$') {
+            $title = $Matches[1]
+            $slug = ([regex]::Replace($title.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
+            [void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + $slug; Title = $title })
+        }
+    }
+    return $topics
+}
+
+function Expand-RecordTopics([string]$Html) {
+    # Fold each topic into a disclosure block, the first left open. A record that renders every
+    # reference table at once is the wall the archived guides avoided by collapsing detail.
+    $headings = [regex]::Matches($Html, '<h2 id="([^"]+)">(.*?)</h2>')
+    if ($headings.Count -eq 0) { return $Html }
+    $builder = New-Object Text.StringBuilder
+    [void]$builder.Append($Html.Substring(0, $headings[0].Index))
+    for ($i = 0; $i -lt $headings.Count; $i++) {
+        $heading = $headings[$i]
+        $start = $heading.Index + $heading.Length
+        $end = if ($i + 1 -lt $headings.Count) { $headings[$i + 1].Index } else { $Html.Length }
+        $inner = $Html.Substring($start, $end - $start)
+        $open = if ($i -eq 0) { ' open' } else { '' }
+        [void]$builder.Append(('<details class="topic" id="{0}"{1}><summary>{2}</summary><div class="topic-body">{3}</div></details>' -f $heading.Groups[1].Value, $open, $heading.Groups[2].Value, $inner))
+    }
+    return $builder.ToString()
+}
+
 function Render-GuideNode([object]$Node, [int]$Depth, [hashtable]$Anchors) {
     $builder = New-Object Text.StringBuilder
     $markdown = Read-Utf8 $Node.Path
@@ -624,6 +667,7 @@ function Render-GuideNode([object]$Node, [int]$Depth, [hashtable]$Anchors) {
         $rendered = Convert-Markdown $markdown ($anchor + '-heading-')
         $rendered = Rewrite-GuideLinks $rendered $Node.Path $Anchors
         $rendered = [regex]::Replace($rendered, '<li>([A-Z][A-Z0-9]*-[0-9]+) —', '<li><strong>$1</strong> —')
+        $rendered = Expand-RecordTopics $rendered
     }
     [void]$builder.Append("<article class=`"record`" id=`"$anchor`" data-depth=`"$Depth`" data-source=`"$([Net.WebUtility]::HtmlEncode($relative))`" data-search-item data-nav-target>")
     [void]$builder.Append("<div class=`"source`">$([Net.WebUtility]::HtmlEncode($relative))</div>")
@@ -648,10 +692,11 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         $current = $null
         foreach ($line in @($text -split "`n")) {
             if ($line -match '^- ([A-Z][A-Z0-9]*-[0-9]+) — (OPEN|IN PROGRESS|BLOCKED|DONE) — (\S.+)$') {
-                $current = [pscustomobject]@{ Id=$Matches[1]; Status=$Matches[2]; Description=$Matches[3]; Source=$path; Why=(New-Object System.Collections.ArrayList); How=(New-Object System.Collections.ArrayList) }
+                $current = [pscustomobject]@{ Id=$Matches[1]; Status=$Matches[2]; Description=$Matches[3]; Source=$path; Body=(New-Object System.Collections.ArrayList); Why=(New-Object System.Collections.ArrayList); How=(New-Object System.Collections.ArrayList) }
                 [void]$tickets.Add($current)
                 continue
             }
+            if ($null -ne $current -and $line -match '^\s{2,}\S') { [void]$current.Body.Add($line) }
             if ($null -ne $current -and $line -match '^\s{2,}- (Why|How):\s+(.+)$') {
                 $kind = $Matches[1]
                 foreach ($match in [regex]::Matches($Matches[2], '\[[^\]]+\]\(([^)]+)\)')) {
@@ -662,6 +707,29 @@ function New-Guide([object]$Graphs, [string]$Digest) {
             }
         }
     }
+    # A record that names a declared ticket is a source for it. Only ids State declares are
+    # matched, so `SHA-256` and `UTF-8` cannot be mistaken for work items. The snippet is the
+    # paragraph carrying the mention, not the whole record: the Guide shows what an authority
+    # says about this ticket and points at the authority for the rest.
+    $declared = @{}
+    foreach ($ticket in $tickets) { $declared[$ticket.Id] = $ticket }
+    foreach ($graph in @($Graphs.Rationale,$Graphs.BuildLog)) {
+        foreach ($recordPath in @($graph.Ordered)) {
+            if ((Split-Path -Leaf $recordPath) -ieq 'index.md') { continue }
+            $recordText = Read-Utf8 $recordPath
+            if ([string]::IsNullOrWhiteSpace($recordText)) { continue }
+            foreach ($paragraph in ($recordText -split "(`r?`n){2,}")) {
+                $trimmed = $paragraph.Trim()
+                if ($trimmed.Length -lt 3) { continue }
+                foreach ($id in $declared.Keys) {
+                    if ($trimmed -notmatch ('(?<![A-Za-z0-9-])' + [regex]::Escape($id) + '(?![A-Za-z0-9-])')) { continue }
+                    $bucket = if ($graph.Name -eq 'Rationale') { 'Why' } else { 'How' }
+                    [void]$declared[$id].$bucket.Add([pscustomobject]@{ Path=$recordPath; Text=$trimmed })
+                }
+            }
+        }
+    }
+
     $navigation = New-Object Text.StringBuilder
     [void]$navigation.Append('<ul>')
     if ($tickets.Count -gt 0) { [void]$navigation.Append('<li data-nav-item data-target="work-overview"><a href="#work-overview">Work overview</a><span class="nav-description">Current work with its linked reasons and evidence.</span></li>') }
@@ -674,17 +742,35 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         foreach ($ticket in $tickets) {
             $ticketId = [Net.WebUtility]::HtmlEncode($ticket.Id)
             [void]$body.AppendLine(('<article class="ticket" id="ticket-{0}" data-search-item><h2>{0}</h2><p><strong>{1}</strong> — {2}</p>' -f $ticketId,[Net.WebUtility]::HtmlEncode($ticket.Status),[Net.WebUtility]::HtmlEncode($ticket.Description)))
+            # What State says: the ticket's own prose, in the words State uses.
+            $bodyLines = @($ticket.Body)
+            if ($bodyLines.Count -gt 0) {
+                $stateAnchor = $anchors[$ticket.Source.ToLowerInvariant()]
+                $stateRelative = [Net.WebUtility]::HtmlEncode((Get-Relative $ticket.Source $StrataRoot).Replace('\','/'))
+                [void]$body.AppendLine("<h3>What State says</h3>")
+                $prefix = 'ticket-' + $ticket.Id.ToLowerInvariant() + '-state-heading-'
+                $rendered = Rewrite-GuideLinks (Convert-Markdown (($bodyLines -join "`n") -replace '(?m)^  ', '') $prefix) $ticket.Source $anchors
+                [void]$body.AppendLine(('<div class="linked-record"><div class="source"><a href="#{0}">{1}</a></div>{2}</div>' -f $stateAnchor,$stateRelative,$rendered))
+            }
+            $labels = @{ Why = 'Why — what Rationale says'; How = 'How — what the Build Log says' }
             foreach ($kind in @('Why','How')) {
-                $targets = @($ticket.$kind)
-                if ($targets.Count -eq 0) { continue }
-                [void]$body.AppendLine("<h3>$kind</h3>")
+                $entries = @($ticket.$kind)
+                if ($entries.Count -eq 0) {
+                    [void]$body.AppendLine(('<h3>{0}</h3><p class="empty">No {1} record names {2}.</p>' -f $labels[$kind],$(if ($kind -eq 'Why') { 'Rationale' } else { 'Build Log' }),$ticketId))
+                    continue
+                }
+                [void]$body.AppendLine("<h3>$($labels[$kind])</h3>")
                 $targetNumber = 0
-                foreach ($target in $targets) {
+                foreach ($entry in $entries) {
                     $targetNumber++
-                    $markdown = Remove-ContentsSection (Read-Utf8 $target)
+                    $isSnippet = $entry -isnot [string]
+                    $target = if ($isSnippet) { $entry.Path } else { $entry }
+                    $markdown = if ($isSnippet) { $entry.Text } else { Remove-ContentsSection (Read-Utf8 $target) }
                     $embeddedPrefix = 'ticket-' + $ticket.Id.ToLowerInvariant() + '-' + $kind.ToLowerInvariant() + '-' + $targetNumber + '-heading-'
                     $rendered = Rewrite-GuideLinks (Convert-Markdown $markdown $embeddedPrefix) $target $anchors
-                    [void]$body.AppendLine(('<div class="linked-record">{0}</div>' -f $rendered))
+                    $targetAnchor = $anchors[$target.ToLowerInvariant()]
+                    $targetRelative = [Net.WebUtility]::HtmlEncode((Get-Relative $target $StrataRoot).Replace('\','/'))
+                    [void]$body.AppendLine(('<div class="linked-record"><div class="source"><a href="#{0}">{1}</a></div>{2}</div>' -f $targetAnchor,$targetRelative,$rendered))
                 }
             }
             [void]$body.AppendLine('</article>')
