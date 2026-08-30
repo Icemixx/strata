@@ -79,18 +79,15 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 ## The brief
 
-Whoever composes a debate prompt puts the check into the prompt. The gate is defined here, but a
-participant meets the brief first, and a brief that names a first action gets that action: a Phase 3
-brief opening "read this file from disk now" produced four commands run by a Technician that never
-determined its model, in a session that had refused the same work cleanly twice when asked without that
-line. A rule stated only where it is read second loses to an instruction read first.
+A brief says which phase, the subject, the question, and nothing about tier. The check is carried by the
+on-demand trigger in `universal_agent_instructions.md`, which is loaded at session start and therefore
+reached before this file, before the brief, and before any first action a brief might name. A safeguard
+the user has to remember to type is a safeguard that leaves with their attention.
 
-Open every debate brief with this line, before the phase, subject, question, rendezvous path and turn
-marker:
-
-```text
-Before anything else, determine your model per _strata/universal/debate.md and stop if it is below Architect.
-```
+This file was the only home for the gate once, and a brief opening "read this file from disk now"
+produced four commands run by a Technician that never determined its model - a session that had refused
+the same work cleanly twice when asked without that line. A rule stated only where it is read second
+loses to an instruction read first, so it moved to the context that is read before anything.
 
 ## Phases
 
