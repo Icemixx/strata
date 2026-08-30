@@ -41,9 +41,12 @@ load-bearing rather than a limitation: it is what keeps each participant's frami
 
 ## Rounds
 
-Head each round `## Round N — <product> / <model> (Architect)`, using the model name you can determine or
-`model-undisclosed` when you cannot. In your first round, also state in one line whether you can execute
-verification commands against the repository.
+Head each round `## Round N — <product> / <model> (<tier>)`. Both fields record what you determined this
+round, never what the procedure requires. Write the model id you determined, or `model-undisclosed` when
+you could not. Write `Architect` when the id maps to it, or `Architect-unconfirmed` when you could not
+determine the model — stamping `Architect` on a round whose participant just said it cannot confirm its
+model asserts the one thing that was not established. In your first round, also state in one line whether
+you can execute verification commands against the repository.
 
 **Determine your model again at the start of every round, not only the first.** A session's model can
 change between turns, so a start-only check certifies a tier the later rounds may not have. The heading
