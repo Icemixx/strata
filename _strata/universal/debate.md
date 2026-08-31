@@ -58,8 +58,7 @@ append-only forbids correcting.
 
 Before writing, read the last turn marker. If it does not name you, say so in normal chat, name the
 participant whose turn it is, and stop. Being asked again does not make it your turn. When the file
-carries no marker yet, the participant asked first opens; if both were asked, the one whose report is
-alphabetically first by product opens, so neither waits for the other.
+carries no marker yet, the participant asked first opens.
 
 Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
