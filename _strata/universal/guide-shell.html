@@ -88,7 +88,7 @@
     .topic { margin: 14px 0; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
     .topic > summary { padding: 11px 14px; font-size: 17px; font-weight: 650; cursor: pointer; list-style: none; }
     .topic > summary::-webkit-details-marker { display: none; }
-    .topic > summary::before { content: "B8"; display: inline-block; width: 1em; color: var(--muted); transition: transform .15s; }
+    .topic > summary::before { content: "\25B8"; display: inline-block; width: 1em; color: var(--muted); transition: transform .15s; }
     .topic[open] > summary::before { transform: rotate(90deg); }
     .topic > summary:hover { color: var(--accent); }
     .topic-body { padding: 0 14px 12px; }
@@ -96,6 +96,7 @@
     .nav-topics { margin: 2px 0 6px; padding-left: 14px; border-left: 1px solid var(--line); }
     .nav-topics a { font-size: 13px; color: var(--muted); }
     .nav-topics a:hover, .nav-topics a.active { color: var(--text); background: var(--accent-soft); }
+    .nav-group > a { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: .02em; }
     .source { margin-bottom: 10px; color: var(--muted); font: 12px/1.4 ui-monospace,"Cascadia Code",Consolas,monospace; }
     .linked-record { margin: 12px 0; padding: 14px; background: var(--surface-soft); border-left: 3px solid var(--accent); border-radius: 6px; }
     .empty { padding: 16px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: 10px; }

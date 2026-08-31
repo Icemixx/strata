@@ -650,20 +650,63 @@ function Get-RecordTopics([string]$Markdown, [string]$HeadingPrefix) {
     return $topics
 }
 
+function Get-RecordOutline([string]$Markdown, [string]$HeadingPrefix) {
+    # A composed guide has two levels and the left pane must show both: "# " names a group of
+    # subjects, "## " names a subject. Harvesting only the second flattens six groups into sixteen
+    # siblings, which is the grouping being lost between composition and page.
+    # Slugs are deduplicated across every level, exactly as Convert-Markdown deduplicates them, or
+    # navigation links at an id the renderer never emitted.
+    $safePrefix = [regex]::Replace($HeadingPrefix, '[^a-zA-Z0-9_-]', '-')
+    $used = @{}
+    $items = New-Object System.Collections.ArrayList
+    $inCode = $false
+    $seenHeading = $false
+    $firstTitle = $null
+    foreach ($line in @($Markdown -replace "`r`n?", "`n" -split "`n")) {
+        if ($line -match '^```') { $inCode = -not $inCode; continue }
+        if ($inCode) { continue }
+        if ($line -notmatch '^(#{1,6})\s+(.+?)\s*#*$') { continue }
+        $level = $Matches[1].Length
+        $title = $Matches[2]
+        $slug = ([regex]::Replace($title.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
+        if ($used.ContainsKey($slug)) { $used[$slug] = $used[$slug] + 1; $slug = $slug + '-' + $used[$slug] }
+        else { $used[$slug] = 1 }
+        if (-not $seenHeading) {
+            $seenHeading = $true
+            # The document opens with its own title, which is not a group. Hold it back and only
+            # discard it once a later "# " proves it was a title rather than the first group.
+            if ($level -eq 1) { $firstTitle = [pscustomobject]@{ Level = 1; Anchor = $safePrefix + $slug; Title = $title }; continue }
+        }
+        if ($level -gt 2) { continue }
+        if ($level -eq 1) { $firstTitle = $null }
+        [void]$items.Add([pscustomobject]@{ Level = $level; Anchor = $safePrefix + $slug; Title = $title })
+    }
+    if ($null -ne $firstTitle) { [void]$items.Insert(0, $firstTitle) }
+    return $items
+}
+
 function Expand-RecordTopics([string]$Html) {
     # Fold each topic into a disclosure block, the first left open. A record that renders every
     # reference table at once is the wall the archived guides avoided by collapsing detail.
-    $headings = [regex]::Matches($Html, '<h2 id="([^"]+)">(.*?)</h2>')
+    # A group heading ends the fold above it as surely as the next topic does: absorbed into the
+    # preceding <details>, a group title disappears from the page whenever that fold is shut.
+    $headings = [regex]::Matches($Html, '<h([12]) id="([^"]+)">(.*?)</h[12]>')
     if ($headings.Count -eq 0) { return $Html }
     $builder = New-Object Text.StringBuilder
     [void]$builder.Append($Html.Substring(0, $headings[0].Index))
+    $opened = $false
     for ($i = 0; $i -lt $headings.Count; $i++) {
         $heading = $headings[$i]
         $start = $heading.Index + $heading.Length
         $end = if ($i + 1 -lt $headings.Count) { $headings[$i + 1].Index } else { $Html.Length }
         $inner = $Html.Substring($start, $end - $start)
-        $open = if ($i -eq 0) { ' open' } else { '' }
-        [void]$builder.Append(('<details class="topic" id="{0}"{1}><summary>{2}</summary><div class="topic-body">{3}</div></details>' -f $heading.Groups[1].Value, $open, $heading.Groups[2].Value, $inner))
+        if ($heading.Groups[1].Value -eq '1') {
+            [void]$builder.Append($heading.Value).Append($inner)
+            continue
+        }
+        $open = if ($opened) { '' } else { ' open' }
+        $opened = $true
+        [void]$builder.Append(('<details class="topic" id="{0}"{1}><summary>{2}</summary><div class="topic-body">{3}</div></details>' -f $heading.Groups[2].Value, $open, $heading.Groups[3].Value, $inner))
     }
     return $builder.ToString()
 }
@@ -812,22 +855,43 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         }
     }
 
+    # Resolved before navigation: when a composed guide exists it is the document, and the authorities
+    # are what it was composed from rather than pages of their own.
+    $compositionPath = Join-Path $ProjectRoot '_sediment/guide/project_guide.md'
+    $hasComposition = Test-Path -LiteralPath $compositionPath
+
     $navigation = New-Object Text.StringBuilder
     [void]$navigation.Append('<ul>')
-    if (Test-Path -LiteralPath (Join-Path $ProjectRoot '_sediment/guide/project_guide.md')) { [void]$navigation.Append('<li data-nav-item data-target="how-it-works"><a href="#how-it-works">How it works</a><span class="nav-description">What the application does and how it behaves, composed from the code and the authorities.</span></li>') }
-    if ($tickets.Count -gt 0) { [void]$navigation.Append('<li data-nav-item data-target="work-overview"><a href="#work-overview">Work overview</a><span class="nav-description">Current work with its linked reasons and evidence.</span></li>') }
-    foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) { [void]$navigation.Append((Render-GuideNavigationNode $graph.Tree $anchors)) }
+    if ($hasComposition) {
+        # The composed guide is the document. Its own sections are what a reader navigates by.
+        [void]$navigation.Append('<li data-nav-item data-target="how-it-works"><a href="#how-it-works">Guide</a><span class="nav-description">What the application does and how it behaves.</span><ul class="nav-topics">')
+        $inGroup = $false
+        foreach ($topic in @(Get-RecordOutline (Read-Utf8 $compositionPath) 'guide-heading-')) {
+            $label = [Net.WebUtility]::HtmlEncode($topic.Title)
+            if ($topic.Level -eq 1) {
+                if ($inGroup) { [void]$navigation.Append('</ul></li>') }
+                [void]$navigation.Append(("<li class=`"nav-group`" data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a><ul class=`"nav-topics`">" -f $topic.Anchor,$label))
+                $inGroup = $true
+            }
+            else {
+                [void]$navigation.Append(("<li data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a></li>" -f $topic.Anchor,$label))
+            }
+        }
+        if ($inGroup) { [void]$navigation.Append('</ul></li>') }
+        [void]$navigation.Append('</ul></li>')
+    }
+    if (-not $hasComposition -and $tickets.Count -gt 0) { [void]$navigation.Append('<li data-nav-item data-target="work-overview"><a href="#work-overview">Work overview</a><span class="nav-description">Current work with its linked reasons and evidence.</span></li>') }
+    if (-not $hasComposition) { foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) { [void]$navigation.Append((Render-GuideNavigationNode $graph.Tree $anchors)) } }
     [void]$navigation.Append('</ul>')
 
     $body = New-Object Text.StringBuilder
 
-    # The composed explanation leads the Guide. It is the part a person reads; the authorities behind it
+    # The composed explanation is the Guide. It is the part a person reads; the authorities behind it
     # are the working material. Read one exact conventional path - `_sediment/` stays unrouted,
     # untraversed and unvalidated, and a direct read of a known file is not traversal.
-    $compositionPath = Join-Path $ProjectRoot '_sediment/guide/project_guide.md'
     $citationProblems = New-Object System.Collections.ArrayList
     $citedFiles = New-Object System.Collections.ArrayList
-    if (Test-Path -LiteralPath $compositionPath) {
+    if ($hasComposition) {
         $composed = Read-Utf8 $compositionPath
         if (-not [string]::IsNullOrWhiteSpace($composed)) {
             $chips = New-Object System.Collections.ArrayList
@@ -846,7 +910,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
             throw ("Guide composition has unresolvable references: " + (($citationProblems | Select-Object -Unique) -join '; '))
         }
     }
-    if ($tickets.Count -gt 0) {
+    if (-not $hasComposition -and $tickets.Count -gt 0) {
         [void]$body.AppendLine('<section class="guide-section" id="work-overview" data-nav-target><h1>Work overview</h1><p class="authority-intro">Current work with its linked reasons and implementation evidence.</p>')
         foreach ($ticket in $tickets) {
             $ticketId = [Net.WebUtility]::HtmlEncode($ticket.Id)
@@ -886,7 +950,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         }
         [void]$body.AppendLine('</section>')
     }
-    foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) {
+    foreach ($graph in @($(if ($hasComposition) { @() } else { $Graphs.State,$Graphs.Rationale,$Graphs.BuildLog }))) {
         $sectionId = 'authority-' + ([regex]::Replace($graph.Name.ToLowerInvariant(), '[^a-z0-9]+', '-')).Trim('-')
         [void]$body.AppendLine("<section class=`"guide-section`" id=`"$sectionId`"><h1>$([Net.WebUtility]::HtmlEncode($graph.Name))</h1>")
         [void]$body.Append((Render-GuideNode $graph.Tree 0 $anchors))

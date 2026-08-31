@@ -270,6 +270,19 @@ try {
         Assert-GuideRefused $root "# How it works`n`nInvented. [code: _strata/state/current.md:NO_SUCH_SYMBOL]`n" 'locator not found' 'a locator absent from its cited file must fail generation'
         Assert-GuideRefused $root "# How it works`n`nInvented. [code: nope/missing.py:thing]`n" 'cited file not found' 'a missing cited file must fail generation'
         Assert-GuideRefused $root "# How it works`n`nInvented. [authority: _sediment/guide/project_guide.md]`n" 'not routed|not found' 'an unrouted authority target must fail generation'
+        # Two levels, and the left pane must show both. v1 composed six groups as "# " headings and
+        # the renderer harvested only "## ", so sixteen sections rendered as flat siblings.
+        $grouped = "# SmartAutoBase`n`n# Operations`n`n## Work orders`n`nThe trio. [code: _strata/state/current.md:BUG-1]`n`n## Vehicles`n`nEvery car. [code: _strata/state/current.md:BUG-1]`n`n# Financial`n`n## Payments`n`nSettled against a work order. [authority: _strata/rationale/R1.md]`n"
+        Write-Utf8 $guideMd $grouped
+        $groupedRun = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($groupedRun.ExitCode -eq 0) "grouped composition should generate: $($groupedRun.Output)"
+        $groupedHtml = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'))
+        Assert-True ($groupedHtml -match '(?s)#guide-heading-operations">Operations</a><ul class="nav-topics"><li[^>]*><a href="#guide-heading-work-orders">Work orders</a></li><li[^>]*><a href="#guide-heading-vehicles">Vehicles</a></li></ul>') 'group did not nest its sections in navigation'
+        Assert-True ($groupedHtml -match '#guide-heading-financial">Financial</a><ul class="nav-topics"><li[^>]*><a href="#guide-heading-payments">Payments</a>') 'second group did not nest its sections'
+        Assert-True ($groupedHtml -notmatch 'href="#guide-heading-smartautobase"') 'document title was navigated as a group'
+        Assert-True ($groupedHtml -match '</details>\s*<h1 id="guide-heading-financial">') 'a group heading was folded into the topic above it'
+        Assert-True ($groupedHtml -match '<details class="topic" id="guide-heading-work-orders" open>') 'first topic was not left open'
+        Assert-True ($groupedHtml -notmatch '<details class="topic" id="guide-heading-payments" open>') 'a later topic was left open'
         [IO.File]::Delete($guideMd)
         Assert-True ($html -match '<h3>Why[^<]*what Rationale says</h3>') 'ticket-linked WHY section missing'
         Assert-True ($html -match '<h3>How[^<]*what the Build Log says</h3>') 'ticket-linked HOW section missing'
