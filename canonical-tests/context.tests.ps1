@@ -157,6 +157,22 @@ try {
         Assert-True ($testSource -notmatch [regex]::Escape($launchToken)) 'canonical tests start a child process'
     }
 
+    Assert-Test 'debate uses provider sessions and supplies only the opening transport prompt' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match 'Head each round `## Round N — <product>`') 'round heading is not product-only'
+        Assert-True ($debate -match 'participant that creates a debate returns one ready-to-paste opening prompt') 'creation-time transport prompt rule missing'
+        Assert-True ([regex]::Matches($debate, 'ready-to-paste', 'IgnoreCase').Count -eq 1) 'debate does not define exactly one opening transport prompt'
+        Assert-True ($debate -match 'After creation, the shared files and turn marker carry the handoff') 'post-creation simple handoff rule missing'
+        Assert-True ($debate -match 'a simple\s+user instruction to proceed is sufficient') 'simple post-creation proceed rule missing'
+        Assert-True ($debate -match 'Do not provide another transport prompt') 'post-creation prompt prohibition missing'
+        Assert-True ($debate -match 'one `report-<product>\.md` and one `cross-<product>\.md` per participant') 'debate artifacts are not product-named'
+        Assert-True ($debate -match 'DEBATE: converged — \[count\] settled — \[subject\]') 'converged stamp shape changed'
+        Assert-True ($debate -match 'DEBATE: terminated — \[reason\] — \[count\] settled, \[count\] open — \[subject\]') 'terminated stamp shape changed'
+        Assert-True ($debate -match 'DEBATE: void — \[reason\] — \[subject\]') 'void stamp shape changed'
+        Assert-True ($router -match 'debate\.md` \| Reconcile independently-derived work with an agent from another provider') 'router does not describe provider-only debate'
+    }
+
     Assert-Test 'direct user Guide generation is rejected' {
         $root = New-Fixture 'user-generation-rejected'
         $contextScript = Join-Path $root '_strata\universal\context.ps1'

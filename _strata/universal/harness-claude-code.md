@@ -15,14 +15,14 @@ handoff for a Claude Code session.
 are now; the transcript answers what you have been.
 
 The environment context names the family and the exact model id, and it is re-stated to you on every turn.
-It is the live value and the only one that describes the turn you are currently executing, so it is what a
-procedure re-determining tier per prompt must read.
+It is the live value and the only one that describes the turn you are currently executing, so use it when
+a workflow genuinely needs current-turn model identity.
 
 The session transcript at `<user-home>/.claude/projects/<encoded-project-path>/<session-id>.jsonl` records
 `message.model` on each assistant message, but records are written as a turn completes: the newest entry
 is the previous turn, and the turn in flight is absent. It therefore cannot tell you what you are running
-right now, and a procedure that relies on it alone detects a switch only after a round was already written
-under the wrong tier. Use it for the switch history, not to determine the current turn.
+right now, and a role-constrained workflow that relies on it alone detects a switch only after work was
+already performed. Use it for the switch history, not to determine the current turn.
 
 It has one job nothing else can do. `message.model` is recorded per assistant message, so it is the only
 place a model change *inside* a single prompt becomes visible, which capacity fallback can cause. The

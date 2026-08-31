@@ -7,7 +7,7 @@ participants from the same provider are a council, not a debate; use `dap.md` fo
 
 ## Preconditions
 
-The user seats both participants and chooses their models. No agent can verify the other's runtime.
+The user seats the two provider sessions.
 
 Re-read this file from disk at the start of every round; do not work from the copy in your context.
 Whoever is editing it stops while a debate is running.
@@ -15,7 +15,13 @@ Whoever is editing it stops while a debate is running.
 A participant is the session itself. Do not spawn an agent to take a round; switch the session or do not
 debate.
 
-The user carries every exchange between providers. No agent invokes, polls, or notifies the other.
+The user carries every exchange between providers. No agent invokes, polls, or notifies the other. The
+participant that creates a debate returns one ready-to-paste opening prompt for the other participant in
+normal chat; the user transports that prompt but does not have to reconstruct the handoff. The prompt
+names the repository and debate-branch path, phase, exact inputs and output file, and any blindness rule.
+It tells the recipient to re-read this procedure from disk. It does not quote or summarize an artifact the
+recipient must not yet see. After creation, the shared files and turn marker carry the handoff; a simple
+user instruction to proceed is sufficient. Do not provide another transport prompt.
 
 ## The brief
 
@@ -34,9 +40,7 @@ A brief says which phase, the subject, and the question.
 
 ## Rounds
 
-Head each round `## Round N — <product> / <model>`. Record the model that wrote the round; if you do not
-know it, write `model-undisclosed` rather than guessing. `harness-codex.md` and `harness-claude-code.md`
-say how each product identifies its own model. In your first round, also state in one line whether you can
+Head each round `## Round N — <product>`. In your first round, also state in one line whether you can
 execute verification commands against the repository.
 
 End every round with a turn marker on its own line:
@@ -45,9 +49,8 @@ End every round with a turn marker on its own line:
 Round N complete — next: <participant>
 ```
 
-`<participant>` is the product - `Claude Code` or `Codex` - never a model or a person. A model may change
-mid-debate while the participant does not, and a marker naming a model stops addressing anyone when it
-does.
+`<participant>` is the product - `Claude Code` or `Codex` - never a person or session detail. That name
+stays stable for the whole debate.
 
 Number rounds sequentially across the whole file, not per participant: read the highest N present and
 write N+1. The file is shared, so two participants numbering their own sequences produce two Round 2s that
@@ -83,9 +86,9 @@ identity or absent verifiable ground.
 
 Close `rounds.md` with exactly one stamp:
 
-- `DEBATE: converged — [count] settled — [models] — [subject]`
-- `DEBATE: terminated — [reason] — [count] settled, [count] open — [models] — [subject]`
-- `DEBATE: void — [reason] — [models] — [subject]`
+- `DEBATE: converged — [count] settled — [subject]`
+- `DEBATE: terminated — [reason] — [count] settled, [count] open — [subject]`
+- `DEBATE: void — [reason] — [subject]`
 
 ## Recording
 
@@ -96,8 +99,7 @@ meet. An unfinished debate is deliberation, which is what `_sediment/` is for.
 
 The branch holds `index.md`, one `report-<product>.md` and one `cross-<product>.md` per participant,
 `rounds.md`, and `settled.md`. Name leaf files by product - `report-codex.md`, `report-claude-code.md` -
-never by model. A participant may change model mid-debate, and a filename that moves is one the other
-side cannot find.
+so their paths remain stable for the whole debate.
 
 ## On close
 
@@ -125,5 +127,5 @@ A void debate produces no spec and no authority record.
 
 ## Limits
 
-Nothing detects a stalled debate; only the user can restart or close one. Two capable models exchanging
+Nothing detects a stalled debate; only the user can restart or close one. Two capable agents exchanging
 rounds is expensive: use DAP when one provider's scrutiny is enough.
