@@ -116,6 +116,15 @@ tickets. A dated entry goes to Build Log recording that the debate ran, between 
 many rounds, and **what it measured** - counts, verified figures, defects found. Those measurements are
 dated evidence and are the part of a debate worth keeping.
 
+**Confirm the spec.** After the spec is written and every settled item is placed, the other participant
+reads the spec and states whether it implements the settled items. A settled item whose measurement did not
+survive into the spec is not implemented. Where it does not, the author revises and the other participant
+re-checks what changed. The loop ends when both participants expressly agree the spec is correct; silence
+agrees to nothing, and an author's own reading of its own document is not agreement. Record that agreement
+in the spec, because the branch does not survive to carry it. Only then may the close procedure proceed.
+Nothing detects a stalled confirmation either; only the user can end one, and a spec closed that way
+carries its gaps into the record.
+
 **Then delete the branch**: the reports, the cross-analyses, `rounds.md`, `settled.md` and `index.md`.
 
 **Nothing is deleted until every settled item has a home.** An item with no destination was not settled;
