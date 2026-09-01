@@ -187,7 +187,6 @@ try {
         Assert-True ($spec -match 'Provenance recovery for an inherited specification') 'inherited-spec provenance recovery is missing'
         Assert-True ($spec -match 'Do not begin with an arbitrary chat date window') 'provenance recovery is tied to a date window'
         Assert-True ($spec -match 'Do not elevate reversible internal engineering choices into user decisions') 'decision-ownership filter is missing'
-        Assert-True ($spec -match 'Provenance reconstruction\s+complete.*does not mean the specification is\s+confirmed or implementation-ready') 'reconstruction and readiness are conflated'
         Assert-True ($router -match 'adding, changing, simplifying,\s+replacing, or removing an instruction') 'Strata recommendation signal does not cover additions and changes'
         Assert-True ($router -match 'report it promptly\s+as a separate Strata recommendation') 'reusable Strata recommendation signal is missing'
         Assert-True ($router -match 'accepted recommendation becomes separately authorized kit work') 'recommendation does not preserve authorization boundary'
@@ -286,9 +285,7 @@ try {
         Assert-True ($html -match '<h3>What State says</h3>') 'ticket State prose missing'
 
         # Watched red: prove each citation check fails on a planted defect before trusting a pass.
-        $composed = Join-Path $root '_sediment\guide'
-        [void][IO.Directory]::CreateDirectory($composed)
-        $guideMd = Join-Path $composed 'project_guide.md'
+        $guideMd = Join-Path $root '_strata\project_guide.md'
         Write-Utf8 $guideMd "# How it works`n`nThe fixture is under test. [code: _strata/state/current.md:BUG-1] [authority: _strata/rationale/R1.md]`n"
         $ok = Invoke-Context $root @('-GenerateGuide')
         Assert-True ($ok.ExitCode -eq 0) "valid citations should generate: $($ok.Output)"
@@ -300,7 +297,7 @@ try {
         # A generation refusal surfaces as a terminating error here, not an exit code, because the
         # harness runs with ErrorActionPreference Stop. Assert on the refusal and its reason.
         function Assert-GuideRefused([string]$Root, [string]$Markdown, [string]$Expected, [string]$Why) {
-            Write-Utf8 (Join-Path $Root '_sediment\guide\project_guide.md') $Markdown
+            Write-Utf8 (Join-Path $Root '_strata\project_guide.md') $Markdown
             $refused = $false; $message = ''
             try { $null = Invoke-Context $Root @('-GenerateGuide') }
             catch { $refused = $true; $message = $_.Exception.Message }
@@ -309,7 +306,8 @@ try {
         }
         Assert-GuideRefused $root "# How it works`n`nInvented. [code: _strata/state/current.md:NO_SUCH_SYMBOL]`n" 'locator not found' 'a locator absent from its cited file must fail generation'
         Assert-GuideRefused $root "# How it works`n`nInvented. [code: nope/missing.py:thing]`n" 'cited file not found' 'a missing cited file must fail generation'
-        Assert-GuideRefused $root "# How it works`n`nInvented. [authority: _sediment/guide/project_guide.md]`n" 'not routed|not found' 'an unrouted authority target must fail generation'
+        Assert-GuideRefused $root "# How it works`n`nInvented. [authority: _strata/project_guide.md]`n" 'not routed|not found' 'an unrouted authority target must fail generation'
+        Assert-GuideRefused $root "# How it works`n`nInvented. [code: _strata/state/current.md]`n" 'needs a locator' 'a code reference naming only a file must fail generation'
         # Two levels, and the left pane must show both. v1 composed six groups as "# " headings and
         # the renderer harvested only "## ", so sixteen sections rendered as flat siblings.
         $grouped = "# SmartAutoBase`n`n# Operations`n`n## Work orders`n`nThe trio. [code: _strata/state/current.md:BUG-1]`n`n## Vehicles`n`nEvery car. [code: _strata/state/current.md:BUG-1]`n`n# Financial`n`n## Payments`n`nSettled against a work order. [authority: _strata/rationale/R1.md]`n"

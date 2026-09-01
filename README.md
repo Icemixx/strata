@@ -10,8 +10,8 @@ the task needs it.
 - **State** records WHAT is current, using compact ticket entries and routed completed history.
 - **Rationale** records WHY decisions were made.
 - **Build Log** records HOW work was performed and the evidence observed.
-- **Guide** is a generated, self-contained HTML view over those three project authorities. It is not an
-  authority and contains no manually maintained unique content.
+- **Guide** is a generated, self-contained HTML explanation built from those three project authorities and
+  the application's code. It is not an authority and contains no directly maintained content.
 - **`_sediment/`** holds project material that is not an authority: deliberation at its root, stable
   domain material under `reference/`. It is not routed, and every file a record still needs is named by
   that record.

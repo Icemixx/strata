@@ -29,6 +29,7 @@ _strata/
 |   `-- index.md
 |-- build-log/
 |   `-- index.md
+|-- project_guide.md                        # composed explanation, generated projects only
 `-- project_guide.html
 ```
 
@@ -37,8 +38,9 @@ project-defined.
 
 ## Supporting material: `_sediment/`
 
-`_strata/` holds the shared payload and the project's own authorities, and nothing else. Project material
-that is not an authority lives in `_sediment/` at the repository root:
+`_strata/` holds the shared payload, the project's own authorities, and the Guide pair that is generated
+from them. Nothing else. Project material that is not an authority lives in `_sediment/` at the repository
+root:
 
 ```text
 _sediment/
@@ -181,10 +183,15 @@ Discovery begins at the three authority root indexes and follows `## Contents` i
 Filesystem records absent from that graph are validation findings, not implicitly included content.
 
 Guide is a committed, visibly generated, self-contained HTML snapshot with no server, network resource,
-or manually maintained unique content. It mirrors authority hierarchy, includes the short descriptions
+or directly maintained content. Its explanatory prose is owned by the derived Markdown composition source;
+its rendering, source map, hashes and manifest are generated. It includes the short descriptions
 owned by indexes and authority introductions, gives State tickets stable ID-derived anchors, combines
 their typed WHY and HOW targets, and embeds offline search. Empty Rationale or Build Log sections display
 `No records yet`.
+
+`_strata/project_guide.md` is the composed explanation the Guide renders. It is derived, non-authoritative,
+machine-composed during an explicit Guide update, and not routed as agent context. Generation reads it by
+exact path when it exists. Both Guide files are project surfaces; the canonical kit carries neither.
 
 Guide embeds a deterministic digest of routed source content, generator version, generation date, and
 available Git snapshot information. Its permanent notice says which commit supplied the snapshot and

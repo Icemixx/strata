@@ -46,8 +46,7 @@ window when necessary. Stop when every such requirement has a verified source, a
 unavailable-evidence disposition, or a named unresolved decision. Record the sessions or other inputs
 inspected, their relevant time range, and any discovery limitation that could have hidden material context.
 
-This is a repair path for inherited specifications, not a normal implementation dependency. A confirmed
-specification must remain usable when those conversations and temporary artifacts are unavailable.
+This is a repair path for inherited specifications, not a normal implementation dependency.
 
 ## Draft and confirmation state
 
@@ -65,10 +64,6 @@ SPECIFICATION: confirmed — implementation-ready
 
 `draft` is an honest working state, not an implementation handoff. Unresolved implementation-blocking
 choices, missing inputs, or unverified load-bearing claims keep the marker at `draft`.
-
-Report historical reconstruction and specification readiness separately. `Provenance reconstruction
-complete` means the relevant decision path has been recovered; it does not mean the specification is
-confirmed or implementation-ready.
 
 Unless the user or calling procedure selects another path, write the retained document at
 `_sediment/<subject>-spec.md`. The exact path must be known before inbound references are created.

@@ -746,7 +746,9 @@ function Test-GuideCitation([string]$Kind, [string]$Target, [string]$RepoRoot, [
     if ($relative -match '[<>"|*?]') { return "code target has illegal path characters: $Target" }
     $full = Join-Path $RepoRoot $relative
     if (-not (Test-Path -LiteralPath $full)) { return "cited file not found: $relative" }
-    if ([string]::IsNullOrWhiteSpace($locator)) { return '' }
+    # A path alone is not evidence. Code files are large; "somewhere in this file" cannot be checked by
+    # a reader, so the form requires the spot and generation refuses a reference that omits it.
+    if ([string]::IsNullOrWhiteSpace($locator)) { return "code reference needs a locator: $Target" }
     $content = Read-Utf8 $full
     if ($null -eq $content) { return "cited file unreadable: $relative" }
     # Delimiter-aware for a simple identifier; literal for compound tokens carrying punctuation.
@@ -857,7 +859,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
 
     # Resolved before navigation: when a composed guide exists it is the document, and the authorities
     # are what it was composed from rather than pages of their own.
-    $compositionPath = Join-Path $ProjectRoot '_sediment/guide/project_guide.md'
+    $compositionPath = Join-Path $ProjectRoot '_strata/project_guide.md'
     $hasComposition = Test-Path -LiteralPath $compositionPath
 
     $navigation = New-Object Text.StringBuilder
@@ -887,8 +889,8 @@ function New-Guide([object]$Graphs, [string]$Digest) {
     $body = New-Object Text.StringBuilder
 
     # The composed explanation is the Guide. It is the part a person reads; the authorities behind it
-    # are the working material. Read one exact conventional path - `_sediment/` stays unrouted,
-    # untraversed and unvalidated, and a direct read of a known file is not traversal.
+    # are the working material. It sits beside its own rendered output in `_strata/`, composed by an
+    # agent and read here by exact path. It is a project surface: the canonical kit never carries one.
     $citationProblems = New-Object System.Collections.ArrayList
     $citedFiles = New-Object System.Collections.ArrayList
     if ($hasComposition) {
@@ -902,7 +904,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
             $rendered = Expand-RecordTopics $rendered
             [void]$body.AppendLine('<section class="guide-section" id="how-it-works" data-nav-target><h1>How it works</h1>')
             [void]$body.AppendLine('<article class="record" id="doc-guide-composition" data-depth="0" data-search-item data-nav-target>')
-            [void]$body.AppendLine('<div class="source">_sediment/guide/project_guide.md &mdash; composed explanation, not an authority</div>')
+            [void]$body.AppendLine('<div class="source">_strata/project_guide.md &mdash; composed explanation, not an authority</div>')
             [void]$body.Append($rendered)
             [void]$body.AppendLine('</article></section>')
         }
