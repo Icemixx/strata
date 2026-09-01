@@ -184,6 +184,15 @@ try {
         Assert-True ($spec -match 'SPECIFICATION: draft') 'draft marker is missing'
         Assert-True ($spec -match 'SPECIFICATION: confirmed — implementation-ready') 'confirmed marker is missing'
         Assert-True ($spec -match 'no implementation-blocking decision remains') 'readiness gate is missing'
+        Assert-True ($spec -match 'Provenance recovery for an inherited specification') 'inherited-spec provenance recovery is missing'
+        Assert-True ($spec -match 'Do not begin with an arbitrary chat date window') 'provenance recovery is tied to a date window'
+        Assert-True ($spec -match 'Do not elevate reversible internal engineering choices into user decisions') 'decision-ownership filter is missing'
+        Assert-True ($spec -match 'Provenance reconstruction\s+complete.*does not mean the specification is\s+confirmed or implementation-ready') 'reconstruction and readiness are conflated'
+        Assert-True ($router -match 'adding, changing, simplifying,\s+replacing, or removing an instruction') 'Strata recommendation signal does not cover additions and changes'
+        Assert-True ($router -match 'report it promptly\s+as a separate Strata recommendation') 'reusable Strata recommendation signal is missing'
+        Assert-True ($router -match 'accepted recommendation becomes separately authorized kit work') 'recommendation does not preserve authorization boundary'
+        $active = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\active-agent.md'), [Text.Encoding]::UTF8)
+        Assert-True ($active -match 'reusable Strata improvement that has not yet been reported') 'closing recommendation backstop is missing'
         Assert-True ($debate -match 'Follow `_strata/universal/spec-building\.md`') 'debate does not invoke the shared workflow'
         Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
     }

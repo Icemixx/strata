@@ -18,6 +18,14 @@ Read routed procedures silently. Visible load announcements are not required. An
 discovery promptly when it changes an accepted conclusion, plan, risk, scope, or unresolved item. A
 delegated agent reports such a discovery to the Active Agent.
 
+During any task, when direct evidence shows that Strata would benefit from adding, changing, simplifying,
+replacing, or removing an instruction, safeguard, procedure, or other shared-kit behavior, report it promptly
+as a separate Strata recommendation. State the evidence, affected procedure, proposed kind of change, likely
+consequence, and urgency. Do not silently expand the current task, modify the kit, or create backlog work. An
+accepted recommendation becomes separately authorized kit work routed through
+`_strata/universal/kit-editing.md`. Do not promote a project-specific preference into a universal rule without
+cross-project justification.
+
 ## Scope and authority
 
 - Answer, explanation, review, diagnosis, and planning requests are read-only.

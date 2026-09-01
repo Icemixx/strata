@@ -34,6 +34,21 @@ Before drafting:
 The caller owns source-specific lifecycle. This procedure does not decide whether an audit closes, a
 debate branch is deleted, an authority changes, or an older specification is superseded.
 
+## Provenance recovery for an inherited specification
+
+When an existing specification is not self-contained, start with that document, its explicit references,
+and the live implementation baseline. Do not begin with an arbitrary chat date window or assume that the
+latest session contains the origin of every requirement.
+
+Inspect the most direct producing input first, then trace backward only where a load-bearing requirement
+lacks its decision, reason, or evidence. Follow referenced sessions or artifacts beyond the initial time
+window when necessary. Stop when every such requirement has a verified source, an explicit inference, an
+unavailable-evidence disposition, or a named unresolved decision. Record the sessions or other inputs
+inspected, their relevant time range, and any discovery limitation that could have hidden material context.
+
+This is a repair path for inherited specifications, not a normal implementation dependency. A confirmed
+specification must remain usable when those conversations and temporary artifacts are unavailable.
+
 ## Draft and confirmation state
 
 Put one exact marker near the top of the document:
@@ -50,6 +65,10 @@ SPECIFICATION: confirmed — implementation-ready
 
 `draft` is an honest working state, not an implementation handoff. Unresolved implementation-blocking
 choices, missing inputs, or unverified load-bearing claims keep the marker at `draft`.
+
+Report historical reconstruction and specification readiness separately. `Provenance reconstruction
+complete` means the relevant decision path has been recovered; it does not mean the specification is
+confirmed or implementation-ready.
 
 Unless the user or calling procedure selects another path, write the retained document at
 `_sediment/<subject>-spec.md`. The exact path must be known before inbound references are created.
@@ -118,6 +137,12 @@ Review the draft as though the source material no longer exists:
 5. Check that the validation plan can fail for every required behavior before trusting its passing form.
 6. Confirm that no step requires opening the source chat, session, debate branch, or temporary report to
    discover what to do.
+
+Do not elevate reversible internal engineering choices into user decisions. A choice blocks confirmation
+only when different conforming implementations could materially change compatibility, safety, stored data,
+recovery, externally visible behavior, or the acceptance result, or when the user explicitly retained that
+choice. Leave other representation and implementation mechanics to the implementer within the pinned
+contract.
 
 If any material ambiguity remains, keep `SPECIFICATION: draft` and return the smallest decision set to the
 user. Do not bury an architectural choice inside implementation.

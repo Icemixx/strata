@@ -91,5 +91,6 @@ handoff file.
 ## Closing review
 
 Before closing meaningful work, confirm no required gate was weakened, discoveries were dispositioned,
-authority records are current, and omissions or unverified surfaces are stated plainly. For long or
-high-stakes work, also load `_strata/universal/self-critique.md`.
+authority records are current, and omissions or unverified surfaces are stated plainly. Check whether the
+evidence exposed a reusable Strata improvement that has not yet been reported. For long or high-stakes work,
+also load `_strata/universal/self-critique.md`.
