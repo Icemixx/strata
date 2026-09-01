@@ -102,28 +102,25 @@ so their paths remain stable for the whole debate.
 
 ## On close
 
-A converged debate is consumed, not archived. Write the spec, place every settled item in the authority
-that owns it, then delete the branch.
+A converged debate is consumed, not archived. Build the spec through the shared specification workflow,
+place every settled item in the authority that owns it, then delete the branch.
 
-**Write the spec.** One document at `_sediment/<subject>-spec.md`, written to be implemented by someone
-who was not in the debate: what is being built, how, what it deliberately does not do, and the order to
-build it in. It carries the reasoning that decided each position and the measurements that settled the
-contested ones. It does not carry who held what, who conceded, or in which round - that is process
-residue, and a reader implementing the result has no use for it.
+**Build the spec.** Follow `_strata/universal/spec-building.md`, using `settled.md` as the input ledger and
+the reports, cross-analyses and rounds as evidence for the reasoning and measurements that must survive.
+The output is `_sediment/<subject>-spec.md`. Debate is only the source of this specification; it does not
+change the shared content, traceability, ambiguity, readiness, or handoff requirements.
 
 **Place every settled item.** Decisions and their reasons go to Rationale. Remaining work goes to State as
 tickets. A dated entry goes to Build Log recording that the debate ran, between which products, over how
 many rounds, and **what it measured** - counts, verified figures, defects found. Those measurements are
 dated evidence and are the part of a debate worth keeping.
 
-**Confirm the spec.** After the spec is written and every settled item is placed, the other participant
-reads the spec and states whether it implements the settled items. A settled item whose measurement did not
-survive into the spec is not implemented. Where it does not, the author revises and the other participant
-re-checks what changed. The loop ends when both participants expressly agree the spec is correct; silence
-agrees to nothing, and an author's own reading of its own document is not agreement. Record that agreement
-in the spec, because the branch does not survive to carry it. Only then may the close procedure proceed.
-Nothing detects a stalled confirmation either; only the user can end one, and a spec closed that way
-carries its gaps into the record.
+**Confirm the spec.** The other participant performs the independent confirmation required by
+`spec-building.md`. Silence agrees to nothing, and the author's review of its own document is not
+independent confirmation. The close procedure may continue only after the specification carries
+`SPECIFICATION: confirmed — implementation-ready` and records the required agreement. Nothing detects a
+stalled confirmation; only the user can end one, and ending it does not promote a draft or authorize its
+implementation.
 
 **Then delete the branch**: the reports, the cross-analyses, `rounds.md`, `settled.md` and `index.md`.
 

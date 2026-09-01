@@ -74,6 +74,7 @@ Read the mapped file before acting when its trigger applies:
 | `consolidation.md` | Consolidate duplicated or superseded documentation |
 | `dap.md` | Make a consequential decision or run an explicitly triggered six-seat council |
 | `debate.md` | Reconcile independently-derived work with an agent from another provider |
+| `spec-building.md` | Create, revise, review, confirm, or hand off a retained specification |
 | `session-pickup.md` | Examine or continue another harness session |
 | `self-critique.md` | Review long or high-stakes work, or when the user requests deeper critique |
 | `seasonal-audit.md` | Perform a seasonal, full-application, or refactor audit |

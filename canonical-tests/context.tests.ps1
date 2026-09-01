@@ -173,6 +173,21 @@ try {
         Assert-True ($router -match 'debate\.md` \| Reconcile independently-derived work with an agent from another provider') 'router does not describe provider-only debate'
     }
 
+    Assert-Test 'spec building is one routed cold-start workflow' {
+        $specPath = Join-Path $StagedStrata 'universal\spec-building.md'
+        Assert-True (Test-Path -LiteralPath $specPath -PathType Leaf) 'shared specification procedure is missing'
+        $spec = [IO.File]::ReadAllText($specPath, [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        Assert-True ($router -match 'spec-building\.md` \| Create, revise, review, confirm, or hand off a retained specification') 'specification procedure is not routed'
+        Assert-True ($spec -match 'A specification is a cold-start implementation contract') 'cold-start contract is missing'
+        Assert-True ($spec -match 'SPECIFICATION: draft') 'draft marker is missing'
+        Assert-True ($spec -match 'SPECIFICATION: confirmed — implementation-ready') 'confirmed marker is missing'
+        Assert-True ($spec -match 'no implementation-blocking decision remains') 'readiness gate is missing'
+        Assert-True ($debate -match 'Follow `_strata/universal/spec-building\.md`') 'debate does not invoke the shared workflow'
+        Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
+    }
+
     Assert-Test 'direct user Guide generation is rejected' {
         $root = New-Fixture 'user-generation-rejected'
         $contextScript = Join-Path $root '_strata\universal\context.ps1'
