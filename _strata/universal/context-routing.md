@@ -193,10 +193,24 @@ their typed WHY and HOW targets, and embeds offline search. Empty Rationale or B
 machine-composed during an explicit Guide update, and not routed as agent context. Generation reads it by
 exact path when it exists. Both Guide files are project surfaces; the canonical kit carries neither.
 
-Guide embeds a deterministic digest of routed source content, generator version, generation date, and
-available Git snapshot information. Its permanent notice says which commit supplied the snapshot and
-that it may be behind current authorities. `-GuideStatus` compares the embedded digest with the current
-routed authorities and reports `GUIDE_MISSING`, `GUIDE_CURRENT`, or `GUIDE_STALE` without writing.
+Guide embeds a deterministic digest, generator version, generation date, and available Git snapshot
+information. Its permanent notice says which commit supplied the snapshot and that it may be behind
+current authorities. `-GuideStatus` is read-only and its first token is always one of `GUIDE_MISSING`,
+`GUIDE_CURRENT`, `GUIDE_STALE` or `GUIDE_INVALID`.
+
+Which digest and which record fields follow that token depend on whether `_strata/project_guide.md`
+exists.
+
+When it does not exist, the digest is of routed source content and the authority-only records, field
+sets and optional `GUIDE_CHANGE` advisories are unchanged.
+
+When it exists, the digest is derived from the composed sections, the HTML carries an embedded
+`strata-guide-manifest/v1` provenance manifest, and status adds `sections`, `changed_sections`,
+`changed_paths` and one `GUIDE_SECTION_STALE id=<section-id> changed_paths_json=<array>` record per
+stale section. Absent or corrupt embedded provenance is `GUIDE_INVALID`, which is distinct from stale.
+Generation of a composed Guide also emits `GUIDE_WARNING` records for a `workflow`, `architecture` or
+`module-family` section with no declared watch surface, and one `GUIDE_COVERAGE` record per section,
+before `GUIDE_GENERATED`.
 
 Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
 unsafe link schemes; unexpected HTML-like text is displayed rather than executed.

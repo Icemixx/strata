@@ -60,13 +60,22 @@ function Get-Relative([string]$Path, [string]$Root) {
 }
 
 function Invoke-GitRead([string[]]$GitArguments) {
+    # Git writes advisory warnings to stderr and still exits 0 - an unreadable
+    # global ignore file, an unreadable directory during a walk. Under the
+    # caller's ErrorActionPreference Stop, PowerShell turns that native stderr
+    # into a terminating error, which silently emptied every watch expansion on
+    # one host. Read with the preference relaxed for the duration of the call,
+    # restore the caller's, and keep failing closed only on a nonzero exit.
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     try {
         $safeRoot = $ProjectRoot.Replace('\','/')
         $output = @(& git -c "safe.directory=$safeRoot" -C $ProjectRoot @GitArguments 2>$null)
         if ($LASTEXITCODE -ne 0) { return @() }
-        return $output
+        return @($output | Where-Object { $_ -is [string] })
     }
     catch { return @() }
+    finally { $ErrorActionPreference = $previousPreference }
 }
 
 function Get-GitSnapshot {
@@ -273,7 +282,8 @@ function Test-GuideShell {
         '@@STRATA_BASE_COMMIT_DATE@@',
         '@@STRATA_BASE_COMMIT_SUBJECT@@',
         '<!--STRATA_NAVIGATION-->',
-        '<!--STRATA_CONTENT-->'
+        '<!--STRATA_CONTENT-->',
+        '<!--STRATA_MANIFEST-->'
     )) {
         $count = [regex]::Matches($shell, [regex]::Escape($placeholder)).Count
         if ($count -ne 1) { Add-Finding 'GUIDE_SHELL_PLACEHOLDER' "$GuideShellPath must contain $placeholder exactly once; found $count." }
@@ -360,6 +370,15 @@ function Get-SourceDigest([object]$Graphs) {
 }
 
 function Write-GuideStatus([object]$Graphs) {
+    # Two paths, one first-token interface. With a composition source the v1
+    # manifest, section and closed reason-code grammar applies; without one the
+    # pre-v1 authority-only digest, field sets, missing-digest result and
+    # GUIDE_CHANGE advisories below remain exactly as they were.
+    $compositionPath = Join-Path $ProjectRoot '_strata/project_guide.md'
+    if (Test-Path -LiteralPath $compositionPath -PathType Leaf) {
+        Write-GuideCompositionStatus $compositionPath
+        return
+    }
     $currentDigest = Get-SourceDigest $Graphs
     if (-not (Test-Path -LiteralPath $GuidePath -PathType Leaf)) {
         Write-Output "GUIDE_MISSING current_digest=$currentDigest"
@@ -650,41 +669,6 @@ function Get-RecordTopics([string]$Markdown, [string]$HeadingPrefix) {
     return $topics
 }
 
-function Get-RecordOutline([string]$Markdown, [string]$HeadingPrefix) {
-    # A composed guide has two levels and the left pane must show both: "# " names a group of
-    # subjects, "## " names a subject. Harvesting only the second flattens six groups into sixteen
-    # siblings, which is the grouping being lost between composition and page.
-    # Slugs are deduplicated across every level, exactly as Convert-Markdown deduplicates them, or
-    # navigation links at an id the renderer never emitted.
-    $safePrefix = [regex]::Replace($HeadingPrefix, '[^a-zA-Z0-9_-]', '-')
-    $used = @{}
-    $items = New-Object System.Collections.ArrayList
-    $inCode = $false
-    $seenHeading = $false
-    $firstTitle = $null
-    foreach ($line in @($Markdown -replace "`r`n?", "`n" -split "`n")) {
-        if ($line -match '^```') { $inCode = -not $inCode; continue }
-        if ($inCode) { continue }
-        if ($line -notmatch '^(#{1,6})\s+(.+?)\s*#*$') { continue }
-        $level = $Matches[1].Length
-        $title = $Matches[2]
-        $slug = ([regex]::Replace($title.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
-        if ($used.ContainsKey($slug)) { $used[$slug] = $used[$slug] + 1; $slug = $slug + '-' + $used[$slug] }
-        else { $used[$slug] = 1 }
-        if (-not $seenHeading) {
-            $seenHeading = $true
-            # The document opens with its own title, which is not a group. Hold it back and only
-            # discard it once a later "# " proves it was a title rather than the first group.
-            if ($level -eq 1) { $firstTitle = [pscustomobject]@{ Level = 1; Anchor = $safePrefix + $slug; Title = $title }; continue }
-        }
-        if ($level -gt 2) { continue }
-        if ($level -eq 1) { $firstTitle = $null }
-        [void]$items.Add([pscustomobject]@{ Level = $level; Anchor = $safePrefix + $slug; Title = $title })
-    }
-    if ($null -ne $firstTitle) { [void]$items.Insert(0, $firstTitle) }
-    return $items
-}
-
 function Expand-RecordTopics([string]$Html) {
     # Fold each topic into a disclosure block, the first left open. A record that renders every
     # reference table at once is the wall the archived guides avoided by collapsing detail.
@@ -715,7 +699,7 @@ function Test-GuideCitation([string]$Kind, [string]$Target, [string]$RepoRoot, [
     # Two reference kinds resolve at different strengths, because they can. An authority target is
     # present in the routed graph or it is not. A code locator can only be checked textually: deciding
     # which declaration a token denotes is static analysis, which universal tooling must not attempt.
-    $parts = $Target -split '(?<!^[A-Za-z]):', 2
+    $parts = $Target -split ':', 2
     $relative = $parts[0]
     $locator = if ($parts.Count -gt 1) { $parts[1] } else { '' }
     if ($Kind -eq 'authority') {
@@ -770,7 +754,7 @@ function Convert-GuideCitations([string]$Markdown, [string]$RepoRoot, [object]$G
         $target = $m.Groups[2].Value.Trim()
         $problem = Test-GuideCitation $kind $target $RepoRoot $Graphs
         if ($problem) { [void]$Problems.Add($problem) }
-        if ($kind -eq 'code') { [void]$CitedFiles.Add((($target -split '(?<!^[A-Za-z]):', 2)[0])) }
+        if ($kind -eq 'code') { [void]$CitedFiles.Add((($target -split ':', 2)[0])) }
         $token = '@@STRATACITE' + $script:GuideCiteCounter + '@@'
         $script:GuideCiteCounter++
         [void]$Chips.Add([pscustomobject]@{
@@ -804,6 +788,1082 @@ function Render-GuideNode([object]$Node, [int]$Depth, [hashtable]$Anchors) {
     [void]$builder.Append('</article>')
     foreach ($child in @($Node.Children)) { [void]$builder.Append((Render-GuideNode $child ($Depth + 1) $Anchors)) }
     return $builder.ToString()
+}
+
+# ---------------------------------------------------------------------------
+# Guide composition v1: directive grammar, section identity, block coverage,
+# table evidence, watch surfaces, per-section digests and the embedded manifest.
+#
+# Everything below runs only when `_strata/project_guide.md` exists. The
+# authority-only path keeps its pre-v1 generation, digest and status behaviour
+# untouched, because a consuming project that has not composed a Guide must not
+# see its status output change.
+# ---------------------------------------------------------------------------
+
+$GuideManifestSchema = 'strata-guide-manifest/v1'
+$GuideSectionKinds = @('topic','workflow','architecture','module-family')
+$GuideWatchKinds = @('workflow','architecture','module-family')
+$GuideCompositionRelative = '_strata/project_guide.md'
+
+function Get-Sha256Hex([byte[]]$Bytes) {
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($sha.ComputeHash($Bytes))).Replace('-','').ToLowerInvariant() }
+    finally { $sha.Dispose() }
+}
+
+function Get-Sha256Text([string]$Text) { return Get-Sha256Hex $Utf8NoBom.GetBytes($Text) }
+
+function Get-FileDigest([string]$FullPath) {
+    if (-not (Test-Path -LiteralPath $FullPath -PathType Leaf)) { return '' }
+    try { return Get-Sha256Hex ([IO.File]::ReadAllBytes($FullPath)) }
+    catch { return '' }
+}
+
+# A dedicated serializer. ConvertTo-Json fixes neither property order nor
+# whitespace nor escaping, and this JSON is hashed: any of the three would let
+# an identical Guide hash differently on a different host.
+function ConvertTo-GuideJsonString([string]$Value) {
+    $builder = New-Object Text.StringBuilder
+    [void]$builder.Append('"')
+    foreach ($char in $Value.ToCharArray()) {
+        if ($char -ceq '"') { [void]$builder.Append('\"') }
+        elseif ($char -ceq '\') { [void]$builder.Append('\\') }
+        elseif ($char -ceq "`b") { [void]$builder.Append('\b') }
+        elseif ($char -ceq "`f") { [void]$builder.Append('\f') }
+        elseif ($char -ceq "`n") { [void]$builder.Append('\n') }
+        elseif ($char -ceq "`r") { [void]$builder.Append('\r') }
+        elseif ($char -ceq "`t") { [void]$builder.Append('\t') }
+        elseif ([int][char]$char -lt 32) { [void]$builder.Append('\u').Append(([int][char]$char).ToString('x4')) }
+        else { [void]$builder.Append($char) }
+    }
+    [void]$builder.Append('"')
+    return $builder.ToString()
+}
+
+# Pairs arrive as ordered @(@('key','<already encoded json>'),...). Property
+# order is the caller's order, never a hashtable's enumeration order.
+function ConvertTo-GuideJsonObject([object[]]$Pairs) {
+    $parts = @()
+    foreach ($pair in $Pairs) { $parts += ((ConvertTo-GuideJsonString $pair[0]) + ':' + $pair[1]) }
+    return '{' + ($parts -join ',') + '}'
+}
+
+function ConvertTo-GuideJsonArray([object[]]$Items) {
+    if ($null -eq $Items) { return '[]' }
+    return '[' + (@($Items) -join ',') + ']'
+}
+
+function Sort-GuideOrdinal([object[]]$Values) {
+    $list = [Collections.Generic.List[string]]::new()
+    foreach ($value in @($Values)) { [void]$list.Add([string]$value) }
+    $list.Sort([StringComparer]::Ordinal)
+    return @($list.ToArray())
+}
+
+function ConvertTo-GuideCitedTargetsJson([object[]]$Targets) {
+    $encoded = @()
+    foreach ($target in @($Targets)) {
+        $encoded += ConvertTo-GuideJsonObject @(
+            @('kind',   (ConvertTo-GuideJsonString $target.kind)),
+            @('target', (ConvertTo-GuideJsonString $target.target)),
+            @('path',   (ConvertTo-GuideJsonString $target.path)),
+            @('digest', (ConvertTo-GuideJsonString $target.digest))
+        )
+    }
+    return ConvertTo-GuideJsonArray $encoded
+}
+
+function ConvertTo-GuideWatchSurfacesJson([object[]]$Surfaces) {
+    $encoded = @()
+    foreach ($surface in @($Surfaces)) {
+        $entries = @()
+        foreach ($entry in @($surface.entries)) {
+            $entries += ConvertTo-GuideJsonObject @(
+                @('path',   (ConvertTo-GuideJsonString $entry.path)),
+                @('digest', (ConvertTo-GuideJsonString $entry.digest))
+            )
+        }
+        $encoded += ConvertTo-GuideJsonObject @(
+            @('pattern', (ConvertTo-GuideJsonString $surface.pattern)),
+            @('digest',  (ConvertTo-GuideJsonString $surface.digest)),
+            @('entries', (ConvertTo-GuideJsonArray $entries))
+        )
+    }
+    return ConvertTo-GuideJsonArray $encoded
+}
+
+function Get-GuideInputDigest([object[]]$Targets, [object[]]$Surfaces) {
+    $json = ConvertTo-GuideJsonObject @(
+        @('cited_targets',  (ConvertTo-GuideCitedTargetsJson $Targets)),
+        @('watch_surfaces', (ConvertTo-GuideWatchSurfacesJson $Surfaces))
+    )
+    return Get-Sha256Text $json
+}
+
+# ---- Watch surfaces -------------------------------------------------------
+
+function Get-RepositoryFiles {
+    # The expansion set is the sorted union of tracked files and non-ignored
+    # untracked files beneath the repository root. Both halves are Git facts, so
+    # there is no filesystem substitute: outside a repository the set is empty
+    # and a declared watch surface expands to nothing.
+    # Not cached: generation and status both run inside one dot-sourced process
+    # per invocation, and the set changes between them whenever a watched file
+    # is added, deleted or renamed.
+    $listed = @(Invoke-GitRead @('-c','core.quotepath=off','ls-files','--cached','--others','--exclude-standard'))
+    $unique = @{}
+    foreach ($line in $listed) {
+        if ([string]::IsNullOrWhiteSpace($line)) { continue }
+        $relative = $line.Trim().Replace('\','/')
+        if ($relative.StartsWith('"')) { continue }
+        if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot $relative) -PathType Leaf)) { continue }
+        $unique[$relative] = $true
+    }
+    return @(Sort-GuideOrdinal @($unique.Keys))
+}
+
+function Test-GuideWatchPattern([string]$Pattern) {
+    if ([string]::IsNullOrWhiteSpace($Pattern)) { return 'watch pattern is empty' }
+    if ($Pattern.Contains('\')) { return "watch pattern uses a backslash: $Pattern" }
+    if ($Pattern.StartsWith('/')) { return "watch pattern is absolute: $Pattern" }
+    if ($Pattern -match '^[A-Za-z]:') { return "watch pattern is absolute: $Pattern" }
+    if ($Pattern -match '[\[\]\{\}\?!]') { return "watch pattern uses an unsupported wildcard: $Pattern" }
+    # Never digest the whole repository: a signal that is always red is a signal
+    # nobody reads, so the one pattern that watches everything is refused.
+    if ($Pattern -ceq '**') { return 'watch pattern must be narrower than the repository: **' }
+    $segments = @($Pattern -split '/')
+    for ($i = 0; $i -lt $segments.Count; $i++) {
+        $segment = $segments[$i]
+        $isLast = ($i -eq $segments.Count - 1)
+        if ($segment -eq '') { return "watch pattern has an empty segment: $Pattern" }
+        if ($segment -eq '.' -or $segment -eq '..') { return "watch pattern has a relative segment: $Pattern" }
+        if ($segment.Contains('**')) {
+            if (-not $isLast -or $segment -cne '**') { return "watch pattern may use ** only as the complete final segment: $Pattern" }
+            continue
+        }
+        if ($segment.Contains('*') -and -not $isLast) { return "watch pattern may use * only in the final segment: $Pattern" }
+    }
+    return ''
+}
+
+function Test-GuideWatchMatch([string]$Pattern, [string]$Path) {
+    $segments = @($Pattern -split '/')
+    if ($segments[$segments.Count - 1] -ceq '**') {
+        if ($segments.Count -eq 1) { return $true }
+        $prefix = (@($segments[0..($segments.Count - 2)]) -join '/') + '/'
+        return $Path.StartsWith($prefix, [StringComparison]::Ordinal)
+    }
+    $pathSegments = @($Path -split '/')
+    if ($pathSegments.Count -ne $segments.Count) { return $false }
+    for ($i = 0; $i -lt $segments.Count; $i++) {
+        if ($i -eq $segments.Count - 1 -and $segments[$i].Contains('*')) {
+            $expression = '^' + ([regex]::Escape($segments[$i]).Replace('\*','[^/]*')) + '$'
+            if ($pathSegments[$i] -cnotmatch $expression) { return $false }
+        }
+        elseif ($segments[$i] -cne $pathSegments[$i]) { return $false }
+    }
+    return $true
+}
+
+function Get-GuideWatchDigest([object[]]$Entries) {
+    $builder = New-Object Text.StringBuilder
+    foreach ($entry in @($Entries)) { [void]$builder.Append($entry.path).Append([char]0).Append($entry.digest).Append("`n") }
+    return Get-Sha256Text $builder.ToString()
+}
+
+function Get-GuideWatchSurface([string]$Pattern, [hashtable]$Claimed) {
+    # Overlapping declarations store each expanded path once for the section,
+    # and the first declaration owns it, so the stored set is a function of
+    # declaration order rather than of expansion order. MatchCount reports the
+    # full expansion, because the zero-result generation error is about what the
+    # pattern matches, not about what an earlier pattern already claimed.
+    $byPath = @{}
+    $matchCount = 0
+    foreach ($relative in @(Get-RepositoryFiles)) {
+        if (-not (Test-GuideWatchMatch $Pattern $relative)) { continue }
+        $matchCount++
+        if ($Claimed.ContainsKey($relative)) { continue }
+        $Claimed[$relative] = $true
+        $byPath[$relative] = [pscustomobject]@{ path = $relative; digest = (Get-FileDigest (Join-Path $ProjectRoot $relative)) }
+    }
+    $ordered = @()
+    foreach ($path in @(Sort-GuideOrdinal @($byPath.Keys))) { $ordered += $byPath[$path] }
+    return [pscustomobject]@{
+        pattern = $Pattern
+        digest  = (Get-GuideWatchDigest $ordered)
+        entries = $ordered
+        MatchCount = $matchCount
+    }
+}
+
+# ---- Composition parsing --------------------------------------------------
+
+function Get-GuideDirective([string]$Line) {
+    $match = [regex]::Match($Line, '^\s*\[\[guide:([^\]\s]+)(?:\s+(.*))?\]\]\s*$')
+    if (-not $match.Success) { return $null }
+    $value = ''
+    if ($match.Groups[2].Success) { $value = $match.Groups[2].Value.Trim() }
+    return [pscustomobject]@{ Name = $match.Groups[1].Value; Value = $value }
+}
+
+function Get-GuideCitationList([string]$Text) {
+    $found = @()
+    foreach ($match in @([regex]::Matches($Text, '\[(code|authority):\s*([^\]]+)\]'))) {
+        $found += [pscustomobject]@{ Kind = $match.Groups[1].Value; Target = $match.Groups[2].Value.Trim() }
+    }
+    return $found
+}
+
+function New-GuideParseError([string]$Message) { throw "Guide composition: $Message" }
+
+function New-GuideSectionRecord([string]$Id, [string]$Kind, [string]$Heading, [int]$Level, [int]$StartLine) {
+    return [pscustomobject]@{
+        Id = $Id
+        Kind = $Kind
+        Heading = $Heading
+        Level = $Level
+        StartLine = $StartLine
+        EndLine = $StartLine
+        AuthoredMarkdown = ''
+        AuthoredDigest = ''
+        Blocks = (New-Object System.Collections.ArrayList)
+        Tables = (New-Object System.Collections.ArrayList)
+        WatchPatterns = (New-Object System.Collections.ArrayList)
+        Citations = (New-Object System.Collections.ArrayList)
+        DropLines = (New-Object System.Collections.ArrayList)
+        Replacements = @{}
+        Appends = @{}
+        SawContent = $false
+    }
+}
+
+# One pass over the composition Markdown. Produces the identified sections, the
+# evidence-bearing blocks inside them, their exemptions, their table evidence
+# and their declared watch patterns. Headings, navigation and literal code are
+# structural and never require evidence.
+function Read-GuideComposition([string]$Markdown, [switch]$Lenient) {
+    $lines = @($Markdown -replace "`r`n?", "`n" -split "`n")
+    $sections = New-Object System.Collections.ArrayList
+    $ids = @{}
+    $documentTitle = $null
+    $current = $null
+    $inCode = $false
+    $lastBlock = $null
+    $lastTable = $null
+    $sawHeading = $false
+    $exemptCounter = 0
+
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+
+        if ($line -match '^```') {
+            $inCode = -not $inCode
+            $lastBlock = $null
+            $lastTable = $null
+            if ($null -ne $current) { $current.SawContent = $true }
+            continue
+        }
+        if ($inCode) { continue }
+        if ([string]::IsNullOrWhiteSpace($line)) { continue }
+
+        $directive = Get-GuideDirective $line
+        if ($null -eq $directive -and $line -match '^\s*\[\[guide:') {
+            New-GuideParseError "malformed directive (line $($i + 1))"
+        }
+        if ($null -ne $directive) {
+            if ($directive.Name -ceq 'watch') {
+                if ($null -eq $current) { New-GuideParseError "a watch declaration must be inside an identified section (line $($i + 1))" }
+                if ($current.SawContent) { New-GuideParseError "a watch declaration must precede the section's first content block (line $($i + 1))" }
+                $problem = Test-GuideWatchPattern $directive.Value
+                if ($problem -and -not $Lenient) { New-GuideParseError "$problem (line $($i + 1))" }
+                if (-not $problem) { [void]$current.WatchPatterns.Add($directive.Value) }
+                [void]$current.DropLines.Add($i)
+                continue
+            }
+            if ($directive.Name -ceq 'exempt') {
+                if ($directive.Value -cne 'framing' -and $directive.Value -cne 'illustration') {
+                    New-GuideParseError "unknown exemption '$($directive.Value)' (line $($i + 1))"
+                }
+                if ($null -eq $current -or $null -eq $lastBlock) { New-GuideParseError "an exemption must follow an evidence-bearing block (line $($i + 1))" }
+                if ($lastBlock.Type -ceq 'table') { New-GuideParseError "an exemption cannot exempt a table row (line $($i + 1))" }
+                if ($lastBlock.Exemption) { New-GuideParseError "a block carries more than one exemption (line $($i + 1))" }
+                if (@($lastBlock.Citations).Count -gt 0) { New-GuideParseError "a block carries both a citation and an exemption (line $($i + 1))" }
+                $lastBlock.Exemption = $directive.Value
+                $lastBlock.ExemptToken = '@@STRATAEXEMPT' + $exemptCounter + '@@'
+                $exemptCounter++
+                $current.Appends[$lastBlock.LastLine] = $lastBlock.ExemptToken
+                [void]$current.DropLines.Add($i)
+                continue
+            }
+            if ($directive.Name -ceq 'table') {
+                if ($directive.Value -cne 'shared') { New-GuideParseError "unknown table directive '$($directive.Value)' (line $($i + 1))" }
+                if ($null -eq $current -or $null -eq $lastTable) { New-GuideParseError "a shared table declaration must follow a table (line $($i + 1))" }
+                if ($lastTable.Shared) { New-GuideParseError "a table has more than one shared evidence declaration (line $($i + 1))" }
+                $shared = @()
+                $sharedText = @()
+                $j = $i + 1
+                while ($j -lt $lines.Count -and -not [string]::IsNullOrWhiteSpace($lines[$j])) {
+                    $shared += Get-GuideCitationList $lines[$j]
+                    $sharedText += $lines[$j].Trim()
+                    [void]$current.DropLines.Add($j)
+                    $j++
+                }
+                if (@($shared).Count -eq 0) { New-GuideParseError "a shared table declaration must be followed by at least one citation (line $($i + 1))" }
+                $lastTable.Shared = $true
+                foreach ($citation in $shared) { [void]$current.Citations.Add($citation) }
+                $current.Replacements[$i] = '@@STRATATABLEEVIDENCE@@ ' + ($sharedText -join ' ')
+                $i = $j - 1
+                continue
+            }
+            if ($directive.Name -ceq 'section') {
+                New-GuideParseError "a section identity line must follow a level-one or level-two heading (line $($i + 1))"
+            }
+            if ($directive.Name -ceq 'row') {
+                New-GuideParseError "a row override token is valid only inside a table body row (line $($i + 1))"
+            }
+            New-GuideParseError "unknown directive '$($directive.Name)' (line $($i + 1))"
+        }
+
+        $headingMatch = [regex]::Match($line, '^(#{1,6})\s+(.+?)\s*#*$')
+        if ($headingMatch.Success) {
+            $level = $headingMatch.Groups[1].Value.Length
+            $heading = $headingMatch.Groups[2].Value
+            if ($level -le 2) {
+                if ($null -ne $current) { [void]$sections.Add($current); $current = $null }
+                $lastBlock = $null
+                $lastTable = $null
+                $identity = $null
+                $identityLine = -1
+                for ($j = $i + 1; $j -lt $lines.Count; $j++) {
+                    if ([string]::IsNullOrWhiteSpace($lines[$j])) { continue }
+                    $candidate = Get-GuideDirective $lines[$j]
+                    if ($null -ne $candidate -and $candidate.Name -ceq 'section') { $identity = $candidate; $identityLine = $j }
+                    break
+                }
+                if ($null -eq $identity) {
+                    # The document title is the one heading that owns no section: it holds no
+                    # content of its own and another level-one heading follows it.
+                    $titleOk = ($level -eq 1) -and (-not $sawHeading) -and ($null -eq $documentTitle)
+                    if ($titleOk) {
+                        for ($j = $i + 1; $j -lt $lines.Count; $j++) {
+                            if ([string]::IsNullOrWhiteSpace($lines[$j])) { continue }
+                            $nextHeading = [regex]::Match($lines[$j], '^(#{1,6})\s+(.+?)\s*#*$')
+                            if (-not ($nextHeading.Success -and $nextHeading.Groups[1].Value.Length -eq 1)) { $titleOk = $false }
+                            break
+                        }
+                    }
+                    if (-not $titleOk) { New-GuideParseError "the heading on line $($i + 1) has no [[guide:section <id> <kind>]] identity" }
+                    $documentTitle = $heading
+                    $sawHeading = $true
+                    continue
+                }
+                $sawHeading = $true
+                $valueMatch = [regex]::Match($identity.Value, '^(\S+)\s+(\S+)$')
+                if (-not $valueMatch.Success) { New-GuideParseError "a section identity needs an id and a kind (line $($identityLine + 1))" }
+                $sectionId = $valueMatch.Groups[1].Value
+                $sectionKind = $valueMatch.Groups[2].Value
+                if ($sectionId -cnotmatch '^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$') { New-GuideParseError "invalid section id '$sectionId' (line $($identityLine + 1))" }
+                if ($GuideSectionKinds -cnotcontains $sectionKind) { New-GuideParseError "invalid section kind '$sectionKind' (line $($identityLine + 1))" }
+                if ($ids.ContainsKey($sectionId)) { New-GuideParseError "duplicate section id '$sectionId' (line $($identityLine + 1))" }
+                $ids[$sectionId] = $true
+                $current = New-GuideSectionRecord $sectionId $sectionKind $heading $level $i
+                [void]$current.DropLines.Add($identityLine)
+                $i = $identityLine
+                continue
+            }
+            if ($null -eq $current) { New-GuideParseError "the heading on line $($i + 1) precedes the first identified section" }
+            $sawHeading = $true
+            $current.SawContent = $true
+            $lastBlock = $null
+            $lastTable = $null
+            continue
+        }
+
+        if ($null -eq $current) { New-GuideParseError "content on line $($i + 1) precedes the first identified section" }
+        $current.SawContent = $true
+
+        # A table is a header row followed by a delimiter row, exactly as the renderer detects it.
+        if ($i + 1 -lt $lines.Count -and $line.Contains('|') -and $lines[$i + 1] -match '^\s*\|?\s*:?-{3,}') {
+            $table = [pscustomobject]@{ Rows = (New-Object System.Collections.ArrayList); Shared = $false }
+            $i++
+            while ($i + 1 -lt $lines.Count -and $lines[$i + 1].Contains('|') -and -not [string]::IsNullOrWhiteSpace($lines[$i + 1])) {
+                $i++
+                $rowText = $lines[$i]
+                $override = $false
+                if ($rowText.Contains('[[guide:row override]]')) {
+                    $override = $true
+                    $current.Replacements[$i] = $rowText.Replace('[[guide:row override]]', '')
+                }
+                $rowCitations = @(Get-GuideCitationList $rowText)
+                foreach ($citation in $rowCitations) { [void]$current.Citations.Add($citation) }
+                [void]$table.Rows.Add([pscustomobject]@{ Line = $i; Override = $override; Citations = $rowCitations })
+            }
+            [void]$current.Tables.Add($table)
+            $lastTable = $table
+            $lastBlock = [pscustomobject]@{ Type='table'; FirstLine=$i; LastLine=$i; Citations=@(); Exemption=''; ExemptToken='' }
+            continue
+        }
+
+        if ($line -match '^\s*(?:-{3,}|\*{3,}|_{3,})\s*$') { $lastBlock = $null; $lastTable = $null; continue }
+
+        $blockType = 'paragraph'
+        if ($line -match '^\s*[-+*]\s+\S' -or $line -match '^\s*\d+[.)]\s+\S') { $blockType = 'list-item' }
+        elseif ($line -match '^>') { $blockType = 'callout' }
+
+        $start = $i
+        $end = $i
+        if ($blockType -ceq 'paragraph') {
+            while ($end + 1 -lt $lines.Count) {
+                $next = $lines[$end + 1]
+                if ([string]::IsNullOrWhiteSpace($next)) { break }
+                if ($next -match '^(#{1,6})\s+' -or $next -match '^```' -or $next -match '^\s*[-+*]\s+' -or $next -match '^\s*\d+[.)]\s+' -or $next -match '^>') { break }
+                if ($null -ne (Get-GuideDirective $next)) { break }
+                if ($next.Contains('|') -and $end + 2 -lt $lines.Count -and $lines[$end + 2] -match '^\s*\|?\s*:?-{3,}') { break }
+                $end++
+            }
+        }
+        elseif ($blockType -ceq 'callout') {
+            while ($end + 1 -lt $lines.Count -and $lines[$end + 1] -match '^>') { $end++ }
+        }
+        $text = (@($lines[$start..$end]) -join "`n")
+        $block = [pscustomobject]@{
+            Type = $blockType
+            FirstLine = $start
+            LastLine = $end
+            Citations = @(Get-GuideCitationList $text)
+            Exemption = ''
+            ExemptToken = ''
+        }
+        foreach ($citation in $block.Citations) { [void]$current.Citations.Add($citation) }
+        [void]$current.Blocks.Add($block)
+        $lastBlock = $block
+        $lastTable = $null
+        $i = $end
+    }
+    if ($null -ne $current) { [void]$sections.Add($current) }
+    if (@($sections).Count -eq 0) { New-GuideParseError 'the composition declares no identified section' }
+
+    $ordered = @($sections)
+    for ($s = 0; $s -lt $ordered.Count; $s++) {
+        $section = $ordered[$s]
+        $endLine = if ($s + 1 -lt $ordered.Count) { $ordered[$s + 1].StartLine - 1 } else { $lines.Count - 1 }
+        $section.EndLine = $endLine
+        $section.AuthoredMarkdown = (@($lines[$section.StartLine..$endLine]) -join "`n")
+        $section.AuthoredDigest = Get-Sha256Text $section.AuthoredMarkdown
+    }
+    return [pscustomobject]@{ Sections = $ordered; DocumentTitle = $documentTitle }
+}
+
+# Coverage is enforced after parsing, so a parse failure never reports as a
+# coverage failure and a coverage failure names the block that caused it.
+function Test-GuideCoverage([object]$Section) {
+    foreach ($block in @($Section.Blocks)) {
+        if (@($block.Citations).Count -gt 0) { continue }
+        if ($block.Exemption) { continue }
+        New-GuideParseError "an unmarked uncited prose block on line $($block.FirstLine + 1) of section '$($Section.Id)'"
+    }
+    foreach ($table in @($Section.Tables)) {
+        foreach ($row in @($table.Rows)) {
+            $rowCitations = @($row.Citations).Count
+            if ($row.Override) {
+                if (-not $table.Shared) { New-GuideParseError "a row override on line $($row.Line + 1) has no shared table evidence to override" }
+                if ($rowCitations -eq 0) { New-GuideParseError "a row override on line $($row.Line + 1) carries no row citation" }
+                continue
+            }
+            if ($table.Shared) { continue }
+            if ($rowCitations -eq 0) { New-GuideParseError "a table row on line $($row.Line + 1) of section '$($Section.Id)' has no evidence" }
+        }
+    }
+}
+
+function Get-GuideCoverageCounts([object]$Section) {
+    $cited = 0
+    $framing = 0
+    $illustration = 0
+    foreach ($block in @($Section.Blocks)) {
+        if ($block.Exemption -ceq 'framing') { $framing++; continue }
+        if ($block.Exemption -ceq 'illustration') { $illustration++; continue }
+        if (@($block.Citations).Count -gt 0) { $cited++ }
+    }
+    $rows = 0
+    $inherited = 0
+    foreach ($table in @($Section.Tables)) {
+        foreach ($row in @($table.Rows)) {
+            $rows++
+            if ($table.Shared -and -not $row.Override) { $inherited++ }
+        }
+    }
+    return [pscustomobject]@{
+        CitedBlocks = $cited
+        Framing = $framing
+        Illustration = $illustration
+        TableRows = $rows
+        InheritedRows = $inherited
+    }
+}
+
+# ---- Resolution, digests and rendering ------------------------------------
+
+function Resolve-GuideCitedTargets([object]$Section) {
+    $unique = @{}
+    foreach ($citation in @($Section.Citations)) {
+        # NUL is below every character a target can carry, so sorting the joined
+        # key ordinally is exactly "sorted by kind, then target".
+        $key = $citation.Kind + [char]0 + $citation.Target
+        if ($unique.ContainsKey($key)) { continue }
+        $relative = if ($citation.Kind -ceq 'authority') { ($citation.Target -split '#',2)[0] } else { ($citation.Target -split ':',2)[0] }
+        $relative = $relative.Replace('\','/').Trim()
+        $unique[$key] = [pscustomobject]@{
+            kind = $citation.Kind
+            target = $citation.Target
+            path = $relative
+            digest = (Get-FileDigest (Join-Path $ProjectRoot $relative))
+        }
+    }
+    $ordered = @()
+    foreach ($key in @(Sort-GuideOrdinal @($unique.Keys))) { $ordered += $unique[$key] }
+    return $ordered
+}
+
+function Test-GuideSectionReferences([object]$Section, [object]$Graphs) {
+    $problems = New-Object System.Collections.ArrayList
+    $seen = @{}
+    foreach ($citation in @($Section.Citations)) {
+        $key = $citation.Kind + [char]0 + $citation.Target
+        if ($seen.ContainsKey($key)) { continue }
+        $seen[$key] = $true
+        $problem = Test-GuideCitation $citation.Kind $citation.Target $ProjectRoot $Graphs
+        if ($problem) { [void]$problems.Add($problem) }
+    }
+    if ($problems.Count -gt 0) {
+        throw ("Guide composition has unresolvable references: " + (($problems | Select-Object -Unique) -join '; '))
+    }
+}
+
+function Get-GuideSectionInputs([object]$Section) {
+    $targets = @(Resolve-GuideCitedTargets $Section)
+    $surfaces = @()
+    $claimed = @{}
+    foreach ($pattern in @($Section.WatchPatterns)) { $surfaces += Get-GuideWatchSurface $pattern $claimed }
+    return [pscustomobject]@{
+        CitedTargets = $targets
+        WatchSurfaces = $surfaces
+        InputDigest = (Get-GuideInputDigest $targets $surfaces)
+    }
+}
+
+function Get-GuideSourceDigest([object[]]$Entries) {
+    $builder = New-Object Text.StringBuilder
+    foreach ($entry in @($Entries)) {
+        [void]$builder.Append($entry.Id).Append([char]0).Append($entry.AuthoredDigest).Append([char]0).Append($entry.InputDigest).Append("`n")
+    }
+    return Get-Sha256Text $builder.ToString()
+}
+
+function Get-GuideSectionRenderMarkdown([object]$Section, [string[]]$Lines) {
+    $rendered = New-Object System.Collections.Generic.List[string]
+    $drop = @{}
+    foreach ($index in @($Section.DropLines)) { $drop[[int]$index] = $true }
+    for ($i = $Section.StartLine; $i -le $Section.EndLine; $i++) {
+        if ($drop.ContainsKey($i)) { continue }
+        $line = if ($Section.Replacements.ContainsKey($i)) { [string]$Section.Replacements[$i] } else { $Lines[$i] }
+        if ($Section.Appends.ContainsKey($i)) { $line = $line + ' ' + [string]$Section.Appends[$i] }
+        $rendered.Add($line)
+    }
+    return ($rendered -join "`n")
+}
+
+function Get-GuideProvenanceHtml([object]$Inputs) {
+    if (@($Inputs.WatchSurfaces).Count -eq 0) { return '' }
+    $builder = New-Object Text.StringBuilder
+    [void]$builder.Append('<details class="guide-provenance"><summary>Watched sources</summary><ul>')
+    foreach ($surface in @($Inputs.WatchSurfaces)) {
+        [void]$builder.Append('<li><code>').Append([Net.WebUtility]::HtmlEncode($surface.pattern)).Append('</code>')
+        if (@($surface.entries).Count -gt 0) {
+            [void]$builder.Append('<ul>')
+            foreach ($entry in @($surface.entries)) { [void]$builder.Append('<li>').Append([Net.WebUtility]::HtmlEncode($entry.path)).Append('</li>') }
+            [void]$builder.Append('</ul>')
+        }
+        [void]$builder.Append('</li>')
+    }
+    [void]$builder.Append('</ul></details>')
+    return $builder.ToString()
+}
+
+function Render-GuideSection([object]$Section, [object]$Inputs, [string[]]$Lines, [string]$RepoRoot, [object]$Graphs) {
+    $markdown = Get-GuideSectionRenderMarkdown $Section $Lines
+    if ($markdown -match '\[\[guide:') { New-GuideParseError "section '$($Section.Id)' contains a malformed or misplaced directive" }
+    $problems = New-Object System.Collections.ArrayList
+    $citedFiles = New-Object System.Collections.ArrayList
+    $chips = New-Object System.Collections.ArrayList
+    # Harvest before rendering: a path like `_strata/state/current.md` carries
+    # underscores that inline conversion reads as emphasis, so a reference
+    # validated after rendering is validated against the wrong string.
+    $script:GuideCiteCounter = 0
+    $marked = Convert-GuideCitations $markdown $RepoRoot $Graphs $problems $citedFiles $chips
+    if ($problems.Count -gt 0) {
+        throw ("Guide composition has unresolvable references: " + (($problems | Select-Object -Unique) -join '; '))
+    }
+    $html = Convert-Markdown $marked ('guide-' + $Section.Id + '-h-')
+    foreach ($chip in @($chips)) { $html = $html.Replace($chip.Token, $chip.Html) }
+    $html = [regex]::Replace($html, '(?s)<p>@@STRATATABLEEVIDENCE@@\s*(.*?)</p>', {
+        param($m)
+        '<div class="table-evidence"><span class="table-evidence-label">Table evidence</span>' + $m.Groups[1].Value + '</div>'
+    })
+    foreach ($block in @($Section.Blocks)) {
+        if (-not $block.Exemption) { continue }
+        $label = if ($block.Exemption -ceq 'framing') { 'Framing — not sourced' } else { 'Illustration — hypothetical' }
+        $badge = '<span class="guide-exempt guide-exempt-' + $block.Exemption + '">' + $label + '</span>'
+        $html = $html.Replace($block.ExemptToken, $badge)
+    }
+    $html = $html + (Get-GuideProvenanceHtml $Inputs)
+    $id = [Net.WebUtility]::HtmlEncode($Section.Id)
+    $kind = [Net.WebUtility]::HtmlEncode($Section.Kind)
+    return ('<section class="guide-topic" data-guide-section-id="{0}" data-guide-section-kind="{1}"><div class="guide-topic-body" id="guide-section-{0}" data-search-item data-nav-target>{2}</div></section>' -f $id,$kind,$html)
+}
+
+function Get-GuideRenderedSectionList([string]$Html) {
+    # A list, not a map: two boundaries carrying one id must be visible as a
+    # defect rather than collapsing into a single entry.
+    $found = @()
+    foreach ($match in @([regex]::Matches($Html, '(?s)<section class="guide-topic" data-guide-section-id="([^"]*)"[^>]*>.*?</section>'))) {
+        $found += [pscustomobject]@{ Id = [Net.WebUtility]::HtmlDecode($match.Groups[1].Value); Html = $match.Value }
+    }
+    return $found
+}
+
+function ConvertTo-GuideManifestJson([object[]]$Entries, [string]$SourceDigest, [string]$GeneratedAt, [string]$GenerationCommit) {
+    $sections = @()
+    foreach ($entry in @($Entries)) {
+        $sections += ConvertTo-GuideJsonObject @(
+            @('id',              (ConvertTo-GuideJsonString $entry.Id)),
+            @('kind',            (ConvertTo-GuideJsonString $entry.Kind)),
+            @('heading',         (ConvertTo-GuideJsonString $entry.Heading)),
+            @('authored_digest', (ConvertTo-GuideJsonString $entry.AuthoredDigest)),
+            @('input_digest',    (ConvertTo-GuideJsonString $entry.InputDigest)),
+            @('rendered_digest', (ConvertTo-GuideJsonString $entry.RenderedDigest)),
+            @('cited_targets',   (ConvertTo-GuideCitedTargetsJson $entry.CitedTargets)),
+            @('watch_surfaces',  (ConvertTo-GuideWatchSurfacesJson $entry.WatchSurfaces))
+        )
+    }
+    return ConvertTo-GuideJsonObject @(
+        @('schema',            (ConvertTo-GuideJsonString $GuideManifestSchema)),
+        @('generated_at',      (ConvertTo-GuideJsonString $GeneratedAt)),
+        @('generation_commit', (ConvertTo-GuideJsonString $GenerationCommit)),
+        @('composition_path',  (ConvertTo-GuideJsonString $GuideCompositionRelative)),
+        @('source_digest',     (ConvertTo-GuideJsonString $SourceDigest)),
+        @('sections',          (ConvertTo-GuideJsonArray $sections))
+    )
+}
+
+function Test-GuideManifestPath([string]$Path) {
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    if ($Path.Contains('\')) { return $false }
+    if ($Path.StartsWith('/')) { return $false }
+    if ($Path -match '^[A-Za-z]:') { return $false }
+    foreach ($segment in @($Path -split '/')) {
+        if ($segment -eq '' -or $segment -eq '.' -or $segment -eq '..') { return $false }
+    }
+    return $true
+}
+
+function New-GuideProvenanceFailure([string]$Reason) {
+    return [pscustomobject]@{ Valid=$false; Reason=$Reason; Sections=@(); Rendered=@{}; SourceDigest=''; GenerationCommit='' }
+}
+
+function Test-GuideDigestField([object]$Value) {
+    if ($Value -isnot [string]) { return $false }
+    return ([string]$Value -cmatch '^[0-9a-f]{64}$')
+}
+
+function Test-GuideOrdinalAscending([object[]]$Keys) {
+    for ($i = 1; $i -lt @($Keys).Count; $i++) {
+        if ([StringComparer]::Ordinal.Compare([string]$Keys[$i - 1], [string]$Keys[$i]) -ge 0) { return $false }
+    }
+    return $true
+}
+
+# One contract, used in all three places provenance matters: reading an existing
+# Guide for status, reading the previous Guide before carrying bytes forward,
+# and checking the candidate before it replaces anything. Every failure maps to
+# the confirmed closed reason-code set.
+function Test-GuideProvenance([string]$Html) {
+    $templates = @([regex]::Matches($Html, '<template id="strata-guide-manifest"'))
+    if ($templates.Count -eq 0) { return New-GuideProvenanceFailure 'missing-manifest' }
+    if ($templates.Count -gt 1) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    $match = [regex]::Match($Html, '(?s)<template id="strata-guide-manifest" data-schema="([^"]*)">(.*?)</template>')
+    if (-not $match.Success) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    if ($match.Groups[1].Value -cne $GuideManifestSchema) { return New-GuideProvenanceFailure 'unsupported-manifest-schema' }
+
+    $parsed = $null
+    try { $parsed = [Net.WebUtility]::HtmlDecode($match.Groups[2].Value) | ConvertFrom-Json }
+    catch { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    if ($null -eq $parsed -or $parsed -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+
+    $topLevel = @('schema','generated_at','generation_commit','composition_path','source_digest','sections')
+    $present = @($parsed.PSObject.Properties | ForEach-Object { $_.Name })
+    if (@($present).Count -ne @($topLevel).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    foreach ($name in $topLevel) { if ($present -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
+    foreach ($name in @('schema','generated_at','generation_commit','composition_path','source_digest')) {
+        if ($parsed.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    }
+    if ($parsed.sections -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    if ($parsed.schema -cne $GuideManifestSchema) { return New-GuideProvenanceFailure 'unsupported-manifest-schema' }
+    if (-not (Test-GuideDigestField $parsed.source_digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    if ([string]$parsed.composition_path -cne $GuideCompositionRelative) { return New-GuideProvenanceFailure 'invalid-manifest-path' }
+
+    $sectionFields = @('id','kind','heading','authored_digest','input_digest','rendered_digest','cited_targets','watch_surfaces')
+    $targetFields = @('kind','target','path','digest')
+    $surfaceFields = @('pattern','digest','entries')
+    $entryFields = @('path','digest')
+    $ids = @{}
+    $sections = @()
+    $digestEntries = @()
+    foreach ($section in @($parsed.sections)) {
+        if ($section -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        $sectionPresent = @($section.PSObject.Properties | ForEach-Object { $_.Name })
+        if (@($sectionPresent).Count -ne @($sectionFields).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        foreach ($name in $sectionFields) { if ($sectionPresent -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
+        foreach ($name in @('id','kind','heading','authored_digest','input_digest','rendered_digest')) {
+            if ($section.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        }
+        if ($section.cited_targets -isnot [Array] -or $section.watch_surfaces -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        if ([string]$section.id -cnotmatch '^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$') { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        if ($GuideSectionKinds -cnotcontains [string]$section.kind) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        foreach ($digest in @($section.authored_digest,$section.input_digest,$section.rendered_digest)) {
+            if (-not (Test-GuideDigestField $digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        }
+        if ($ids.ContainsKey([string]$section.id)) { return New-GuideProvenanceFailure 'duplicate-section-id' }
+        $ids[[string]$section.id] = $true
+
+        $targetKeys = @()
+        foreach ($target in @($section.cited_targets)) {
+            if ($target -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            $targetPresent = @($target.PSObject.Properties | ForEach-Object { $_.Name })
+            if (@($targetPresent).Count -ne @($targetFields).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            foreach ($name in $targetFields) {
+                if ($targetPresent -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                if ($target.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            }
+            if (@('code','authority') -cnotcontains [string]$target.kind) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if ([string]::IsNullOrWhiteSpace([string]$target.target)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if (-not (Test-GuideManifestPath ([string]$target.path))) { return New-GuideProvenanceFailure 'invalid-manifest-path' }
+            if (-not (Test-GuideDigestField $target.digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            $targetKeys += ([string]$target.kind + [char]0 + [string]$target.target)
+        }
+        # Sorted by kind then target, and therefore also unique.
+        if (-not (Test-GuideOrdinalAscending $targetKeys)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+
+        $patterns = @{}
+        $storedPaths = @{}
+        foreach ($surface in @($section.watch_surfaces)) {
+            if ($surface -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            $surfacePresent = @($surface.PSObject.Properties | ForEach-Object { $_.Name })
+            if (@($surfacePresent).Count -ne @($surfaceFields).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            foreach ($name in $surfaceFields) { if ($surfacePresent -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
+            if ($surface.pattern -isnot [string] -or $surface.digest -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if ($surface.entries -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if (Test-GuideWatchPattern ([string]$surface.pattern)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if ($patterns.ContainsKey([string]$surface.pattern)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            $patterns[[string]$surface.pattern] = $true
+            if (-not (Test-GuideDigestField $surface.digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            $entryPaths = @()
+            foreach ($entry in @($surface.entries)) {
+                if ($entry -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                $entryPresent = @($entry.PSObject.Properties | ForEach-Object { $_.Name })
+                if (@($entryPresent).Count -ne @($entryFields).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                foreach ($name in $entryFields) {
+                    if ($entryPresent -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                    if ($entry.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                }
+                if (-not (Test-GuideManifestPath ([string]$entry.path))) { return New-GuideProvenanceFailure 'invalid-manifest-path' }
+                if (-not (Test-GuideDigestField $entry.digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                # One stored path per section, however the declared patterns overlap.
+                if ($storedPaths.ContainsKey([string]$entry.path)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+                $storedPaths[[string]$entry.path] = $true
+                $entryPaths += [string]$entry.path
+            }
+            if (-not (Test-GuideOrdinalAscending $entryPaths)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+            if ((Get-GuideWatchDigest @($surface.entries)) -cne [string]$surface.digest) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+        }
+
+        if ((Get-GuideInputDigest @($section.cited_targets) @($section.watch_surfaces)) -cne [string]$section.input_digest) {
+            return New-GuideProvenanceFailure 'corrupt-manifest'
+        }
+        $digestEntries += [pscustomobject]@{
+            Id = [string]$section.id
+            AuthoredDigest = [string]$section.authored_digest
+            InputDigest = [string]$section.input_digest
+        }
+        $sections += $section
+    }
+
+    $sourceDigest = [string]$parsed.source_digest
+    if ((Get-GuideSourceDigest $digestEntries) -cne $sourceDigest) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+
+    # The page and the manifest must agree about what produced them.
+    $shellDigest = [regex]::Match($Html, '\bdata-source-digest="([^"]*)"', 'IgnoreCase')
+    if (-not $shellDigest.Success -or [Net.WebUtility]::HtmlDecode($shellDigest.Groups[1].Value) -cne $sourceDigest) {
+        return New-GuideProvenanceFailure 'corrupt-manifest'
+    }
+    $generationCommit = [string]$parsed.generation_commit
+    $shellCommit = [regex]::Match($Html, '\bdata-generation-commit="([^"]*)"', 'IgnoreCase')
+    if (-not $shellCommit.Success -or [Net.WebUtility]::HtmlDecode($shellCommit.Groups[1].Value) -cne $generationCommit) {
+        return New-GuideProvenanceFailure 'corrupt-manifest'
+    }
+
+    $renderedList = @(Get-GuideRenderedSectionList $Html)
+    if (@($renderedList).Count -ne @($sections).Count) { return New-GuideProvenanceFailure 'rendered-digest-mismatch' }
+    $rendered = @{}
+    foreach ($item in $renderedList) {
+        if ($rendered.ContainsKey($item.Id)) { return New-GuideProvenanceFailure 'rendered-digest-mismatch' }
+        $rendered[$item.Id] = $item.Html
+    }
+    foreach ($section in @($sections)) {
+        $sectionId = [string]$section.id
+        if (-not $rendered.ContainsKey($sectionId)) { return New-GuideProvenanceFailure 'rendered-digest-mismatch' }
+        if ((Get-Sha256Text $rendered[$sectionId]) -cne [string]$section.rendered_digest) { return New-GuideProvenanceFailure 'rendered-digest-mismatch' }
+    }
+
+    return [pscustomobject]@{
+        Valid = $true
+        Reason = ''
+        Sections = $sections
+        Rendered = $rendered
+        SourceDigest = $sourceDigest
+        GenerationCommit = $generationCommit
+    }
+}
+
+# Builds every composition artifact: the rendered sections, their navigation,
+# the manifest and the coverage records. Throws on any generation error, before
+# the caller has touched the existing Guide.
+function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [string]$GeneratedAt, [string]$GenerationCommit) {
+    $markdown = Read-Utf8 $CompositionPath
+    if ($null -eq $markdown) { throw "Guide composition source could not be read: $CompositionPath" }
+    $lines = @($markdown -replace "`r`n?", "`n" -split "`n")
+    $parsed = Read-GuideComposition $markdown
+
+    # Carry-forward: a section whose authored Markdown and whose resolved inputs
+    # both still match the previous manifest reuses its previous rendered bytes.
+    # Carried bytes may come only from a Guide whose whole provenance still
+    # verifies: manifest, section boundaries and every rendered digest. A page
+    # someone edited by hand must not be laundered into a fresh manifest.
+    $previous = @{}
+    if (Test-Path -LiteralPath $GuidePath -PathType Leaf) {
+        try {
+            $previousProvenance = Test-GuideProvenance ([IO.File]::ReadAllText($GuidePath, $Utf8Strict))
+            if ($previousProvenance.Valid) {
+                foreach ($entry in @($previousProvenance.Sections)) {
+                    $entryId = [string]$entry.id
+                    $previous[$entryId] = [pscustomobject]@{
+                        AuthoredDigest = [string]$entry.authored_digest
+                        InputDigest = [string]$entry.input_digest
+                        Rendered = $previousProvenance.Rendered[$entryId]
+                    }
+                }
+            }
+        }
+        catch { $previous = @{} }
+    }
+
+    $entries = @()
+    $bodies = @()
+    $warnings = @()
+    $coverage = @()
+    foreach ($section in @($parsed.Sections)) {
+        Test-GuideCoverage $section
+        # Before, not after, the carry-forward decision: routing and locator
+        # rules can move without any cited file changing, and a carried section
+        # must never ship a reference that no longer resolves.
+        Test-GuideSectionReferences $section $Graphs
+        $inputs = Get-GuideSectionInputs $section
+        foreach ($surface in @($inputs.WatchSurfaces)) {
+            if ($surface.MatchCount -eq 0) { New-GuideParseError "watch pattern '$($surface.pattern)' in section '$($section.Id)' matches no readable file" }
+        }
+        if (@($section.WatchPatterns).Count -eq 0 -and $GuideWatchKinds -ccontains $section.Kind) {
+            $warnings += "GUIDE_WARNING section=$($section.Id) code=missing-watch-surface"
+        }
+        $carried = $false
+        $rendered = ''
+        if ($previous.ContainsKey($section.Id)) {
+            $candidate = $previous[$section.Id]
+            if ($candidate.AuthoredDigest -ceq $section.AuthoredDigest -and $candidate.InputDigest -ceq $inputs.InputDigest) {
+                $rendered = $candidate.Rendered
+                $carried = $true
+            }
+        }
+        if (-not $carried) { $rendered = Render-GuideSection $section $inputs $lines $ProjectRoot $Graphs }
+        $counts = Get-GuideCoverageCounts $section
+        $coverage += ("GUIDE_COVERAGE section={0} cited_blocks={1} framing_exemptions={2} illustration_exemptions={3} table_rows={4} inherited_rows={5}" -f `
+            $section.Id,$counts.CitedBlocks,$counts.Framing,$counts.Illustration,$counts.TableRows,$counts.InheritedRows)
+        $entries += [pscustomobject]@{
+            Id = $section.Id
+            Kind = $section.Kind
+            Heading = $section.Heading
+            Level = $section.Level
+            AuthoredDigest = $section.AuthoredDigest
+            InputDigest = $inputs.InputDigest
+            RenderedDigest = (Get-Sha256Text $rendered)
+            CitedTargets = $inputs.CitedTargets
+            WatchSurfaces = $inputs.WatchSurfaces
+            CarriedForward = $carried
+        }
+        $bodies += $rendered
+    }
+    $sourceDigest = Get-GuideSourceDigest $entries
+    $manifestJson = ConvertTo-GuideManifestJson $entries $sourceDigest $GeneratedAt $GenerationCommit
+    $manifestHtml = '<template id="strata-guide-manifest" data-schema="' + $GuideManifestSchema + '">' + [Net.WebUtility]::HtmlEncode($manifestJson) + '</template>'
+    return [pscustomobject]@{
+        Sections = $entries
+        DocumentTitle = $parsed.DocumentTitle
+        Body = ($bodies -join '')
+        ManifestHtml = $manifestHtml
+        SourceDigest = $sourceDigest
+        Warnings = $warnings
+        Coverage = $coverage
+    }
+}
+
+function Get-GuideCompositionNavigation([object]$Composition) {
+    $builder = New-Object Text.StringBuilder
+    [void]$builder.Append('<li data-nav-item data-target="how-it-works"><a href="#how-it-works">Guide</a><span class="nav-description">What the application does and how it behaves.</span><ul class="nav-topics">')
+    $inGroup = $false
+    foreach ($entry in @($Composition.Sections)) {
+        $anchor = 'guide-section-' + [Net.WebUtility]::HtmlEncode($entry.Id)
+        $label = [Net.WebUtility]::HtmlEncode($entry.Heading)
+        if ($entry.Level -eq 1) {
+            if ($inGroup) { [void]$builder.Append('</ul></li>') }
+            [void]$builder.Append(("<li class=`"nav-group`" data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a><ul class=`"nav-topics`">" -f $anchor,$label))
+            $inGroup = $true
+            continue
+        }
+        [void]$builder.Append(("<li data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a></li>" -f $anchor,$label))
+    }
+    if ($inGroup) { [void]$builder.Append('</ul></li>') }
+    [void]$builder.Append('</ul></li>')
+    return $builder.ToString()
+}
+
+# ---- Composition status ---------------------------------------------------
+
+function Get-GuideCurrentSectionState([string]$CompositionPath) {
+    # Status never fails on a draft. When the composition cannot be parsed for
+    # structure, every generated section is reported as changed rather than
+    # raising a generation error a reader did not ask for.
+    $markdown = Read-Utf8 $CompositionPath
+    if ($null -eq $markdown) { return $null }
+    $parsed = $null
+    try { $parsed = Read-GuideComposition $markdown -Lenient }
+    catch { return $null }
+    $state = New-Object Collections.Specialized.OrderedDictionary
+    foreach ($section in @($parsed.Sections)) {
+        $inputs = Get-GuideSectionInputs $section
+        $state[$section.Id] = [pscustomobject]@{
+            Id = $section.Id
+            AuthoredDigest = $section.AuthoredDigest
+            InputDigest = $inputs.InputDigest
+            CitedTargets = $inputs.CitedTargets
+            WatchSurfaces = $inputs.WatchSurfaces
+        }
+    }
+    return $state
+}
+
+function Get-GuidePathDigestMap([object]$CitedTargets, [object]$WatchSurfaces) {
+    $map = @{}
+    foreach ($target in @($CitedTargets)) { $map[[string]$target.path] = [string]$target.digest }
+    foreach ($surface in @($WatchSurfaces)) {
+        foreach ($entry in @($surface.entries)) { $map[[string]$entry.path] = [string]$entry.digest }
+    }
+    return $map
+}
+
+function Write-GuideCompositionStatus([string]$CompositionPath) {
+    $state = Get-GuideCurrentSectionState $CompositionPath
+    $currentEntries = @()
+    if ($null -ne $state) { foreach ($key in @($state.Keys)) { $currentEntries += $state[$key] } }
+    $currentDigest = Get-GuideSourceDigest $currentEntries
+
+    if (-not (Test-Path -LiteralPath $GuidePath -PathType Leaf)) {
+        Write-Output "GUIDE_MISSING current_digest=$currentDigest"
+        return
+    }
+    try { $html = [IO.File]::ReadAllText($GuidePath, $Utf8Strict) }
+    catch {
+        Write-Output 'GUIDE_INVALID reason=utf8'
+        return
+    }
+    $manifest = Test-GuideProvenance $html
+    if (-not $manifest.Valid) {
+        Write-Output "GUIDE_INVALID reason=$($manifest.Reason)"
+        return
+    }
+
+    $baseCommit = $manifest.GenerationCommit
+    $commitMatch = [regex]::Match($html, '\bdata-generation-commit="([^"]+)"', 'IgnoreCase')
+    if ($commitMatch.Success) { $baseCommit = $commitMatch.Groups[1].Value }
+    $commitsSince = 'unknown'
+    $authorityCommitsSince = 'unknown'
+    if ($baseCommit -match '^[0-9a-f]{40}$') {
+        $null = @(Invoke-GitRead @('merge-base','--is-ancestor',$baseCommit,'HEAD'))
+        if ($LASTEXITCODE -eq 0) {
+            $count = @(Invoke-GitRead @('rev-list','--count',("$baseCommit..HEAD")))
+            if ($count.Count -gt 0) { $commitsSince = $count[0] }
+            $authorityCount = @(Invoke-GitRead @('rev-list','--count',("$baseCommit..HEAD"),'--','_strata/state','_strata/rationale','_strata/build-log'))
+            if ($authorityCount.Count -gt 0) { $authorityCommitsSince = $authorityCount[0] }
+        }
+    }
+    $authorityDirty = @(Invoke-GitRead @('status','--porcelain','--','_strata/state','_strata/rationale','_strata/build-log')).Count -gt 0
+
+    $manifestById = @{}
+    $orderedIds = @()
+    if ($null -ne $state) { foreach ($key in @($state.Keys)) { $orderedIds += [string]$key } }
+    foreach ($entry in @($manifest.Sections)) {
+        $manifestById[[string]$entry.id] = $entry
+        if ($orderedIds -cnotcontains [string]$entry.id) { $orderedIds += [string]$entry.id }
+    }
+
+    $stale = New-Object System.Collections.ArrayList
+    $seen = @{}
+    foreach ($id in $orderedIds) {
+        $changed = @{}
+        $currentSection = $null
+        if ($null -ne $state -and $state.Contains($id)) { $currentSection = $state[$id] }
+        $manifestSection = $null
+        if ($manifestById.ContainsKey($id)) { $manifestSection = $manifestById[$id] }
+        if ($null -eq $currentSection -or $null -eq $manifestSection) {
+            $changed[($GuideCompositionRelative + '#' + $id)] = $true
+        }
+        else {
+            if ($currentSection.AuthoredDigest -cne [string]$manifestSection.authored_digest) { $changed[($GuideCompositionRelative + '#' + $id)] = $true }
+            $currentMap = Get-GuidePathDigestMap $currentSection.CitedTargets $currentSection.WatchSurfaces
+            $previousMap = Get-GuidePathDigestMap $manifestSection.cited_targets $manifestSection.watch_surfaces
+            foreach ($path in @($currentMap.Keys)) {
+                if (-not $previousMap.ContainsKey($path) -or $previousMap[$path] -cne $currentMap[$path]) { $changed[$path] = $true }
+            }
+            foreach ($path in @($previousMap.Keys)) {
+                if (-not $currentMap.ContainsKey($path)) { $changed[$path] = $true }
+            }
+        }
+        if ($changed.Count -eq 0) { continue }
+        [void]$stale.Add([pscustomobject]@{ Id = $id; Paths = (Sort-GuideOrdinal @($changed.Keys)) })
+        foreach ($path in @($changed.Keys)) { $seen[$path] = $true }
+    }
+
+    $sectionCount = @($manifest.Sections).Count
+    if ($stale.Count -eq 0 -and $currentDigest -ceq $manifest.SourceDigest) {
+        Write-Output ("GUIDE_CURRENT sections={0} digest={1} generated_from={2} commits_since={3} authority_commits_since={4} authority_worktree_dirty={5}" -f `
+            $sectionCount,$currentDigest,$baseCommit,$commitsSince,$authorityCommitsSince,$authorityDirty.ToString().ToLowerInvariant())
+        return
+    }
+    Write-Output ("GUIDE_STALE sections={0} changed_sections={1} changed_paths={2} generated_from={3}" -f `
+        $sectionCount,$stale.Count,@($seen.Keys).Count,$baseCommit)
+    foreach ($entry in $stale) {
+        $encoded = @()
+        foreach ($path in @($entry.Paths)) { $encoded += ConvertTo-GuideJsonString $path }
+        Write-Output ("GUIDE_SECTION_STALE id={0} changed_paths_json={1}" -f $entry.Id,('[' + ($encoded -join ',') + ']'))
+    }
 }
 
 function New-Guide([object]$Graphs, [string]$Digest) {
@@ -861,26 +1921,19 @@ function New-Guide([object]$Graphs, [string]$Digest) {
     # are what it was composed from rather than pages of their own.
     $compositionPath = Join-Path $ProjectRoot '_strata/project_guide.md'
     $hasComposition = Test-Path -LiteralPath $compositionPath
+    $generated = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+    $snapshot = Get-GitSnapshot
+    $composition = $null
+    # Validated in full before anything is written: a generation error here
+    # leaves the previous Guide untouched.
+    if ($hasComposition) { $composition = Build-GuideComposition $compositionPath $Graphs $generated $snapshot.Oid }
 
     $navigation = New-Object Text.StringBuilder
     [void]$navigation.Append('<ul>')
     if ($hasComposition) {
-        # The composed guide is the document. Its own sections are what a reader navigates by.
-        [void]$navigation.Append('<li data-nav-item data-target="how-it-works"><a href="#how-it-works">Guide</a><span class="nav-description">What the application does and how it behaves.</span><ul class="nav-topics">')
-        $inGroup = $false
-        foreach ($topic in @(Get-RecordOutline (Read-Utf8 $compositionPath) 'guide-heading-')) {
-            $label = [Net.WebUtility]::HtmlEncode($topic.Title)
-            if ($topic.Level -eq 1) {
-                if ($inGroup) { [void]$navigation.Append('</ul></li>') }
-                [void]$navigation.Append(("<li class=`"nav-group`" data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a><ul class=`"nav-topics`">" -f $topic.Anchor,$label))
-                $inGroup = $true
-            }
-            else {
-                [void]$navigation.Append(("<li data-nav-item data-target=`"{0}`"><a href=`"#{0}`">{1}</a></li>" -f $topic.Anchor,$label))
-            }
-        }
-        if ($inGroup) { [void]$navigation.Append('</ul></li>') }
-        [void]$navigation.Append('</ul></li>')
+        # The composed guide is the document. Its own identified sections, not its
+        # headings, are what a reader navigates by.
+        [void]$navigation.Append((Get-GuideCompositionNavigation $composition))
     }
     if (-not $hasComposition -and $tickets.Count -gt 0) { [void]$navigation.Append('<li data-nav-item data-target="work-overview"><a href="#work-overview">Work overview</a><span class="nav-description">Current work with its linked reasons and evidence.</span></li>') }
     if (-not $hasComposition) { foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) { [void]$navigation.Append((Render-GuideNavigationNode $graph.Tree $anchors)) } }
@@ -891,26 +1944,15 @@ function New-Guide([object]$Graphs, [string]$Digest) {
     # The composed explanation is the Guide. It is the part a person reads; the authorities behind it
     # are the working material. It sits beside its own rendered output in `_strata/`, composed by an
     # agent and read here by exact path. It is a project surface: the canonical kit never carries one.
-    $citationProblems = New-Object System.Collections.ArrayList
-    $citedFiles = New-Object System.Collections.ArrayList
     if ($hasComposition) {
-        $composed = Read-Utf8 $compositionPath
-        if (-not [string]::IsNullOrWhiteSpace($composed)) {
-            $chips = New-Object System.Collections.ArrayList
-            $script:GuideCiteCounter = 0
-            $marked = Convert-GuideCitations (Remove-ContentsSection $composed) $ProjectRoot $Graphs $citationProblems $citedFiles $chips
-            $rendered = Convert-Markdown $marked 'guide-heading-'
-            foreach ($chip in @($chips)) { $rendered = $rendered.Replace($chip.Token, $chip.Html) }
-            $rendered = Expand-RecordTopics $rendered
-            [void]$body.AppendLine('<section class="guide-section" id="how-it-works" data-nav-target><h1>How it works</h1>')
-            [void]$body.AppendLine('<article class="record" id="doc-guide-composition" data-depth="0" data-search-item data-nav-target>')
-            [void]$body.AppendLine('<div class="source">_strata/project_guide.md &mdash; composed explanation, not an authority</div>')
-            [void]$body.Append($rendered)
-            [void]$body.AppendLine('</article></section>')
-        }
-        if ($citationProblems.Count -gt 0) {
-            throw ("Guide composition has unresolvable references: " + (($citationProblems | Select-Object -Unique) -join '; '))
-        }
+        # Identified sections render as flat siblings. Nothing folds them: the exact
+        # bytes of each <section class="guide-topic"> element are digested, and an
+        # exemption badge must not be hidden inside a disclosure.
+        $documentHeading = if ([string]::IsNullOrWhiteSpace($composition.DocumentTitle)) { 'How it works' } else { $composition.DocumentTitle }
+        [void]$body.AppendLine('<section class="guide-section" id="how-it-works" data-nav-target><h1>' + [Net.WebUtility]::HtmlEncode($documentHeading) + '</h1>')
+        [void]$body.AppendLine('<div class="source">_strata/project_guide.md &mdash; composed explanation, not an authority</div>')
+        [void]$body.Append($composition.Body)
+        [void]$body.AppendLine('</section>')
     }
     if (-not $hasComposition -and $tickets.Count -gt 0) {
         [void]$body.AppendLine('<section class="guide-section" id="work-overview" data-nav-target><h1>Work overview</h1><p class="authority-intro">Current work with its linked reasons and implementation evidence.</p>')
@@ -962,10 +2004,14 @@ function New-Guide([object]$Graphs, [string]$Digest) {
     }
     $shell = Read-Utf8 $GuideShellPath
     if ($null -eq $shell) { throw "Guide shell could not be read: $GuideShellPath" }
-    $generated = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
-    $snapshot = Get-GitSnapshot
+    # With a composition source the exposed digest is the section-derived one;
+    # without it the authority digest computed by the caller is unchanged.
+    $effectiveDigest = if ($hasComposition) { $composition.SourceDigest } else { $Digest }
+    $script:GuideEmittedDigest = $effectiveDigest
+    $script:GuideRecords = @()
+    if ($hasComposition) { $script:GuideRecords = @($composition.Warnings) + @($composition.Coverage) }
     $html = $shell.Replace('@@STRATA_GENERATOR@@', [Net.WebUtility]::HtmlEncode($GeneratorVersion))
-    $html = $html.Replace('@@STRATA_DIGEST@@', [Net.WebUtility]::HtmlEncode($Digest))
+    $html = $html.Replace('@@STRATA_DIGEST@@', [Net.WebUtility]::HtmlEncode($effectiveDigest))
     $html = $html.Replace('@@STRATA_GENERATED_AT@@', [Net.WebUtility]::HtmlEncode($generated))
     $html = $html.Replace('@@STRATA_BASE_COMMIT@@', [Net.WebUtility]::HtmlEncode($snapshot.Oid))
     $html = $html.Replace('@@STRATA_BASE_COMMIT_SHORT@@', [Net.WebUtility]::HtmlEncode($snapshot.Short))
@@ -973,6 +2019,8 @@ function New-Guide([object]$Graphs, [string]$Digest) {
     $html = $html.Replace('@@STRATA_BASE_COMMIT_SUBJECT@@', [Net.WebUtility]::HtmlEncode($snapshot.Subject))
     $html = $html.Replace('<!--STRATA_NAVIGATION-->', $navigation.ToString())
     $html = $html.Replace('<!--STRATA_CONTENT-->', $body.ToString())
+    $manifest = if ($hasComposition) { $composition.ManifestHtml } else { '' }
+    $html = $html.Replace('<!--STRATA_MANIFEST-->', $manifest)
     return $html
 }
 
@@ -1035,9 +2083,21 @@ function Invoke-StrataContext {
     elseif ($GenerateGuide) {
         $tempGuide = $null
         try {
+            $script:GuideRecords = @()
+            $script:GuideEmittedDigest = $null
             $digest = Get-SourceDigest $graphs
             $html = New-Guide $graphs $digest
+            if ($null -ne $script:GuideEmittedDigest) { $digest = $script:GuideEmittedDigest }
             Test-GeneratedGuideHtml $html
+            # The candidate is held to the same provenance contract status will
+            # apply to it. A Guide that would be born invalid never replaces one
+            # that is valid, and emits no coverage record on its way out.
+            if (Test-Path -LiteralPath (Join-Path $ProjectRoot '_strata/project_guide.md') -PathType Leaf) {
+                $candidateProvenance = Test-GuideProvenance $html
+                if (-not $candidateProvenance.Valid) {
+                    throw "Generated Guide provenance is invalid: $($candidateProvenance.Reason)"
+                }
+            }
             $tempGuide = Join-Path $StrataRoot ('.project_guide.' + [Guid]::NewGuid().ToString('N') + '.tmp')
             [IO.File]::WriteAllText($tempGuide, $html, $Utf8NoBom)
             if (Test-Path -LiteralPath $GuidePath -PathType Leaf) {
@@ -1046,6 +2106,8 @@ function Invoke-StrataContext {
                 finally { if (Test-Path -LiteralPath $backup) { Remove-Item -LiteralPath $backup -Force } }
             }
             else { [IO.File]::Move($tempGuide, $GuidePath) }
+            # Warnings precede coverage records, and a generation error emits neither.
+            foreach ($record in @($script:GuideRecords)) { Write-Output $record }
             Write-Output "GUIDE_GENERATED digest=$digest path=$GuidePath"
         }
         catch {

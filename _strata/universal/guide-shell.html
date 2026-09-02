@@ -85,6 +85,15 @@
     .topic-card span { margin-top: 3px; color: var(--muted); font-size: 13px; }
     .cite { display: inline-block; margin-left: 4px; padding: 0 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); color: var(--muted); font: 11.5px/1.7 ui-monospace,"Cascadia Code",Consolas,monospace; vertical-align: baseline; }
     .cite-authority { border-color: var(--accent); color: var(--accent); }
+    .guide-topic { position: relative; margin: 0 0 18px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow); scroll-margin-top: 88px; overflow: auto; }
+    .guide-topic-body > :first-child { margin-top: 0; }
+    .guide-exempt { display: inline-block; margin-left: 6px; padding: 0 7px; border: 1px dashed var(--muted); border-radius: 10px; color: var(--muted); font-size: 11.5px; }
+    .guide-exempt-illustration { border-style: dotted; }
+    .table-evidence { margin: -4px 0 14px; padding: 7px 10px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font-size: 12.5px; }
+    .table-evidence-label { margin-right: 6px; font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+    .guide-provenance { margin: 14px 0 0; color: var(--muted); font-size: 12.5px; }
+    .guide-provenance > summary { cursor: pointer; }
+    .guide-provenance ul { margin: 5px 0; }
     .topic { margin: 14px 0; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
     .topic > summary { padding: 11px 14px; font-size: 17px; font-weight: 650; cursor: pointer; list-style: none; }
     .topic > summary::-webkit-details-marker { display: none; }
@@ -130,7 +139,9 @@
     @media print {
       .topbar, .sidebar, #toTop, .copy-code { display: none !important; }
       .layout { display: block; max-width: none; padding: 0; }
-      .record, .ticket { break-inside: avoid; box-shadow: none; }
+      .record, .ticket, .guide-topic { break-inside: avoid; box-shadow: none; }
+      .guide-exempt { display: inline-block !important; }
+      .guide-provenance { display: block !important; }
       .topic { border: 0; background: none; }
       .topic > summary::before { content: ""; }
       [hidden] { display: block !important; }
@@ -153,6 +164,7 @@
     <main><!--STRATA_CONTENT--></main>
   </div>
   <button id="toTop" type="button" title="Back to top" aria-label="Back to top">↑</button>
+  <!--STRATA_MANIFEST-->
   <script>
   (function () {
     "use strict";

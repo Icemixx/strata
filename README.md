@@ -74,8 +74,11 @@ Validate the kit itself with `.\canonical-tests\context.tests.ps1`.
 All public modes are read-only. Guide generation is agent-internal and direct user invocation is rejected.
 It writes `_strata/project_guide.html` only after full graph validation, using an atomic replacement.
 Rendering is offline; raw HTML and unsafe link schemes are sanitized. The generated page includes its
-source digest and available commit snapshot information so `-GuideStatus` can report whether current
-authorities have moved ahead.
+source digest and available commit snapshot information so `-GuideStatus` can report whether the Guide
+has fallen behind. Without a `_strata/project_guide.md` composition source that digest covers the routed
+authority content. With one, the page also embeds a per-section provenance manifest, the digest is
+derived from the composed sections, and `-GuideStatus` reports which sections are stale and which paths
+changed.
 
 Guide refresh is user-triggered. When the user asks to update Guide, the agent reviews concise human-language
 descriptions in the owning authority indexes and introductions, then regenerates the snapshot. Ordinary
