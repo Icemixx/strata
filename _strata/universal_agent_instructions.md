@@ -33,6 +33,12 @@ cross-project justification.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
 - Editing never implies authority to commit, publish, spend money, change external state, or expand
   scope materially.
+- Never ingest credentials, tokens, personal or machine-local settings, transcripts, generated memory,
+  caches, raw logs, or administrator-managed policy into project authorities or the shared kit, and never
+  commit, track, or log customer data, environment values, generated reports, or identifying financial
+  data, including anything derived from them. This prohibition is absolute and cannot be authorized away.
+  A relevant non-sensitive fact may be recorded independently in its owning authority; the protected
+  source material itself is never ingested.
 - Preserve unrelated work and inspect an existing file completely before editing or removing it.
 - If the user asked to discuss, plan, or approve steps first, wait for that approval before editing.
 - Continue safe independent authorized work around one blocked item. Stop when the user changes scope,

@@ -9,11 +9,6 @@ Inspect the repository before writing. If it already contains project history, s
 documentation, an agent namespace, or populated project records, treat it as established and stop this
 procedure without overwriting anything.
 
-Never copy or embed credentials, tokens, personal or machine-local settings, transcripts, generated
-memory, caches, raw logs, or administrator-managed policy in project authorities or the shared kit. This
-prohibition is absolute and cannot be authorized away. A relevant non-sensitive fact may be recorded
-independently in its owning authority, but the protected source material itself is never ingested.
-
 ## Create the topology
 
 1. Copy the complete shared payload as `_strata/universal/kit-editing.md` defines it.

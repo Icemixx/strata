@@ -12,7 +12,7 @@ cross-harness continuity.
    evidence, and exact unfinished step or blocker.
 4. Verify transcript claims against the current filesystem, Git state, and routed project authorities.
    Live evidence determines what actually landed.
-5. Protect secrets and sensitive transcript content. Report only what the task needs.
+5. Report only what the task needs.
 
 Before acting, announce the source harness, selected main-session identifier and timestamp, repository
 match, last completed work, and exact unfinished step or blocker.
