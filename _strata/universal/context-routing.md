@@ -73,7 +73,9 @@ their relevant context arrives through the delegation brief.
 
 Keep current rules in exactly one instruction audience. A rule needed by every agent belongs in common
 Instructions. Active-Agent-only integration and routing rules belong in Active Agent Instructions.
-Historical instruction reasoning belongs in Rationale.
+Historical instruction reasoning belongs in Rationale. Common Instructions, universal and project alike, stay
+agent-agnostic: a rule that applies only under one harness belongs in that harness's dossier, never in a
+common Instructions file.
 
 Root harness routers remain thin: they load common Universal and Project Instructions only. Common
 Instructions route the user-facing session to Active Agent Instructions. Harness adapters load on demand

@@ -5,7 +5,8 @@ Use this procedure when changing the canonical Strata payload or synchronizing a
 ## Boundary
 
 The shared payload is exactly `_strata/universal_agent_instructions.md` plus every regular file under
-`_strata/universal/`. It remains project-, product-, stack-, and repository-agnostic. Generalize a
+`_strata/universal/`. It remains project-, product-, stack-, and repository-agnostic, and agent-agnostic
+apart from the `harness-<product>.md` dossiers, which exist to carry exactly those differences. Generalize a
 project discovery before proposing it for the shared kit; keep project-specific realization in Project
 Instructions or project records.
 
