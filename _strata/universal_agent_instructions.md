@@ -56,6 +56,9 @@ cross-project justification.
   reference only when its claim was deliberately removed.
 - When an existing check inspected moved content, point that check at the new owner and demonstrate that
   it can still detect its target failure.
+- When a check's empty result is itself the finding, demonstrate that the check can detect its target
+  failure before reporting clean. A check that finds nothing is indistinguishable from one that cannot
+  find anything.
 
 For code changes only:
 
