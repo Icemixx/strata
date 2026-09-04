@@ -59,6 +59,10 @@ cross-project justification.
 - When a check's empty result is itself the finding, demonstrate that the check can detect its target
   failure before reporting clean. A check that finds nothing is indistinguishable from one that cannot
   find anything.
+- An edit that targets existing text must fail when that text is absent. An operation that returns its
+  input unchanged on a miss reports success while doing nothing; never pair one with a removal.
+- Before deleting text, confirm every substantive statement either survives at one named destination or
+  has an explicit removal reason.
 
 For code changes only:
 
