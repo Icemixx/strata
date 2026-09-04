@@ -1504,9 +1504,16 @@ function Test-GuideProvenance([string]$Html) {
     $present = @($parsed.PSObject.Properties | ForEach-Object { $_.Name })
     if (@($present).Count -ne @($topLevel).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     foreach ($name in $topLevel) { if ($present -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
-    foreach ($name in @('schema','generated_at','generation_commit','composition_path','source_digest')) {
+    foreach ($name in @('schema','generation_commit','composition_path','source_digest')) {
         if ($parsed.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     }
+    # generated_at is written as an ISO-8601 UTC timestamp, which ConvertFrom-Json deserializes to
+    # [DateTime] on PowerShell 6 and later. The CLR type it returns is a host detail, not corruption,
+    # so the wire format is what gets validated. Nothing downstream reads this field.
+    $generatedAt = if ($parsed.generated_at -is [DateTime]) {
+        ([DateTime]$parsed.generated_at).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+    } else { [string]$parsed.generated_at }
+    if ($generatedAt -cnotmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$') { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ($parsed.sections -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ($parsed.schema -cne $GuideManifestSchema) { return New-GuideProvenanceFailure 'unsupported-manifest-schema' }
     if (-not (Test-GuideDigestField $parsed.source_digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
