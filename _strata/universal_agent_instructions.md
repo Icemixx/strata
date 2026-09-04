@@ -47,6 +47,10 @@ cross-project justification.
 ## Evidence and changes
 
 - Prefer direct evidence and governing project records over assumptions.
+- A question you can answer from evidence is not a question for the user. Before escalating, verify against
+  the code, git history scoped to the relevant paths and dates, the Build Log, the tests, and the originating
+  evidence rather than a later summary of it. Escalate only once that attempt has been made and failed, and
+  say what was attempted. Reserve escalation for judgement the evidence cannot supply.
 - Distinguish what was observed, what was inferred, and what remains unverified.
 - Treat another agent's, transcript's, or report's claim as unverified until you confirm the artifact or
   literal result yourself.
