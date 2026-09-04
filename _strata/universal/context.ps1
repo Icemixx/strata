@@ -2036,7 +2036,23 @@ function Test-GeneratedGuideHtml([string]$Html) {
     if ($Html -match '(?is)<(?:script|img|iframe|frame|link|audio|video|source)\b[^>]*(?:src|href)\s*=') {
         throw 'Generated Guide contains a loadable resource attribute.'
     }
-    if ($Html -match '(?i)url\s*\(') { throw 'Generated Guide contains a CSS url() resource.' }
+    # A CSS url() can only load something from inside a stylesheet or a style attribute. Scanning the
+    # whole document instead caught authority prose: a Build Log record quoting the literal error
+    # "error sending request for url (https://…)" inside a code span blocked generation entirely, and no
+    # rewriting of that record would have been honest, because a dated record states what was seen.
+    # The shell has its own check (GUIDE_SHELL_EXTERNAL); this one guards what generation emits.
+    $stylePatterns = @(
+        '(?is)<style\b[^>]*>(.*?)</style>',
+        '(?i)\sstyle\s*=\s*"([^"]*)"',
+        "(?i)\sstyle\s*=\s*'([^']*)'"
+    )
+    foreach ($stylePattern in $stylePatterns) {
+        foreach ($styleMatch in [regex]::Matches($Html, $stylePattern)) {
+            if ($styleMatch.Groups[1].Value -match '(?i)url\s*\(') {
+                throw 'Generated Guide contains a CSS url() resource.'
+            }
+        }
+    }
     if ([regex]::Matches($Html, '<script\b', 'IgnoreCase').Count -ne 1) { throw 'Generated Guide must contain exactly one canonical inline script.' }
     $ids = @{}
     foreach ($match in [regex]::Matches($Html, '\bid="([^"]+)"', 'IgnoreCase')) {

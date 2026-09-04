@@ -923,6 +923,28 @@ Run `context.ps1 -CheckAll` and read `_strata/state/index.md` before deciding.
         Assert-True ($guide -notmatch '@@STRATA') 'the Guide contains unrestored placeholder tokens'
         Assert-True ($guide -match '<code>context\.ps1 -CheckAll</code>') 'the code span was not rendered'
     }
+
+    Assert-Test 'a url( in authority prose is not a CSS resource' {
+        $root = New-Fixture 'prose-url'
+        Write-Utf8 (Join-Path $root '_strata\build-log\2026-07-23-codex-probe.md') @'
+# 2026-07-23 - Codex nested-delegation probe
+
+- Verbatim result: `ERROR: stream disconnected before completion: error sending request for url (https://api.openai.com/v1/responses)`; exit code `1`.
+'@
+        Replace-Utf8 (Join-Path $root '_strata\build-log\index.md') '## Contents' "## Contents`n`n- [Codex nested-delegation probe](2026-07-23-codex-probe.md) - The nested probe's verbatim failure."
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "a literal url( inside a code span blocked generation: $($result.Output)"
+        $guide = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'), [Text.Encoding]::UTF8)
+        Assert-True ($guide -match 'api\.openai\.com') 'the verbatim error was not carried into the Guide'
+    }
+
+    Assert-Test 'watched red: a CSS url() in the shell still fails generation' {
+        $root = New-Fixture 'shell-url'
+        Replace-Utf8 (Join-Path $root '_strata\universal\guide-shell.html') '</style>' "  body { background-image: url(evil.png); }`n</style>"
+        $result = Invoke-GenerateGuideCapture $root
+        Assert-True ($result.ExitCode -ne 0) 'a CSS url() in a style block was allowed through'
+        Assert-True ($result.Output -match 'CSS url\(\) resource') "the failure did not name the CSS url() guard: $($result.Output)"
+    }
 }
 finally {
     if (Test-Path -LiteralPath $TempRoot) {
