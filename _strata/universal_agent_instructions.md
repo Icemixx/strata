@@ -97,6 +97,7 @@ Read the mapped file before acting when its trigger applies:
 | `context-routing.md` | Route or change project authorities, instruction audiences, indexes, State lifecycle, Guide, or context validation |
 | `initialize.md` | Initialize the kit in a new repository |
 | `consolidation.md` | Consolidate duplicated or superseded documentation |
+| `guide-composition.md` | Write or refresh `_strata/project_guide.md`, the Guide's composition source |
 | `dap.md` | Make a consequential decision or run an explicitly triggered six-seat council |
 | `debate.md` | Reconcile independently-derived work with an agent from another provider |
 | `spec-building.md` | Create, revise, review, confirm, or hand off a retained specification |
