@@ -159,6 +159,13 @@ identity      every level-one and level-two heading carries [[guide:section <id>
               or level-two section, and giving it an identity is an error.
 id and kind   the id matches [a-z][a-z0-9]*(?:[.-][a-z0-9]+)* and is unique in the document; the kind is
               exactly one of topic, workflow, architecture, module-family.
+watch         a section whose kind is workflow, architecture or module-family declares
+              [[guide:watch <glob>]] immediately after its identity line, before its first content
+              block, naming the paths whose change makes the section stale. Every pattern must match
+              a readable file; * may appear only in the final segment and ** only as the whole final
+              segment; the bare ** is refused, because a staleness signal that is always red is one
+              nobody reads. A missing watch surface is a warning rather than a failure, which makes
+              it the one rule a passing generation will not force you to obey.
 citations     every evidence-bearing block ends with a resolving reference -- [authority: <path>] or
               [code: <path>:<symbol>] -- or carries [[guide:exempt framing]] or
               [[guide:exempt illustration]]. Headings, navigation and literal code are not
@@ -186,6 +193,11 @@ know the codebase; that is the one place a generated Guide must beat the manual 
 - **no information loss** — every multi-word source line contiguously present;
 - a duplicated subject canonical in one section and cross-linked from the other, never stated twice;
 - **per-section density measured against the benchmark**, not totalled.
+- **exact identifiers measured against the records the page cites** — every symbol, path, file and
+  threshold a cited record names either appears in the page or was deliberately left to that record.
+  A composition drifts by turning names into descriptions: *on focus-out or Enter* for
+  `editingFinished`, *the old wrapper* for the wrapper's name. Each is readable, none is searchable,
+  and no other check notices, because the sentence is still true and still cited.
 
 Generation plumbing is not reader content. Internal source paths, unavailable commit placeholders,
 generator commands and staleness instructions stay out of the visible page; machine provenance belongs in
