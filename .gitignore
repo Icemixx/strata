@@ -18,6 +18,8 @@
 !.gitattributes
 !.gitignore
 !LICENSE
+!AGENTS.md
+!CLAUDE.md
 !README.md
 
 !_strata/
