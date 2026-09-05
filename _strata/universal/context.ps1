@@ -1148,16 +1148,28 @@ function Read-GuideComposition([string]$Markdown, [switch]$Lenient) {
                 if ($null -eq $identity) {
                     # The document title is the one heading that owns no section: it holds no
                     # content of its own and another level-one heading follows it.
-                    $titleOk = ($level -eq 1) -and (-not $sawHeading) -and ($null -eq $documentTitle)
-                    if ($titleOk) {
+                    $titleShaped = ($level -eq 1) -and (-not $sawHeading) -and ($null -eq $documentTitle)
+                    $titleOk = $titleShaped
+                    $nextLevel = 0
+                    $nextLine = 0
+                    if ($titleShaped) {
                         for ($j = $i + 1; $j -lt $lines.Count; $j++) {
                             if ([string]::IsNullOrWhiteSpace($lines[$j])) { continue }
                             $nextHeading = [regex]::Match($lines[$j], '^(#{1,6})\s+(.+?)\s*#*$')
+                            if ($nextHeading.Success) { $nextLevel = $nextHeading.Groups[1].Value.Length; $nextLine = $j + 1 }
                             if (-not ($nextHeading.Success -and $nextHeading.Groups[1].Value.Length -eq 1)) { $titleOk = $false }
                             break
                         }
                     }
-                    if (-not $titleOk) { New-GuideParseError "the heading on line $($i + 1) has no [[guide:section <id> <kind>]] identity" }
+                    if (-not $titleOk) {
+                        # Blaming the title reads as a contradiction of the rule that every heading
+                        # carries an identity, because the title is the one heading exempt from it.
+                        # Name the constraint that actually failed instead.
+                        if ($titleShaped -and $nextLevel -gt 1) {
+                            New-GuideParseError "the document title on line $($i + 1) may omit its identity only when the next heading is also level one, but line $nextLine is level $nextLevel. Either give the title an identity, or make the heading below it a level-one group."
+                        }
+                        New-GuideParseError "the heading on line $($i + 1) has no [[guide:section <id> <kind>]] identity"
+                    }
                     $documentTitle = $heading
                     $sawHeading = $true
                     continue

@@ -154,7 +154,11 @@ a defect into an invented philosophy, and do not publish a claim the implementat
 These fail an entire refresh rather than warning, so they are worth knowing before the first attempt.
 
 ```text
-identity      every level-one and level-two heading carries [[guide:section <id> <kind>]] on the next
+title         the document's own title is the one heading that carries no identity, and it qualifies
+              only when it is level one, is the first heading in the file, and is followed by another
+              LEVEL-ONE heading. A title followed by `## Something` is refused, because a level-two
+              heading under it would have no group to belong to.
+identity      every other level-one and level-two heading carries [[guide:section <id> <kind>]] on the next
               line. A level-three heading carries NONE: it belongs to the nearest identified level-one
               or level-two section, and giving it an identity is an error.
 id and kind   the id matches [a-z][a-z0-9]*(?:[.-][a-z0-9]+)* and is unique in the document; the kind is
@@ -165,21 +169,43 @@ watch         a section whose kind is workflow, architecture or module-family de
               a readable file; * may appear only in the final segment and ** only as the whole final
               segment; the bare ** is refused, because a staleness signal that is always red is one
               nobody reads. A missing watch surface is a warning rather than a failure, which makes
-              it the one rule a passing generation will not force you to obey.
+              it the one rule a passing generation will not force you to obey. **The failure mode is
+              inverted from everything else here**: omitting the directive warns, while declaring one
+              that matches no readable file refuses the whole document. Expansion comes from the
+              repository's tracked and non-ignored files, so a correct pattern starts failing the day
+              its directory becomes git-ignored.
 citations     every evidence-bearing block ends with a resolving reference -- [authority: <path>] or
               [code: <path>:<symbol>] -- or carries [[guide:exempt framing]] or
               [[guide:exempt illustration]]. Headings, navigation and literal code are not
               evidence-bearing.
+anchors       [authority: <path>#<heading-slug>] points at one heading inside a record instead of the
+              whole file, and the slug is validated against that file's headings. Prefer it: without
+              it, a claim about the backup scheduler and a claim about the restore procedure cite the
+              same two-hundred-line record indistinguishably. The slug is the heading lowercased with
+              every run of characters outside [a-z0-9_] replaced by a hyphen and the ends trimmed, so
+              `Startup Sequence (main.py)` becomes `startup-sequence-main-py`.
 list items    a list item's citation belongs on that item's own line.
-wrapping      a wrapped continuation line parses as its OWN block, so an item that wraps is an uncited
-              block wherever its citation sits. Composition sources want long single lines -- the
-              opposite of ordinary practice.
+wrapping      a PARAGRAPH may wrap freely: continuation lines join it until a blank line, heading,
+              fence, list marker, callout, directive or table, and one citation on its last line
+              covers the whole paragraph. A LIST ITEM and a CALLOUT get no continuation, so each
+              wrapped line is its own block and an uncited one fails the document. Wrap prose
+              normally; keep a list item on one line however long it runs.
 routed only   an [authority:] target must be a record the discovery graph routes to. A file that hangs
               off Instructions rather than State, Rationale or Build Log is not routable and is refused.
-tables        a table may declare [[guide:table shared]] followed by its evidence, which its rows
-              inherit; a row may add to or override it with [[guide:row override]]. Without a shared
-              set, every heterogeneous evidence-bearing row resolves on its own.
+tables        a table may declare [[guide:table shared]] on the line AFTER the table, followed with no
+              blank line by at least one citation line; its rows inherit that evidence, and a row may
+              add to or override it with [[guide:row override]]. Without a shared set, every
+              heterogeneous evidence-bearing row resolves on its own. A shared declaration may appear
+              once per table and may not carry an exemption.
+exemptions    an exemption FOLLOWS the block it exempts, on its own line. It cannot exempt a table
+              row, cannot be doubled, and cannot sit on a block that also carries a citation.
 ```
+
+**[code:] needs the code present.** It resolves only when the file exists in this checkout and the
+named symbol occurs in its text; a bare path with no locator is refused. A tree holding authorities and
+no product code -- a migration rehearsal, an authority-only handover -- cannot use it at all, and every
+claim must then rest on the record that asserts it. That is a real limit on such a tree, not a failure
+of the composition: the Guide is only ever as checkable as what it was given.
 
 Cite the authority for what a migrated repository's records establish, and the code for what only the
 implementation can establish. A guide with no citations cannot be checked by anyone who does not already
@@ -194,7 +220,10 @@ know the codebase; that is the one place a generated Guide must beat the manual 
 - a duplicated subject canonical in one section and cross-linked from the other, never stated twice;
 - **per-section density measured against the benchmark**, not totalled.
 - **exact identifiers measured against the records the page cites** — every symbol, path, file and
-  threshold a cited record names either appears in the page or was deliberately left to that record.
+  threshold a cited record names appears in the page, unless it falls in one of five kinds that
+  belong to the record and not to a manual: a rejected alternative, a superseded value, a ticket
+  identifier or status, dated evidence such as a commit or a run, or an internal of a retired system
+  the record documents as gone. An absence outside those five is a drop.
   A composition drifts by turning names into descriptions: *on focus-out or Enter* for
   `editingFinished`, *the old wrapper* for the wrapper's name. Each is readable, none is searchable,
   and no other check notices, because the sentence is still true and still cited.

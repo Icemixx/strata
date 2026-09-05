@@ -509,7 +509,8 @@ try {
     Assert-Test 'watched red: composition grammar defects fail generation' {
         $root = New-CompositionFixture 'composition-grammar' ''
         $cases = @(
-            @{ Markdown = "# Guide`n`n## Orphan`n`nUncited. [code: app/service.py:create_work_order]`n"; Expected = 'has no \[\[guide:section'; Why = 'a heading without identity must fail generation' },
+            @{ Markdown = "# Guide`n[[guide:section guide topic]]`n`n## Orphan`n`nUncited. [code: app/service.py:create_work_order]`n"; Expected = 'has no \[\[guide:section'; Why = 'a heading without identity must fail generation' },
+            @{ Markdown = "# Guide`n`n## Orphan`n[[guide:section orphan topic]]`n`nCited. [code: app/service.py:create_work_order]`n"; Expected = 'may omit its identity only when the next heading is also level one'; Why = 'a bare document title followed by a level-two heading must name the constraint it broke, not blame the one heading allowed to have no identity' },
             @{ Markdown = "# Orphan`n[[guide:section Bad-Id topic]]`n`nCited. [code: app/service.py:create_work_order]`n"; Expected = 'invalid section id'; Why = 'an invalid section id must fail generation' },
             @{ Markdown = "# Orphan`n[[guide:section orphan mystery]]`n`nCited. [code: app/service.py:create_work_order]`n"; Expected = 'invalid section kind'; Why = 'an invalid section kind must fail generation' },
             @{ Markdown = "# One`n[[guide:section same topic]]`n`nCited. [code: app/service.py:create_work_order]`n`n# Two`n[[guide:section same topic]]`n`nCited. [code: app/service.py:create_work_order]`n"; Expected = 'duplicate section id'; Why = 'a duplicate section id must fail generation before rendering' },
