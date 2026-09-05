@@ -370,11 +370,16 @@ function Get-SourceDigest([object]$Graphs) {
 }
 
 function Write-GuideStatus([object]$Graphs) {
+    # The composition source belongs to the strata tree being operated on, so it is resolved from
+    # $StrataRoot rather than by re-appending a hardcoded '_strata' to $ProjectRoot. The two coincide in
+    # an ordinary repository, which is why the difference stayed invisible; against a tree under any
+    # other name the hardcoded join silently looked in the wrong place and generation fell back to
+    # rendering the authorities directly.
     # Two paths, one first-token interface. With a composition source the v1
     # manifest, section and closed reason-code grammar applies; without one the
     # pre-v1 authority-only digest, field sets, missing-digest result and
     # GUIDE_CHANGE advisories below remain exactly as they were.
-    $compositionPath = Join-Path $ProjectRoot '_strata/project_guide.md'
+    $compositionPath = Join-Path $StrataRoot 'project_guide.md'
     if (Test-Path -LiteralPath $compositionPath -PathType Leaf) {
         Write-GuideCompositionStatus $compositionPath
         return
@@ -1926,7 +1931,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
 
     # Resolved before navigation: when a composed guide exists it is the document, and the authorities
     # are what it was composed from rather than pages of their own.
-    $compositionPath = Join-Path $ProjectRoot '_strata/project_guide.md'
+    $compositionPath = Join-Path $StrataRoot 'project_guide.md'
     $hasComposition = Test-Path -LiteralPath $compositionPath
     $generated = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
     $snapshot = Get-GitSnapshot
@@ -2115,7 +2120,7 @@ function Invoke-StrataContext {
             # The candidate is held to the same provenance contract status will
             # apply to it. A Guide that would be born invalid never replaces one
             # that is valid, and emits no coverage record on its way out.
-            if (Test-Path -LiteralPath (Join-Path $ProjectRoot '_strata/project_guide.md') -PathType Leaf) {
+            if (Test-Path -LiteralPath (Join-Path $StrataRoot 'project_guide.md') -PathType Leaf) {
                 $candidateProvenance = Test-GuideProvenance $html
                 if (-not $candidateProvenance.Valid) {
                     throw "Generated Guide provenance is invalid: $($candidateProvenance.Reason)"
