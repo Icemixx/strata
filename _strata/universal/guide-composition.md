@@ -60,9 +60,22 @@ reading path.
 
 ### Density is the measure
 
-This is the rule that gets missed, because everything else can pass while it fails. Aim for roughly **350
-words per subsection**, and let them be uneven — one subject needs 600 and another needs 150, because that
-is what each needs. Padding a thin section to match a thick one is not depth.
+This is the rule that gets missed, because everything else can pass while it fails, and it has a target
+you can compute rather than a number to remember.
+
+**A section is about as long as the record it covers.** Measured across a mature Guide's seventeen
+sections against the State records they were composed from, the median ratio is 1.01x and the range is
+0.82x to 1.06x — a 339-word record became a 339-word section, a 1,057-word record became 1,058 words.
+That is not a coincidence of that project: a Guide explains what a record states, and explaining a fact
+in a reader's terms costs about what stating it cost. Take the largest record a section cites, and expect
+to write about that many words.
+
+**Below half of it, the section summarised its source instead of explaining it.** That is the single
+most reliable signal that a Guide is a shell, it needs no predecessor document to compute, and it is
+what every failed attempt has in common: 0.12x and 0.51x for two agents working from this procedure,
+against 1.04x for a Guide that reproduces its predecessor. Let the ratios be uneven — one subject needs
+1.3x and another 0.8x — but a section at 0.2x has not been written yet. Padding a thin section to reach
+a number is not depth either; the fix is always more of what the record actually says.
 
 **Beating the target on word count, table count and subsection count while writing 86-word passages
 produces a reference card, not an explanation anybody reads through.** Breadth and depth are both
