@@ -25,6 +25,11 @@ You may still read any dossier, correct a path or format the kit itself changed,
 is unverified or disputed. Flagging a claim is not asserting one, and a dossier nobody can currently reach
 should carry the doubt rather than keep the error silently.
 
+Then stop imagining that agent and ask it. **A claim about another harness's runtime is not accepted until
+an agent running that harness has confirmed it**, and the test costs one round-trip through the user. This
+is scoped to runtime difference, not to reach: a procedure every harness executes -- composing a Guide,
+routing a record, consolidating -- is ordinary shared-kit work and needs no second harness to accept it.
+
 ## Canonical change
 
 Audit source files and inbound references before relocation or removal. Update one normative owner per
@@ -34,10 +39,6 @@ or publication.
 Before accepting a new or changed contract, ask where two competent agents following the same text would
 produce different results, and pin every such point. Name the file, the format, and the location rather
 than the intent.
-
-Then stop imagining the other agent and run it. **A contract another harness must execute is not accepted
-until that harness has executed it.** The test costs one round-trip through the user: pay it for anything
-a second harness must execute; a change only your own harness runs does not need it.
 
 After a canonical payload change, tell the user which consuming repositories still require a separate
 sync. Do not retrofit them as part of the canonical transaction.
