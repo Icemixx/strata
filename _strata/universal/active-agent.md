@@ -74,6 +74,30 @@ implementation, or evidence changed and update the owning authorities. Explicit 
 end-for-today language triggers the same check. Ordinary turn boundaries do not require a separate
 handoff file.
 
+### Closing a work item
+
+**A work item is not finished when its code is committed. It is finished when its records are.** Both
+happen in the same sitting; the code commit and the records commit may be separate commits, never separate
+sessions. Then:
+
+- Retitle the item to what actually shipped, not to what was planned.
+- Record the decisions taken *during* the work, not only its outcome.
+- Date the record by when the work happened. A session spanning days keeps the original dates; correcting
+  them on resume rewrites history that was right.
+- Put the literal verification output and the commit in the record. A summary of a result is not the
+  result.
+- Correct any contradiction the work created, now, in the same change.
+- Never let "shipped" imply "observed". Say which one you have.
+- Turn anything found-but-not-fixed into its own queue item immediately. A finding is a queue event, not a
+  reason to report.
+- Return to the queue rather than reporting. Report once, when no ready or in-flight item remains.
+- Run this check against the *previous* item before starting the next one.
+
+**The last step is mechanical because intention is not enough.** Diligence degrades exactly when
+throughput rises, which is when the record matters most, so the safeguard fires at a fixed moment rather
+than being held in mind across a long session. Each rule above was bought by a real failure; a project
+that has paid for one keeps that evidence in its own Rationale, not here.
+
 ## Commit and publication
 
 - Do not commit unless the user or Project Instructions authorizes it.
