@@ -37,7 +37,7 @@ _strata/
     |-- debate.md
     |-- session-pickup.md
     |-- self-critique.md
-    |-- seasonal-audit.md
+    |-- audit.md
     |-- kit-editing.md
     |-- harness-codex.md
     `-- harness-claude-code.md
