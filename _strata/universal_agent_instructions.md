@@ -60,6 +60,11 @@ cross-project justification.
   literal result yourself.
 - Use checks relevant to the files and behavior changed. A passing unrelated check is not evidence.
 - Do not report a required gate complete without its literal applicable result.
+- **An unresolved item is reported in the reply, not only written to a file.** Say what is open, how many,
+  and where each one lives. A file the user has to know to open is not a report, and work that continues
+  over a known-open item without naming it presents a clean result built on something nobody decided.
+  Where a later step consumes those records — generating a Guide over them, most of all — that step says
+  how many were open when it ran.
 - When a moved file or heading has inbound references, repair every surviving reference. Remove a
   reference only when its claim was deliberately removed.
 - When an existing check inspected moved content, point that check at the new owner and demonstrate that

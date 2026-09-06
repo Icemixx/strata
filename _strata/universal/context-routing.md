@@ -224,6 +224,11 @@ like a right one, and generation cannot detect this: every structural check pass
 cited, unique, well-formed and false. Name what an audit would cover — `audit.md` — and accept a plain
 no. Ask once and do not repeat it on a later generation in the same session.
 
+State in the generation report how many findings were open when it ran, where they are recorded, and
+whether an offered audit was declined. Declining is the user's to make and generation proceeds either
+way — but a Guide built over records that are known to contradict each other must leave a trace saying so,
+or the page and its report are the two places the contradiction becomes invisible.
+
 Then review the owning index descriptions and authority introductions and improve their concise
 human-language summaries where the authoritative meaning warrants it. Do not invent project facts. Then
 perform the internal generation and verification. Do not generate Guide merely because code or an
