@@ -75,11 +75,17 @@ keep every word: length is not the problem a fold would have solved.
 This is the rule that gets missed, because everything else can pass while it fails, and it has a target
 you can compute rather than a number to remember.
 
-**A record's sections together run about as long as the record.** Measured across a mature Guide's
-seventeen sections against the State records they were composed from, the median ratio is 1.01x and the
-range is 0.82x to 1.06x — a 339-word record became a 339-word section, a 1,057-word record became 1,058
-words. That is not a coincidence of that project: a Guide explains what a record states, and explaining a
-fact in a reader's terms costs about what stating it cost.
+**A record's sections together tend to run about as long as the record.** Measured on **one** mature
+Guide — seventeen sections against the State records they were composed from — the median ratio was 1.01x
+and the range 0.82x to 1.06x; a 339-word record became a 339-word section, a 1,057-word record became
+1,058 words. The mechanism is plausible: a Guide explains what a record states, and explaining a fact in a
+reader's terms costs about what stating it cost.
+
+**One project is not a law, and this number is a diagnostic rather than a target.** Seventeen sections of
+one Guide over one codebase cannot establish a ratio every application must hit. Use it to find sections
+worth reading — a wide departure in either direction is a question to ask, not a fault to correct — and
+never as a length to write to. A section padded or trimmed toward 1.0x explains worse than one left at the
+length its subject actually needed, and the generator will hit the number either way.
 
 Measure it against a record's **home** sections — the ones that cite it more than they cite anything
 else — and never against the largest record a section happens to mention. Largest-cited is gameable from
