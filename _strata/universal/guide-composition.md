@@ -63,12 +63,17 @@ reading path.
 This is the rule that gets missed, because everything else can pass while it fails, and it has a target
 you can compute rather than a number to remember.
 
-**A section is about as long as the record it covers.** Measured across a mature Guide's seventeen
-sections against the State records they were composed from, the median ratio is 1.01x and the range is
-0.82x to 1.06x — a 339-word record became a 339-word section, a 1,057-word record became 1,058 words.
-That is not a coincidence of that project: a Guide explains what a record states, and explaining a fact
-in a reader's terms costs about what stating it cost. Take the largest record a section cites, and expect
-to write about that many words.
+**A record's sections together run about as long as the record.** Measured across a mature Guide's
+seventeen sections against the State records they were composed from, the median ratio is 1.01x and the
+range is 0.82x to 1.06x — a 339-word record became a 339-word section, a 1,057-word record became 1,058
+words. That is not a coincidence of that project: a Guide explains what a record states, and explaining a
+fact in a reader's terms costs about what stating it cost.
+
+Measure it against a record's **home** sections — the ones that cite it more than they cite anything
+else — and never against the largest record a section happens to mention. Largest-cited is gameable from
+both ends: a section scores badly because one sentence cites something big and unrelated, and any section
+reaches target by citing only small records. Splitting one record across three sections is fine; the
+three are measured together.
 
 **Below half of it, the section summarised its source instead of explaining it.** That is the single
 most reliable signal that a Guide is a shell, it needs no predecessor document to compute, and it is
