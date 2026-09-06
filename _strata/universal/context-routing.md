@@ -240,6 +240,14 @@ and fresh Guide do not prove that human-authored claims are correct.
 Use the smallest check relevant to touched paths. Run full validation for topology, shared validation or
 generation logic, conversion, or an explicit full audit.
 
+**A record cites code by file and symbol, never by line number.** A line citation is broken by the same
+change that made it worth writing: one project audited every `file:NNN` reference in its live records and
+found eighteen wrong, and the pattern was that nearly every one had been written by the ticket that then
+renamed or moved the very thing it cited, as part of implementing itself. The citation was accurate when
+typed and wrong the moment its own work shipped, and nothing re-reads it. A symbol name survives the edit
+that moves it; a line number silently points at whatever slid into its place. Dated evidence is exempt —
+a Build Log entry records what was true on a day and is not maintained afterwards.
+
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
 An established repository's separately authorized conversion preserves its legacy material until
