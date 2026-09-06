@@ -72,8 +72,8 @@ keep every word: length is not the problem a fold would have solved.
 
 ### Density is the measure
 
-This is the rule that gets missed, because everything else can pass while it fails, and it has a target
-you can compute rather than a number to remember.
+This is the rule that gets missed, because everything else can pass while it fails, and unlike a threshold
+you have to remember, it is a measure you compute from the records themselves.
 
 **A record's sections together tend to run about as long as the record.** Measured on **one** mature
 Guide — seventeen sections against the State records they were composed from — the median ratio was 1.01x
@@ -90,7 +90,7 @@ length its subject actually needed, and the generator will hit the number either
 Measure it against a record's **home** sections — the ones that cite it more than they cite anything
 else — and never against the largest record a section happens to mention. Largest-cited is gameable from
 both ends: a section scores badly because one sentence cites something big and unrelated, and any section
-reaches target by citing only small records. Splitting one record across three sections is fine; the
+can look right by citing only small records. Splitting one record across three sections is fine; the
 three are measured together.
 
 **Below half of it, the section summarised its source instead of explaining it.** That is the single
@@ -100,7 +100,7 @@ against 1.04x for a Guide that reproduces its predecessor. Let the ratios be une
 1.3x and another 0.8x — but a section at 0.2x has not been written yet. Padding a thin section to reach
 a number is not depth either; the fix is always more of what the record actually says.
 
-**Beating the target on word count, table count and subsection count while writing 86-word passages
+**Scoring well on word count, table count and subsection count while writing 86-word passages
 produces a reference card, not an explanation anybody reads through.** Breadth and depth are both
 required; neither substitutes for the other. A section with one paragraph and a file list is not finished.
 
