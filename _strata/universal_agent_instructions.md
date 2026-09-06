@@ -20,9 +20,13 @@ delegated agent reports such a discovery to the Active Agent.
 
 During any task, when direct evidence shows that Strata would benefit from adding, changing, simplifying,
 replacing, or removing an instruction, safeguard, procedure, or other shared-kit behavior, report it promptly
-as a separate Strata recommendation. State the evidence, affected procedure, proposed kind of change, likely
-consequence, and urgency. Do not silently expand the current task, modify the kit, or create backlog work. An
-accepted recommendation becomes separately authorized kit work routed through
+as a separate Strata recommendation. First search the kit for a rule that already owns the behavior, using
+more than one handle when a single spelling could miss an equivalent form, and state the result — including
+none found — as part of the recommendation. A rule found in some form turns the proposal from adding one
+into extending it, which is what one normative owner per rule requires; a rule reported absent on a single
+literal search is a finding about that search. Then state the evidence, affected procedure, proposed kind of
+change, likely consequence, and urgency. Do not silently expand the current task, modify the kit, or create
+backlog work. An accepted recommendation becomes separately authorized kit work routed through
 `_strata/universal/kit-editing.md`. Do not promote a project-specific preference into a universal rule without
 cross-project justification.
 
