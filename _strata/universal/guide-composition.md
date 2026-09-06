@@ -111,7 +111,12 @@ The difference between a thin section and a real one is these six kinds of conte
   write to it.* A specific without its reason reads as arbitrary and gets "cleaned up" by the next person.
 - **Edge and failure paths**, with their real messages.
 - **What is preserved, enumerated.** A reader needs the list, not the reassurance.
-- **Dated behaviour changes.** When behaviour changed, say when.
+- **Dated behaviour changes.** When behaviour changed, say when — and that is the whole of what a
+  date is for here. Keep a date when it tells a reader which builds behave which way; drop every
+  ticket identifier, status, count, build id and commit, because those answer *what the project did*
+  rather than *what the software does*, and they are wrong at the next refresh rather than merely
+  old. "VAT is stored as an amount, not a rate, since 2026-08-03" belongs in the page. "TN-9 closed
+  2026-08-03" does not.
 - **Cross-references.** Say where a subject is covered rather than repeating it.
 
 Also: sequences in order where order matters, states and conditions as tables, constraints and what

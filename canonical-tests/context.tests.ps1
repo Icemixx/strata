@@ -387,7 +387,10 @@ try {
         $html = [IO.File]::ReadAllText((Join-Path $root '_strata\project_guide.html'))
         Assert-True ($html -match 'data-source-digest="[0-9a-f]{64}"') 'digest missing'
         Assert-True ($html -match 'Guide snapshot generated from commit') 'snapshot marker missing'
-        Assert-True ($html -match 'data-generator="strata-context-2"') 'generator version missing'
+        # Pinned to the constant rather than to a literal, so bumping $GeneratorVersion for a rendering
+        # change does not require editing this assertion -- and the test still proves the attribute is
+        # emitted and non-empty.
+        Assert-True ($html -match 'data-generator="strata-context-\d+"') 'generator version missing'
         Assert-True ($html -match 'data-generation-commit="[^"]+"') 'generation commit missing'
         Assert-True ($html -match 'id="ticket-BUG-1"') 'stable ticket anchor missing'
         Assert-True ($html -match '<h3>What State says</h3>') 'ticket State prose missing'
@@ -685,6 +688,31 @@ try {
         $digestBefore = [regex]::Match($before, '&quot;id&quot;:&quot;operations\.vehicles&quot;.*?&quot;rendered_digest&quot;:&quot;([0-9a-f]{64})&quot;').Groups[1].Value
         $digestAfter = [regex]::Match($after, '&quot;id&quot;:&quot;operations\.vehicles&quot;.*?&quot;rendered_digest&quot;:&quot;([0-9a-f]{64})&quot;').Groups[1].Value
         Assert-True ($digestBefore.Length -eq 64 -and $digestBefore -ceq $digestAfter) 'the carried-forward rendered digest changed'
+    }
+
+    Assert-Test 'watched red: a generator change re-renders carried sections' {
+        # Carry-forward compares the authored digest and the input digest. Neither covers the generator,
+        # so before generator_version joined them a rendering change left every unchanged section showing
+        # its previous bytes -- generation reporting success while nothing had been re-rendered at all.
+        # The generator is changed here as well as bumped, because a re-render that produces identical
+        # bytes is indistinguishable from a carry-forward and would prove nothing.
+        $composed = New-ComposedGuide 'composition-generator-bump' ''
+        $before = Get-GuideHtml $composed.Root
+        Assert-True ($before -match 'generator_version') 'the manifest does not record a generator version'
+        Assert-True ($before -notmatch 'STRATA-RERENDER-PROOF') 'the proof marker was already present'
+        $script = Join-Path $composed.Root '_strata/universal/context.ps1'
+        $text = [IO.File]::ReadAllText($script, [Text.Encoding]::UTF8)
+        $changed = $text.Replace('<summary>Watched sources</summary>', '<summary>STRATA-RERENDER-PROOF</summary>')
+        Assert-True ($changed -cne $text) 'the rendering string was not found'
+        Assert-True ($before -match 'Watched sources') 'the provenance block is not rendered per section'
+        $bumped = $changed -replace "GeneratorVersion = 'strata-context-\d+'", "GeneratorVersion = 'strata-context-999'"
+        Assert-True ($bumped -cne $changed) 'the generator version constant was not found'
+        Write-Utf8 $script $bumped
+        $again = Invoke-Context $composed.Root @('-GenerateGuide')
+        Assert-True ($again.ExitCode -eq 0) "regeneration failed: $($again.Output)"
+        $after = Get-GuideHtml $composed.Root
+        Assert-True ($after -match 'STRATA-RERENDER-PROOF') 'a changed generator did not re-render a carried section'
+        Assert-True ($after -match 'strata-context-999') 'the new generator version was not recorded'
     }
 
     Assert-Test 'the manifest and section digests are deterministic' {

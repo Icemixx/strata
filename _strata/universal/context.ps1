@@ -12,7 +12,9 @@ Set-StrictMode -Version 2.0
 $ErrorActionPreference = 'Stop'
 $IsAgentInternalInvocation = $MyInvocation.InvocationName -eq '.'
 
-$GeneratorVersion = 'strata-context-2'
+# Bump whenever generation output changes: it is part of the Guide's per-section carry-forward
+# comparison, so an unbumped change leaves every unchanged section rendering its previous bytes.
+$GeneratorVersion = 'strata-context-3'
 $Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $Findings = New-Object System.Collections.ArrayList
@@ -1107,7 +1109,10 @@ function Read-GuideComposition([string]$Markdown, [switch]$Lenient) {
                 $shared = @()
                 $sharedText = @()
                 $j = $i + 1
-                while ($j -lt $lines.Count -and -not [string]::IsNullOrWhiteSpace($lines[$j])) {
+                # Ending only at a blank line swallows a heading written directly beneath the
+                # citation, and the refusal then surfaces as an unrelated identity error further down.
+                while ($j -lt $lines.Count -and -not [string]::IsNullOrWhiteSpace($lines[$j]) `
+                       -and $lines[$j] -notmatch '^#{1,6}\s+' -and $null -eq (Get-GuideDirective $lines[$j])) {
                     $shared += Get-GuideCitationList $lines[$j]
                     $sharedText += $lines[$j].Trim()
                     [void]$current.DropLines.Add($j)
@@ -1427,8 +1432,20 @@ function Render-GuideSection([object]$Section, [object]$Inputs, [string[]]$Lines
         param($m)
         '<div class="table-evidence"><span class="table-evidence-label">Table evidence</span>' + $m.Groups[1].Value + '</div>'
     })
+    # A section's opening block is its lede, which the anatomy requires and which cannot carry
+    # evidence: it says what the section covers, not what the software does. Badging it labels every
+    # section identically, and a badge that never varies is one readers stop seeing -- which costs the
+    # illustration badge, where the warning is real. Framing anywhere else keeps its badge.
+    $ledeLine = -1
+    foreach ($block in @($Section.Blocks)) {
+        if ($ledeLine -lt 0 -or $block.FirstLine -lt $ledeLine) { $ledeLine = $block.FirstLine }
+    }
     foreach ($block in @($Section.Blocks)) {
         if (-not $block.Exemption) { continue }
+        if ($block.Exemption -ceq 'framing' -and $block.FirstLine -eq $ledeLine) {
+            $html = $html.Replace($block.ExemptToken, '')
+            continue
+        }
         $label = if ($block.Exemption -ceq 'framing') { 'Framing — not sourced' } else { 'Illustration — hypothetical' }
         $badge = '<span class="guide-exempt guide-exempt-' + $block.Exemption + '">' + $label + '</span>'
         $html = $html.Replace($block.ExemptToken, $badge)
@@ -1458,6 +1475,7 @@ function ConvertTo-GuideManifestJson([object[]]$Entries, [string]$SourceDigest, 
             @('heading',         (ConvertTo-GuideJsonString $entry.Heading)),
             @('authored_digest', (ConvertTo-GuideJsonString $entry.AuthoredDigest)),
             @('input_digest',    (ConvertTo-GuideJsonString $entry.InputDigest)),
+            @('generator_version', (ConvertTo-GuideJsonString $entry.GeneratorVersion)),
             @('rendered_digest', (ConvertTo-GuideJsonString $entry.RenderedDigest)),
             @('cited_targets',   (ConvertTo-GuideCitedTargetsJson $entry.CitedTargets)),
             @('watch_surfaces',  (ConvertTo-GuideWatchSurfacesJson $entry.WatchSurfaces))
@@ -1536,7 +1554,10 @@ function Test-GuideProvenance([string]$Html) {
     if (-not (Test-GuideDigestField $parsed.source_digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ([string]$parsed.composition_path -cne $GuideCompositionRelative) { return New-GuideProvenanceFailure 'invalid-manifest-path' }
 
-    $sectionFields = @('id','kind','heading','authored_digest','input_digest','rendered_digest','cited_targets','watch_surfaces')
+    # generator_version joins the set rather than being optional: the count check below makes the
+    # field list exact, and a Guide written by an older generator reads as invalid, which empties
+    # the carry-forward map and re-renders every section once. That is the wanted outcome.
+    $sectionFields = @('id','kind','heading','authored_digest','input_digest','generator_version','rendered_digest','cited_targets','watch_surfaces')
     $targetFields = @('kind','target','path','digest')
     $surfaceFields = @('pattern','digest','entries')
     $entryFields = @('path','digest')
@@ -1548,7 +1569,7 @@ function Test-GuideProvenance([string]$Html) {
         $sectionPresent = @($section.PSObject.Properties | ForEach-Object { $_.Name })
         if (@($sectionPresent).Count -ne @($sectionFields).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
         foreach ($name in $sectionFields) { if ($sectionPresent -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
-        foreach ($name in @('id','kind','heading','authored_digest','input_digest','rendered_digest')) {
+        foreach ($name in @('id','kind','heading','authored_digest','input_digest','generator_version','rendered_digest')) {
             if ($section.$name -isnot [string]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
         }
         if ($section.cited_targets -isnot [Array] -or $section.watch_surfaces -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
@@ -1683,6 +1704,7 @@ function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [stri
                     $previous[$entryId] = [pscustomobject]@{
                         AuthoredDigest = [string]$entry.authored_digest
                         InputDigest = [string]$entry.input_digest
+                        GeneratorVersion = [string]$entry.generator_version
                         Rendered = $previousProvenance.Rendered[$entryId]
                     }
                 }
@@ -1712,7 +1734,10 @@ function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [stri
         $rendered = ''
         if ($previous.ContainsKey($section.Id)) {
             $candidate = $previous[$section.Id]
-            if ($candidate.AuthoredDigest -ceq $section.AuthoredDigest -and $candidate.InputDigest -ceq $inputs.InputDigest) {
+            # The generator is the third input to a section's bytes. Without it here, a release that
+            # changes how a section renders leaves every unchanged section showing the old output.
+            if ($candidate.AuthoredDigest -ceq $section.AuthoredDigest -and $candidate.InputDigest -ceq $inputs.InputDigest `
+                -and $candidate.GeneratorVersion -ceq $GeneratorVersion) {
                 $rendered = $candidate.Rendered
                 $carried = $true
             }
@@ -1728,6 +1753,7 @@ function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [stri
             Level = $section.Level
             AuthoredDigest = $section.AuthoredDigest
             InputDigest = $inputs.InputDigest
+            GeneratorVersion = $GeneratorVersion
             RenderedDigest = (Get-Sha256Text $rendered)
             CitedTargets = $inputs.CitedTargets
             WatchSurfaces = $inputs.WatchSurfaces
