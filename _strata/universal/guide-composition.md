@@ -32,6 +32,13 @@ layout — a reader wants *how a statement becomes a tax figure*, never *everyth
   diffed, and cannot be refused when its source moves. Uncheckable by construction is the one thing this
   design exists to prevent.
 
+**When there is no code to watch, declare nothing and accept the warnings.** A rehearsal tree, an
+authority-only handover, a directory the repository ignores — the expansion set comes from the
+repository's own file list, so in all three every pattern matches nothing and refuses the whole
+document. The warnings are then the honest state of that tree. **Never silence them by calling a
+section `topic` when it is a workflow**: the kind is what tells a later refresh whether the section
+tracks code at all, so falsifying it buys a clean run today and blinds the section permanently.
+
 **Structural affordances are allowed anywhere** — collapsible groups, folded reference blocks, search,
 anchors, a contents list. They encode the shape of the *document*, never a claim about the software, so
 they cannot drift from it. The test for anything new: does it assert something about the software? Then it
@@ -47,16 +54,21 @@ Sections are named for **what the application does**, never for the authority th
 ### Section anatomy
 
 1. `h2` — the subject.
-2. A one-line lede saying what the section covers.
-3. An opening paragraph explaining the thing in plain language, before any detail.
-4. `h3` subsections for the parts, each opening with prose, then specifics.
-5. Tables where the data is genuinely tabular — states, columns, layers, mappings, troubleshooting.
-6. Notes carrying the reasoning a reader needs in order not to misread the design.
-7. A folded `Files` table last: file, role, one row per implementing file.
+2. The identity line, and for a `workflow`, `architecture` or `module-family` section the watch
+   surface naming the code it describes. Decide it here, with the subject in front of you, rather
+   than leaving it to whatever silences a warning at the end.
+3. A one-line lede saying what the section covers.
+4. An opening paragraph explaining the thing in plain language, before any detail.
+5. `h3` subsections for the parts, each opening with prose, then specifics.
+6. Tables where the data is genuinely tabular — states, columns, layers, mappings, troubleshooting.
+7. Notes carrying the reasoning a reader needs in order not to misread the design.
+8. A `Files` table last: file, role, one row per implementing file.
 
-Prose stays open; reference detail most readers skip is folded, and every word is retained. **A heading
-level is not automatically a fold** — hiding a whole subject behind one control removes it from the
-reading path.
+**Folding is not available to a composed section.** The renderer folds only when it is rendering an
+authority record in full, and it encodes markup as text, so a literal `<details>` reaches the page as
+visible characters. A composed section is flat by construction. Put reference detail readers usually
+skip at the end of the section, where it is out of the reading path without being hidden from it, and
+keep every word: length is not the problem a fold would have solved.
 
 ### Density is the measure
 
@@ -186,8 +198,10 @@ watch         a section whose kind is workflow, architecture or module-family de
               block, naming the paths whose change makes the section stale. Every pattern must match
               a readable file; * may appear only in the final segment and ** only as the whole final
               segment; the bare ** is refused, because a staleness signal that is always red is one
-              nobody reads. A missing watch surface is a warning rather than a failure, which makes
-              it the one rule a passing generation will not force you to obey. **The failure mode is
+              nobody reads. Omitting it only warns, and that leniency is not permission: **a section
+              with no watch surface reports stale when someone edits its record and stays silent when
+              the behaviour it describes is rewritten**, which is exactly the wrong way round. It is
+              the only thing that lets `-GuideStatus` see the code move. **The failure mode is
               inverted from everything else here**: omitting the directive warns, while declaring one
               that matches no readable file refuses the whole document. Expansion comes from the
               repository's tracked and non-ignored files, so a correct pattern starts failing the day
