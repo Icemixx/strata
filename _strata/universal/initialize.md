@@ -1,7 +1,7 @@
 # Initialize a repository
 
 Use this procedure to install Strata in a new repository. Established repositories require a separate,
-project-specific archive-seeded migration; do not retrofit them with this procedure.
+project-specific archive-seeded conversion; do not retrofit them with this procedure.
 
 ## Preflight
 
@@ -34,7 +34,7 @@ procedure without overwriting anything.
 4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
    data file under `_sediment/reference/`. In an established repository, existing deliberation and
-   reference material moves there during migration rather than into `_strata/`.
+   reference material moves there during conversion rather than into `_strata/`.
 5. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
    create the initial `_strata/project_guide.html`.
 6. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and

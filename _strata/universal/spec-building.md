@@ -11,7 +11,7 @@ the work that produced it must be able to implement it without reading chat hist
 temporary deliberation artifacts, or the author's mind. A document that still requires a new
 architectural decision is a draft, not an implementation-ready specification.
 
-Writing or confirming a specification does not authorize implementation, migration, synchronization,
+Writing or confirming a specification does not authorize implementation, conversion, synchronization,
 commit, publication, external action, or cleanup. Those remain separate scopes.
 
 ## Trigger and inputs

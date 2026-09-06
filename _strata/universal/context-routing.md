@@ -144,7 +144,7 @@ that requires an explicit user-approved scope redefinition.
 
 Every State ticket has a globally unique ID, one status, and a short contextual description. An ID is an
 uppercase letter followed by any uppercase letters or digits, a hyphen, then digits: `BUG-110`, `TA-8`,
-`R-8`. An identifier of any other shape is a validation finding. When migrating, keep a legacy identifier
+`R-8`. An identifier of any other shape is a validation finding. When converting, keep a legacy identifier
 in the description rather than minting a second ID:
 
 ```markdown
@@ -232,10 +232,10 @@ budgets, commit-provenance grammar, project gates, or harness certification. A s
 and fresh Guide do not prove that human-authored claims are correct.
 
 Use the smallest check relevant to touched paths. Run full validation for topology, shared validation or
-generation logic, migration, or an explicit full audit.
+generation logic, conversion, or an explicit full audit.
 
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
-An established repository's separately authorized migration preserves its legacy material until
+An established repository's separately authorized conversion preserves its legacy material until
 reconciliation is verified and asks the user about conflicting claims; no legacy source wins
 automatically.

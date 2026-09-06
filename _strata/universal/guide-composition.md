@@ -221,11 +221,11 @@ exemptions    an exemption FOLLOWS the block it exempts, on its own line. It can
 
 **[code:] needs the code present.** It resolves only when the file exists in this checkout and the
 named symbol occurs in its text; a bare path with no locator is refused. A tree holding authorities and
-no product code -- a migration rehearsal, an authority-only handover -- cannot use it at all, and every
+no product code -- a conversion rehearsal, an authority-only handover -- cannot use it at all, and every
 claim must then rest on the record that asserts it. That is a real limit on such a tree, not a failure
 of the composition: the Guide is only ever as checkable as what it was given.
 
-Cite the authority for what a migrated repository's records establish, and the code for what only the
+Cite the authority for what a converted repository's records establish, and the code for what only the
 implementation can establish. A guide with no citations cannot be checked by anyone who does not already
 know the codebase; that is the one place a generated Guide must beat the manual it replaces.
 
