@@ -59,9 +59,15 @@ not think through.
 
 `max` buys depth per judgement, not reach. Prefer a second bounded pass over raising a single pass to it.
 
-`ultra` is not a level on this ladder. `/code-review ultra` is a separate multi-agent review that fans out
-across agents; it is user-triggered and billed, and a session cannot start one for itself. Where an audit
-is short of reach rather than depth, that is the distinction that matters.
+Two things are named "ultra" and they are unrelated. **Ultracode** is a setting on the effort control in
+the VS Code extension, described by its own tooltip as *xhigh + workflows*: it carries the `xhigh` depth
+above plus additional workflow behaviour, so wherever this table says `xhigh`, Ultracode satisfies it.
+**`/code-review ultra`** is a separate multi-agent review that fans out across agents; it is user-
+triggered and billed, and a session cannot start one for itself. Where a task is short of reach rather
+than depth, that second one is the distinction that matters.
+
+Recorded from the extension's own interface rather than from behaviour. What the workflow half changes is
+not established here; a session that determines it should say so and correct this.
 
 The setting belongs to the user and no session tool changes it. Report that the session is below the
 recommended level and let the user raise it; do not proceed quietly and do not claim a depth you did not
