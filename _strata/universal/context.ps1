@@ -31,7 +31,7 @@ Usage:
   context.ps1 -CheckAll
   context.ps1 -GuideStatus
 
-All user-callable modes are read-only. Ask the agent to "update the Guide" when a refreshed Guide is needed.
+All user-callable modes are read-only. Ask the agent to "generate the Guide" when a current Guide is needed.
 '@ | Write-Output
 }
 
@@ -2113,7 +2113,7 @@ function Invoke-StrataContext {
     if ($modeCount -eq 0) { Show-Usage; return 0 }
     if ($modeCount -ne 1) { Write-Error 'Specify exactly one mode.'; Show-Usage; return 2 }
     if ($GenerateGuide -and -not $IsAgentInternalInvocation) {
-        Write-Error '-GenerateGuide is agent-internal. Ask the agent to "update the Guide".'
+        Write-Error '-GenerateGuide is agent-internal. Ask the agent to "generate the Guide".'
         return 2
     }
     if ($Check -and ($null -eq $Paths -or $Paths.Count -eq 0)) { Write-Error '-Check requires -Paths.'; return 2 }

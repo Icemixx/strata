@@ -192,7 +192,7 @@ their typed WHY and HOW targets, and embeds offline search. Empty Rationale or B
 `No records yet`.
 
 `_strata/project_guide.md` is the composed explanation the Guide renders. It is derived, non-authoritative,
-machine-composed during an explicit Guide update, and not routed as agent context. Generation reads it by
+machine-composed during an explicit Guide generation, and not routed as agent context. Generation reads it by
 exact path when it exists. Both Guide files are project surfaces; the canonical kit carries neither.
 
 Guide embeds a deterministic digest, generator version, generation date, and available Git snapshot
@@ -217,11 +217,17 @@ before `GUIDE_GENERATED`.
 Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
 unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
 
-Guide refresh is intentionally user-triggered. When the user asks to update Guide, first review the owning
-index descriptions and authority introductions and improve their concise human-language summaries where
-the authoritative meaning warrants it. Do not invent project facts. Then perform the internal generation
-and verification. Do not regenerate Guide merely because code or an authority changed, and never present
-the internal generation mode to the user as a command.
+Guide generation is intentionally user-triggered. When the user asks to generate the Guide, **first say that the
+Guide can only be as current as the records it is built from, and offer an audit.** A Guide is derived,
+so a stale, duplicated or self-contradicting record produces a confidently wrong page that reads exactly
+like a right one, and generation cannot detect this: every structural check passes on a record that is
+cited, unique, well-formed and false. Name what an audit would cover — `audit.md` — and accept a plain
+no. Ask once and do not repeat it on a later generation in the same session.
+
+Then review the owning index descriptions and authority introductions and improve their concise
+human-language summaries where the authoritative meaning warrants it. Do not invent project facts. Then
+perform the internal generation and verification. Do not generate Guide merely because code or an
+authority changed, and never present the internal generation mode to the user as a command.
 
 ## Validation and authority updates
 

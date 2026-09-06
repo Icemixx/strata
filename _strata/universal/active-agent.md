@@ -57,9 +57,9 @@ Update each authority in the same meaningful transaction that changes its inform
 - status and remaining work update State;
 - decisions update Rationale;
 - implementation and evidence update Build Log; and
-- Guide regenerates only when the user explicitly asks to update Guide.
+- Guide is generated only when the user explicitly asks to generate the Guide.
 
-When Guide refresh is requested, follow `_strata/universal/context-routing.md` and invoke the internal
+When Guide generation is requested, follow `_strata/universal/context-routing.md` and invoke the internal
 generator in a child scope with `& { . .\_strata\universal\context.ps1 -GenerateGuide }`, then verify the
 result.
 
