@@ -15,7 +15,7 @@ is true only because the Guide says it. It repeats no record, owns no fact, and 
 everything in it is recoverable from what it cites.
 
 Write it for someone who has to understand the program. Sections follow the subject, not the authority
-layout — a reader wants *how a statement becomes a tax figure*, never *everything in `state/software/`*.
+layout — a reader wants *how a statement becomes a tax figure*, never *everything in `state/system/`*.
 
 ## What must not happen
 
