@@ -30,6 +30,51 @@ Use Codex's in-session delegation tools. A full-history fork inherits the parent
 only with an isolated or bounded-history assignment. Delegated agents work in the shared workspace, so
 their file edits are immediately visible.
 
+## Reasoning depth
+
+Codex exposes `/reasoning` as the current-chat control. The persistent configuration key is
+`model_reasoning_effort`; the CLI has no dedicated reasoning flag, but its generic override accepts
+`-c model_reasoning_effort='"xhigh"'`. These are user-side controls. A running main agent has no tool that
+changes its own effort; selecting `reasoning_effort` when spawning an agent changes the child, not the
+parent.
+
+The legal values are model-dependent. In the live catalog verified with `codex-cli 0.153.0`, the
+recognized models above expose:
+
+| Model | Values |
+| --- | --- |
+| `gpt-5.6-sol` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
+| `gpt-5.6-terra` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
+| `gpt-5.6-luna` | `low`, `medium`, `high`, `xhigh`, `max` |
+
+Do not treat that table as a permanent global ladder. The configuration schema also accepts `minimal`,
+but the verified catalog does not offer it for these three models; compatibility belongs to the selected
+model's live catalog. Re-verify after a Codex or model-catalog change rather than carrying these values
+forward on memory.
+
+When the native rollout is available, read the current value from the latest current-turn
+`turn_context.payload.effort`, selecting the rollout by `CODEX_SESSION_ID` as described above. It is a
+per-turn fact. Do not infer it from the user config, a model default, or a previous turn. If the field or
+unambiguous rollout is unavailable, report the depth as unverified. The user may change the chat's depth
+with `/reasoning`; the agent cannot invoke that composer command for them.
+
+| Work | Level |
+| --- | --- |
+| Deterministic inventory or running an already-defined check | `low` |
+| Coordinating inventory and recording complete coverage | `medium` |
+| Judgement over evidence | `high` |
+| The record checks in `audit.md`, truth checks against code, or one level for a whole audit | `xhigh` |
+
+Use `max` only for an unusually hard bounded judgement where the extra latency is warranted. It deepens
+one agent's work; it does not add coverage.
+
+Codex's reach mechanism is a **subagent workflow**: the in-session delegation controls can fan independent
+assignments out across several agent threads and collect their results. A Codex session can start that
+fan-out itself when the user or an applicable `AGENTS.md` or skill instruction requests delegation; tool
+availability alone is not authority to do so. `ultra`, where the selected model exposes it, combines
+maximum reasoning with automatic task delegation, so it is not a pure depth increment and must not be
+reported as one. Governing instructions and the runtime's concurrency limit still apply.
+
 ## Native sessions and continuity
 
 Codex native rollouts normally live under `<CODEX_HOME>/sessions/YYYY/MM/DD/rollout-*.jsonl`, with older

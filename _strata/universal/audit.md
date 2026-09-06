@@ -7,6 +7,26 @@ Two objects, audited together because the second is nearly free once the first i
 **application**, and the **authorities that describe it**. Verifying a record against the code is the same
 reading as auditing the code, done from the other direction.
 
+## Set the depth before starting
+
+The record checks below do not degrade gracefully. Finding candidates is mechanical and cheap, but
+deciding whether a candidate is a real duplicate, a live contradiction, or a superseded ruling is one
+judgement over two texts, and a truth check is that judgement against the code. Run shallow, those checks
+do not return fewer findings — they return clean, which is indistinguishable from a tree that has none.
+
+Before beginning, read your harness dossier for the reasoning-depth setting it recommends for an audit.
+If this session is below it, say so to the user in one line and let them raise it before you start: on
+some harnesses a session cannot change its own depth, and on none of them is it yours to change silently.
+Delegation is the exception. Where a harness lets a parent choose the depth a delegated worker runs at,
+that choice is yours and you are accountable for it.
+
+Depth is not one value per audit. It can differ between turns, between passes, and between a parent and
+the workers it dispatches. Record what each pass actually ran at, not a single figure for the whole.
+
+Depth is bounded by coverage, not bought by it. A pass reading a fraction of the tree at maximum depth
+establishes less than several bounded passes over disjoint scopes. Prefer narrowing the scope and saying
+so to widening it and thinning every judgement inside it.
+
 ## Establish coverage
 
 Record the repository revision, requested scope, explicit exclusions, available environments, and every
@@ -57,3 +77,6 @@ finding, provide its evidence, affected scope, confidence, consequence, and smal
 A tool that reports nothing has either found nothing or cannot see anything, and the two are
 indistinguishable from the outside. Say which checks ran, over what, and what each could not see. A record
 audit that reports clean without naming its blind spots claims more than it established.
+
+Name the records the pass did not read, and the depth it ran at. An unread record is not a clean record,
+and the report is the only place that difference survives.
