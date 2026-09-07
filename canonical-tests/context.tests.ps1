@@ -627,6 +627,33 @@ try {
         Assert-True ($status.Output -match 'GUIDE_SECTION_STALE id=operations\.vehicles changed_paths_json=\["_strata/project_guide\.md#operations\.vehicles"\]') "composition-only change: $($status.Output)"
     }
 
+    Assert-Test 'a document title change is stale at document level with no changed section' {
+        $composed = New-ComposedGuide 'composition-title' ''
+        $before = Get-GuideHtml $composed.Root
+        $source = Join-Path $composed.Root '_strata\project_guide.md'
+        $text = [IO.File]::ReadAllText($source, [Text.Encoding]::UTF8)
+        $title = [regex]::Match($text, '(?m)^#\s+(.+)$').Groups[1].Value
+        Assert-True (-not [string]::IsNullOrWhiteSpace($title)) 'the fixture has no document title to change'
+        Write-Utf8 $source ($text.Replace("# $title", '# Changed Title'))
+
+        # The title lives outside every identified section, so no section digest moves and the Guide
+        # reported CURRENT while the page carried a different title. Document-level content is now
+        # digested separately: stale, with a reason, and zero changed sections.
+        $status = Invoke-Context $composed.Root @('-GuideStatus')
+        Assert-True ($status.Output -match '^GUIDE_STALE sections=3 changed_sections=0 changed_paths=0 generated_from=\S+') "title change did not report document-level staleness: $($status.Output)"
+        Assert-True ($status.Output -match 'GUIDE_DOCUMENT_STALE reason=title') "no document-level reason: $($status.Output)"
+        Assert-True ($status.Output -notmatch 'GUIDE_SECTION_STALE') 'a title change reported a stale section'
+        Assert-True ((Get-GuideHtml $composed.Root) -eq $before) 'GuideStatus modified the Guide'
+
+        # Regeneration refreshes the title and carries every unchanged section forward.
+        $result = Invoke-Context $composed.Root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "regeneration failed: $($result.Output)"
+        $after = Get-GuideHtml $composed.Root
+        Assert-True ($after -match 'Changed Title') 'the new document title was not rendered'
+        $status = Invoke-Context $composed.Root @('-GuideStatus')
+        Assert-True ($status.Output -match '^GUIDE_CURRENT sections=3') "regeneration did not clear document staleness: $($status.Output)"
+    }
+
     Assert-Test 'composition guide status reports watch-surface additions, deletions and renames' {
         $composed = New-ComposedGuide 'composition-watch-status' ''
         $added = Join-Path $composed.Root 'app\report.py'

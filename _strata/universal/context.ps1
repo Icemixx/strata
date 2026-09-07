@@ -1385,6 +1385,15 @@ function Get-GuideSectionInputs([object]$Section) {
     }
 }
 
+# Document-level content is everything the composition contributes to the page from outside an identified
+# section. Today that is exactly the document title, and this hashes the supported fields rather than the
+# raw file, so reflowing whitespace or editing a comment does not report a stale Guide. Kept separate from
+# the section digests deliberately: a title change should say the document changed and that no section
+# did, rather than re-rendering every section to express it.
+function Get-GuideDocumentDigest([string]$Title) {
+    return Get-Sha256Text ("title" + [char]0 + [string]$Title)
+}
+
 function Get-GuideSourceDigest([object[]]$Entries) {
     $builder = New-Object Text.StringBuilder
     foreach ($entry in @($Entries)) {
@@ -1477,7 +1486,7 @@ function Get-GuideRenderedSectionList([string]$Html) {
     return $found
 }
 
-function ConvertTo-GuideManifestJson([object[]]$Entries, [string]$SourceDigest, [string]$GeneratedAt, [string]$GenerationCommit) {
+function ConvertTo-GuideManifestJson([object[]]$Entries, [string]$SourceDigest, [string]$GeneratedAt, [string]$GenerationCommit, [string]$DocumentDigest) {
     $sections = @()
     foreach ($entry in @($Entries)) {
         $sections += ConvertTo-GuideJsonObject @(
@@ -1498,6 +1507,7 @@ function ConvertTo-GuideManifestJson([object[]]$Entries, [string]$SourceDigest, 
         @('generation_commit', (ConvertTo-GuideJsonString $GenerationCommit)),
         @('composition_path',  (ConvertTo-GuideJsonString $GuideCompositionRelative)),
         @('source_digest',     (ConvertTo-GuideJsonString $SourceDigest)),
+        @('document_digest',   (ConvertTo-GuideJsonString $DocumentDigest)),
         @('sections',          (ConvertTo-GuideJsonArray $sections))
     )
 }
@@ -1546,7 +1556,7 @@ function Test-GuideProvenance([string]$Html) {
     catch { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ($null -eq $parsed -or $parsed -isnot [System.Management.Automation.PSCustomObject]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
 
-    $topLevel = @('schema','generated_at','generation_commit','composition_path','source_digest','sections')
+    $topLevel = @('schema','generated_at','generation_commit','composition_path','source_digest','document_digest','sections')
     $present = @($parsed.PSObject.Properties | ForEach-Object { $_.Name })
     if (@($present).Count -ne @($topLevel).Count) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     foreach ($name in $topLevel) { if ($present -cnotcontains $name) { return New-GuideProvenanceFailure 'corrupt-manifest' } }
@@ -1563,6 +1573,7 @@ function Test-GuideProvenance([string]$Html) {
     if ($parsed.sections -isnot [Array]) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ($parsed.schema -cne $GuideManifestSchema) { return New-GuideProvenanceFailure 'unsupported-manifest-schema' }
     if (-not (Test-GuideDigestField $parsed.source_digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
+    if (-not (Test-GuideDigestField $parsed.document_digest)) { return New-GuideProvenanceFailure 'corrupt-manifest' }
     if ([string]$parsed.composition_path -cne $GuideCompositionRelative) { return New-GuideProvenanceFailure 'invalid-manifest-path' }
 
     # generator_version joins the set rather than being optional: the count check below makes the
@@ -1681,12 +1692,19 @@ function Test-GuideProvenance([string]$Html) {
         if ((Get-Sha256Text $rendered[$sectionId]) -cne [string]$section.rendered_digest) { return New-GuideProvenanceFailure 'rendered-digest-mismatch' }
     }
 
+    # A manifest written before document-level tracking carries no document_digest, so the exact
+    # top-level field set above rejects it as corrupt and the Guide reads as invalid rather than
+    # current. That is the wanted outcome and the same treatment generator_version already gets:
+    # regeneration once, rather than a comparison against a field that is not there.
+    $documentDigest = [string]$parsed.document_digest
+
     return [pscustomobject]@{
         Valid = $true
         Reason = ''
         Sections = $sections
         Rendered = $rendered
         SourceDigest = $sourceDigest
+        DocumentDigest = $documentDigest
         GenerationCommit = $generationCommit
     }
 }
@@ -1773,7 +1791,8 @@ function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [stri
         $bodies += $rendered
     }
     $sourceDigest = Get-GuideSourceDigest $entries
-    $manifestJson = ConvertTo-GuideManifestJson $entries $sourceDigest $GeneratedAt $GenerationCommit
+    $documentDigest = Get-GuideDocumentDigest $parsed.DocumentTitle
+    $manifestJson = ConvertTo-GuideManifestJson $entries $sourceDigest $GeneratedAt $GenerationCommit $documentDigest
     $manifestHtml = '<template id="strata-guide-manifest" data-schema="' + $GuideManifestSchema + '">' + [Net.WebUtility]::HtmlEncode($manifestJson) + '</template>'
     return [pscustomobject]@{
         Sections = $entries
@@ -1781,6 +1800,7 @@ function Build-GuideComposition([string]$CompositionPath, [object]$Graphs, [stri
         Body = ($bodies -join '')
         ManifestHtml = $manifestHtml
         SourceDigest = $sourceDigest
+        DocumentDigest = $documentDigest
         Warnings = $warnings
         Coverage = $coverage
     }
@@ -1829,6 +1849,17 @@ function Get-GuideCurrentSectionState([string]$CompositionPath) {
         }
     }
     return $state
+}
+
+# The section state above is keyed by section id and deliberately carries no document-level fields, so
+# the title is read separately rather than smuggled into that dictionary as a pseudo-section. Returns
+# $null when the composition cannot be parsed, which the caller already treats as no comparable state.
+function Get-GuideCurrentDocumentTitle([string]$CompositionPath) {
+    if (-not (Test-Path -LiteralPath $CompositionPath)) { return $null }
+    $markdown = Read-Utf8 $CompositionPath
+    if ($null -eq $markdown) { return $null }
+    try { return (Read-GuideComposition $markdown -Lenient).DocumentTitle }
+    catch { return $null }
 }
 
 function Get-GuidePathDigestMap([object]$CitedTargets, [object]$WatchSurfaces) {
@@ -1912,14 +1943,23 @@ function Write-GuideCompositionStatus([string]$CompositionPath) {
         foreach ($path in @($changed.Keys)) { $seen[$path] = $true }
     }
 
+    # Document-level content lives outside every identified section, so no section digest moves when it
+    # changes and the Guide reported current with a different title on the page. Compared separately, and
+    # an absent stored digest counts as changed: a manifest predating this field cannot be compared, and
+    # reporting current on an uncomparable field is exactly the defect.
+    $documentDigest = Get-GuideDocumentDigest (Get-GuideCurrentDocumentTitle $CompositionPath)
+    $documentChanged = $documentDigest -cne $manifest.DocumentDigest
+    $documentReason = 'title'
+
     $sectionCount = @($manifest.Sections).Count
-    if ($stale.Count -eq 0 -and $currentDigest -ceq $manifest.SourceDigest) {
+    if ($stale.Count -eq 0 -and -not $documentChanged -and $currentDigest -ceq $manifest.SourceDigest) {
         Write-Output ("GUIDE_CURRENT sections={0} digest={1} generated_from={2} commits_since={3} authority_commits_since={4} authority_worktree_dirty={5}" -f `
             $sectionCount,$currentDigest,$baseCommit,$commitsSince,$authorityCommitsSince,$authorityDirty.ToString().ToLowerInvariant())
         return
     }
     Write-Output ("GUIDE_STALE sections={0} changed_sections={1} changed_paths={2} generated_from={3}" -f `
         $sectionCount,$stale.Count,@($seen.Keys).Count,$baseCommit)
+    if ($documentChanged) { Write-Output ("GUIDE_DOCUMENT_STALE reason={0}" -f $documentReason) }
     foreach ($entry in $stale) {
         $encoded = @()
         foreach ($path in @($entry.Paths)) { $encoded += ConvertTo-GuideJsonString $path }
