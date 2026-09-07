@@ -238,11 +238,27 @@ citations     every evidence-bearing block ends with a resolving reference -- [a
               [[guide:exempt illustration]]. Headings, navigation and literal code are not
               evidence-bearing.
 anchors       [authority: <path>#<heading-slug>] points at one heading inside a record instead of the
-              whole file, and the slug is validated against that file's headings. Prefer it: without
-              it, a claim about the backup scheduler and a claim about the restore procedure cite the
-              same two-hundred-line record indistinguishably. The slug is the heading lowercased with
-              every run of characters outside [a-z0-9_] replaced by a hyphen and the ends trimmed, so
-              `Startup Sequence (main.py)` becomes `startup-sequence-main-py`.
+              whole file, and the slug is validated against the anchors that record renders. Prefer
+              it: without it, a claim about the backup scheduler and a claim about the restore
+              procedure cite the same two-hundred-line record indistinguishably. The slug is the
+              heading lowercased with every run of characters outside [a-z0-9_] replaced by a hyphen
+              and the ends trimmed, so `Startup Sequence (main.py)` becomes `startup-sequence-main-py`.
+              A heading may repeat. Anchors are allocated in document order across every rendered
+              heading level: the first occurrence takes the plain slug, later ones `-2`, `-3`, each
+              candidate tested against the anchors already allocated -- so a literal `Notes 2`
+              heading and the `notes-2` generated for a second `Notes` cannot collide. Heading text
+              is slugged only when an anchor is allocated. A supplied fragment -- in a citation, or
+              in an ordinary `](#...)` link inside a record the Guide renders -- is not heading text
+              awaiting conversion: it names an occurrence already allocated, so it is URL-decoded
+              and case-folded, then looked up. `#notes-2-2` resolves when the map holds it;
+              `#Notes 2` does not resolve at all, because slugging it would make it an alias for the
+              second `Notes` and erase the distinction the suffix exists to hold. A bare `#notes`
+              reaches the first occurrence; a later one needs its suffixed anchor. A heading inside
+              a fenced block and the `## Contents` index are not targets, because neither is
+              rendered as a heading on the page -- a reference to `#contents` that validated against
+              the raw file before is refused now, and correctly, since no reader can reach it.
+              Rendering, navigation, link rewriting and citation validation all resolve against this
+              one map.
 list items    a list item's citation belongs on that item's own line.
 wrapping      a PARAGRAPH may wrap freely: continuation lines join it until a blank line, heading,
               fence, list marker, callout, directive or table, and one citation on its last line

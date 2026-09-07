@@ -462,12 +462,59 @@ function Convert-MarkdownInline([string]$Text) {
     return $encoded
 }
 
+# One heading map serves all four consumers: rendering emits its anchors, navigation targets them,
+# link rewriting resolves fragments by its slug rule and citation validation accepts exactly its
+# slugs. Repeated headings are ordinary prose inside a record, so an anchor is allocated per
+# occurrence in document order.
+function Get-HeadingSlug([string]$Text) {
+    return ([regex]::Replace($Text.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
+}
+
+function Add-HeadingAnchorSlug([hashtable]$Allocated, [string]$Heading) {
+    # The candidate is tested against every anchor already allocated, not counted per slug. Counting
+    # answers "how many times has this text appeared", which is a different question: a literal
+    # "Notes 2" heading and the -2 generated for a second "Notes" both want notes-2, and a tally
+    # hands the id out twice. Duplicate ids fail generation closed and block the whole Guide.
+    $base = Get-HeadingSlug $Heading
+    $candidate = $base
+    $suffix = 1
+    while ($Allocated.ContainsKey($candidate)) {
+        $suffix++
+        $candidate = $base + '-' + $suffix
+    }
+    $Allocated[$candidate] = $true
+    return $candidate
+}
+
+function Get-HeadingMap([string]$Markdown) {
+    # Every rendered heading level is counted, including the ones navigation never displays: a level
+    # one or level three heading takes its slug ahead of a repeat below it, so a map built over level
+    # two alone would number the repeats one occurrence early.
+    # A "## " inside fenced code is sample text. Allocating an anchor for one points navigation and
+    # references at a heading the renderer never emitted.
+    $allocated = @{}
+    $map = New-Object System.Collections.ArrayList
+    $inCode = $false
+    foreach ($line in @($Markdown -replace "`r`n?", "`n" -split "`n")) {
+        if ($line -match '^```') { $inCode = -not $inCode; continue }
+        if ($inCode) { continue }
+        if ($line -match '^(#{1,6})\s+(.+?)\s*#*$') {
+            $level = $Matches[1].Length
+            $title = $Matches[2]
+            [void]$map.Add([pscustomobject]@{ Level = $level; Title = $title; Slug = (Add-HeadingAnchorSlug $allocated $title) })
+        }
+    }
+    return $map
+}
+
 function Convert-Markdown([string]$Markdown, [string]$HeaderPrefix = 'source-heading-') {
     $safePrefix = [regex]::Replace($HeaderPrefix, '[^a-zA-Z0-9_-]', '-')
     # Heading text repeats inside a record - "Files", "Notes", "Verification" once per section is
-    # normal prose, not a mistake - so a slug alone is not an id. Number the repeats rather than
-    # emitting a duplicate id, which fails generation closed and blocks the whole Guide.
-    $usedSlugs = @{}
+    # normal prose, not a mistake - so a slug alone is not an id. The ids come from the shared map
+    # rather than a tally private to rendering, so what is emitted here is what navigation, link
+    # rewriting and citation validation resolve against.
+    $headingMap = @(Get-HeadingMap $Markdown)
+    $headingCursor = 0
     $lines = @($Markdown -replace "`r`n?", "`n" -split "`n")
     $html = [Text.StringBuilder]::new()
     $paragraph = [Collections.Generic.List[string]]::new()
@@ -505,12 +552,14 @@ function Convert-Markdown([string]$Markdown, [string]$HeaderPrefix = 'source-hea
             Flush-Paragraph; Close-List
             $level = $Matches[1].Length
             $heading = $Matches[2]
-            $slug = ([regex]::Replace($heading.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
-            if ($usedSlugs.ContainsKey($slug)) {
-                $usedSlugs[$slug] = $usedSlugs[$slug] + 1
-                $slug = $slug + '-' + $usedSlugs[$slug]
+            # The map walked this same Markdown under the same fence and heading rules, so heading N
+            # here is entry N there. If that stops holding, the two walks have diverged and every
+            # anchor from here down is suspect: refuse rather than render ids nothing else resolves.
+            if ($headingCursor -ge $headingMap.Count -or $headingMap[$headingCursor].Title -cne $heading) {
+                throw "heading map disagrees with the renderer at heading $($headingCursor + 1): '$heading'"
             }
-            else { $usedSlugs[$slug] = 1 }
+            $slug = $headingMap[$headingCursor].Slug
+            $headingCursor++
             [void]$html.Append('<h').Append($level).Append(' id="').Append($safePrefix).Append($slug).Append('">').Append((Convert-MarkdownInline $heading)).Append('</h').Append($level).AppendLine('>')
             continue
         }
@@ -567,10 +616,43 @@ function Get-DocAnchor([string]$Path) {
     return 'doc-' + ([regex]::Replace($relative, '[^a-z0-9]+', '-')).Trim('-')
 }
 
-function Get-HeadingAnchor([string]$DocumentAnchor, [string]$Fragment) {
+function Get-RecordHeadingSlugs([string]$Path) {
+    # The anchors one record actually renders, over the Markdown the renderer is given. Cached per
+    # generation: link rewriting asks once per fragment and citation validation once per reference,
+    # and both must get the answer rendering would give.
+    $key = $Path.ToLowerInvariant()
+    if ($script:GuideHeadingSlugs.ContainsKey($key)) { return $script:GuideHeadingSlugs[$key] }
+    $markdown = Read-Utf8 $Path
+    $slugs = @{}
+    if ($null -ne $markdown) {
+        foreach ($entry in @(Get-HeadingMap (Remove-ContentsSection $markdown))) { $slugs[$entry.Slug] = $true }
+    }
+    $script:GuideHeadingSlugs[$key] = $slugs
+    return $slugs
+}
+
+function Resolve-HeadingFragment([string]$Fragment) {
+    # Heading text is slugged when an anchor is allocated. A supplied fragment is not heading text
+    # awaiting conversion - it names one occurrence that was already allocated - so it is decoded and
+    # case-folded, never slugged. Slugging it would make `#Notes 2` an alias for the anchor of a
+    # second `Notes`, which is the one thing a suffixed anchor exists to keep apart.
     try { $decoded = [Uri]::UnescapeDataString($Fragment) }
     catch { $decoded = $Fragment }
-    $slug = [regex]::Replace($decoded.ToLowerInvariant(), '[^a-z0-9_]+', '-')
+    return $decoded.ToLowerInvariant()
+}
+
+
+function Resolve-GuideFragment([string]$SourcePath, [string]$TargetPath, [string]$DocumentAnchor, [string]$Fragment) {
+    # Resolution happens here, against the headings the target record renders, so a fragment that
+    # names nothing is reported where it can be named: the link, the record it points into and the
+    # anchor that is missing. Composing the anchor and leaving it to the output check reports only
+    # the assembled id, which says nothing about which record wrote the link.
+    $slug = Resolve-HeadingFragment $Fragment
+    if (-not (Get-RecordHeadingSlugs $TargetPath).ContainsKey($slug)) {
+        $sourceRelative = (Get-Relative $SourcePath $StrataRoot).Replace('\','/')
+        $targetRelative = (Get-Relative $TargetPath $StrataRoot).Replace('\','/')
+        [void]$script:GuideLinkProblems.Add(("unresolved link fragment: {0} links to #{1}, which is not a heading anchor in {2}" -f $sourceRelative,$Fragment,$targetRelative))
+    }
     return $DocumentAnchor + '-heading-' + $slug
 }
 
@@ -581,7 +663,7 @@ function Rewrite-GuideLinks([string]$Html, [string]$SourcePath, [hashtable]$Anch
         $sourceKey = [IO.Path]::GetFullPath($SourcePath).ToLowerInvariant()
         if ($raw.StartsWith('#')) {
             if (-not $Anchors.ContainsKey($sourceKey)) { return $m.Value }
-            return 'href="#' + (Get-HeadingAnchor $Anchors[$sourceKey] $raw.Substring(1)) + '"'
+            return 'href="#' + (Resolve-GuideFragment $SourcePath $SourcePath $Anchors[$sourceKey] $raw.Substring(1)) + '"'
         }
         if ($raw -match '^[a-zA-Z][a-zA-Z0-9+.-]*:') { return $m.Value }
         $parts = $raw -split '#',2
@@ -591,7 +673,7 @@ function Rewrite-GuideLinks([string]$Html, [string]$SourcePath, [hashtable]$Anch
         $key = $target.ToLowerInvariant()
         if ($Anchors.ContainsKey($key)) {
             if ($parts.Count -eq 2 -and -not [string]::IsNullOrWhiteSpace($parts[1])) {
-                return 'href="#' + (Get-HeadingAnchor $Anchors[$key] $parts[1]) + '"'
+                return 'href="#' + (Resolve-GuideFragment $SourcePath $target $Anchors[$key] $parts[1]) + '"'
             }
             return 'href="#' + $Anchors[$key] + '"'
         }
@@ -668,21 +750,15 @@ function Render-TopicCards([object]$Node, [hashtable]$Anchors) {
 
 function Get-RecordTopics([string]$Markdown, [string]$HeadingPrefix) {
     # The archived project guides navigated by topic, not by file: every "## " in a record is a
-    # subject a reader looks for by name. Compute the same anchors Convert-Markdown will emit so
-    # navigation and content agree without rendering twice.
+    # subject a reader looks for by name. The anchors come from the shared map, so a topic reaches
+    # the occurrence it is named after. Slugging the level-two headings alone gave every repeat of
+    # a heading the unsuffixed slug, and three "Notes" topics all navigated to the first one.
     $safePrefix = [regex]::Replace($HeadingPrefix, '[^a-zA-Z0-9_-]', '-')
     $topics = New-Object System.Collections.ArrayList
-    $inCode = $false
-    foreach ($line in @($Markdown -split "`n")) {
-        # Track fences exactly as Convert-Markdown does. A "## " inside a code block is sample
-        # text, not a topic: navigating to one links at a heading the renderer never emitted.
-        if ($line -match '^```') { $inCode = -not $inCode; continue }
-        if ($inCode) { continue }
-        if ($line -match '^##\s+(.+?)\s*#*$') {
-            $title = $Matches[1]
-            $slug = ([regex]::Replace($title.ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
-            [void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + $slug; Title = $title })
-        }
+    foreach ($entry in @(Get-HeadingMap $Markdown)) {
+        # Navigation displays level two; the map counted every level to get these slugs right.
+        if ($entry.Level -ne 2) { continue }
+        [void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + $entry.Slug; Title = $entry.Title })
     }
     return $topics
 }
@@ -735,13 +811,14 @@ function Test-GuideCitation([string]$Kind, [string]$Target, [string]$RepoRoot, [
         }
         if (-not $routed) { return "authority target is not routed: $path" }
         if ($anchor) {
-            $slugs = @()
-            foreach ($line in @((Read-Utf8 $full) -split "`n")) {
-                if ($line -match '^#{1,6}\s+(.+?)\s*#*$') {
-                    $slugs += ([regex]::Replace($Matches[1].ToLowerInvariant(), '[^a-z0-9_]+', '-')).Trim('-')
-                }
+            # Exactly the anchors the Guide emits for that record, through the same lookup link
+            # rewriting uses. Slugging every heading line of the raw file instead accepted a heading
+            # inside a fenced example and the stripped Contents index - targets the page never
+            # contains - and refused the second and third occurrence of a repeated heading, which
+            # the page does contain.
+            if (-not (Get-RecordHeadingSlugs $full).ContainsKey((Resolve-HeadingFragment $anchor))) {
+                return "authority anchor not found: $Target"
             }
-            if ($slugs -notcontains $anchor.ToLowerInvariant()) { return "authority anchor not found: $Target" }
         }
         return ''
     }
@@ -1968,6 +2045,10 @@ function Write-GuideCompositionStatus([string]$CompositionPath) {
 }
 
 function New-Guide([object]$Graphs, [string]$Digest) {
+    # Records are rewritten between generations in the same process, so neither the cached maps nor
+    # the problems collected against them may outlive one Guide.
+    $script:GuideHeadingSlugs = @{}
+    $script:GuideLinkProblems = New-Object System.Collections.ArrayList
     $anchors = @{}
     foreach ($graph in @($Graphs.State,$Graphs.Rationale,$Graphs.BuildLog)) {
         foreach ($path in @($graph.Ordered)) { $anchors[$path.ToLowerInvariant()] = Get-DocAnchor $path }
@@ -2127,6 +2208,9 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         $recordCount = @($graph.Ordered | Where-Object { (Split-Path -Leaf $_) -ine 'index.md' }).Count
         if ($recordCount -eq 0 -and $graph.Name -in @('Rationale','Build Log')) { [void]$body.AppendLine('<p class="empty">No records yet</p>') }
         [void]$body.AppendLine('</section>')
+    }
+    if ($script:GuideLinkProblems.Count -gt 0) {
+        throw ("Guide has unresolvable link fragments: " + (($script:GuideLinkProblems | Sort-Object -Unique) -join '; '))
     }
     $shell = Read-Utf8 $GuideShellPath
     if ($null -eq $shell) { throw "Guide shell could not be read: $GuideShellPath" }

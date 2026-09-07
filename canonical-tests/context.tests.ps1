@@ -1027,6 +1027,210 @@ Run `context.ps1 -CheckAll` and read `_strata/state/index.md` before deciding.
         Assert-True ($result.Output -match 'CSS url\(\) resource') "the failure did not name the CSS url() guard: $($result.Output)"
         Assert-True (-not (Test-Path -LiteralPath (Join-Path $root '_strata\project_guide.html'))) 'a CSS url() in a style block still produced a Guide'
     }
+
+    # ---------------------------------------------------------------------
+    # One shared heading anchor map.
+    #
+    # Repeated headings are ordinary prose inside a record. The four consumers
+    # - rendering, navigation, link rewriting and citation validation - must
+    # agree on one allocation, or navigation silently lands on the first
+    # occurrence and a citation to a later one is refused as invented.
+    # ---------------------------------------------------------------------
+    $AnchorPrefix = 'doc-state-anchors-md-heading-'
+    $AnchorFixtureRecord = @'
+# Anchor fixture
+
+Every occurrence is addressed by name: [the second](#notes-2), [the literal](#notes-2-2),
+[the third](#notes-3), [the detail](#detail) and [verification](#verification).
+
+## Notes
+
+The first occurrence answers a bare fragment.
+
+### Detail
+
+A level-three heading. Navigation displays level two; the map still counts this one.
+
+## Notes
+
+The second occurrence.
+
+## Notes 2
+
+A literal heading whose slug is the suffix the second occurrence already took.
+
+## Notes
+
+The third occurrence.
+
+## Verification:
+
+Trailing punctuation is trimmed out of the slug.
+
+```text
+## Fenced only
+```
+'@
+
+    function Add-AnchorRecord([string]$Root) {
+        Replace-Utf8 (Join-Path $Root '_strata\state\index.md') "## Contents`n" "## Contents`n`n- [Anchors](anchors.md) - Repeated headings addressed by name.`n"
+        Write-Utf8 (Join-Path $Root '_strata\state\anchors.md') $AnchorFixtureRecord
+    }
+
+    function New-AnchorGuide([string]$Name) {
+        $root = New-Fixture $Name
+        Add-AnchorRecord $root
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "exit=$($result.ExitCode) $($result.Output)"
+        return (Get-GuideHtml $root)
+    }
+
+    function Assert-AnchorId([string]$Html, [string]$Slug) {
+        Assert-True ($Html.Contains('id="' + $AnchorPrefix + $Slug + '"')) "the map did not allocate #$Slug"
+    }
+
+    Assert-Test 'repeated headings allocate one anchor per occurrence in document order' {
+        $html = New-AnchorGuide 'anchor-map'
+        foreach ($slug in @('anchor-fixture','notes','detail','notes-2','notes-2-2','notes-3','verification')) {
+            Assert-AnchorId $html $slug
+        }
+        # A literal "Notes 2" heading meeting the generated notes-2 is the collision the contract
+        # names: a candidate is tested against everything already allocated, not counted per slug.
+        Assert-True ([regex]::Matches($html, [regex]::Escape('id="' + $AnchorPrefix + 'notes-2"')).Count -eq 1) 'notes-2 was allocated twice'
+        # A heading inside a fence is sample text. The renderer never emits it.
+        Assert-True (-not $html.Contains($AnchorPrefix + 'fenced-only')) 'a fenced heading was allocated an anchor'
+        Assert-GuideIntegrity $html
+    }
+
+    Assert-Test 'navigation and same-file links reach the intended heading occurrence' {
+        $html = New-AnchorGuide 'anchor-navigation'
+        # Not merely unique ids: each repeated topic must target its own occurrence. Before the
+        # shared map, three of these four navigation items carried the first occurrence's anchor.
+        foreach ($slug in @('notes','notes-2','notes-2-2','notes-3','verification')) {
+            Assert-True ($html.Contains('data-target="' + $AnchorPrefix + $slug + '"')) "navigation does not target #$slug"
+        }
+        # Level two is what navigation displays, so the level-three heading is counted but not listed.
+        Assert-True (-not $html.Contains('data-target="' + $AnchorPrefix + 'detail"')) 'a level-three heading was listed as a topic'
+        Assert-True (-not $html.Contains('data-target="' + $AnchorPrefix + 'fenced-only"')) 'a fenced heading was listed as a topic'
+        foreach ($slug in @('notes-2','notes-2-2','notes-3','detail','verification')) {
+            Assert-True ($html.Contains('href="#' + $AnchorPrefix + $slug + '"')) "a same-file fragment did not resolve to #$slug"
+        }
+        Assert-GuideIntegrity $html
+    }
+
+    Assert-Test 'citation targets are exactly the anchors the renderer emits' {
+        $root = New-CompositionFixture 'anchor-citations' ''
+        Add-AnchorRecord $root
+        Write-Utf8 (Join-Path $root '_strata\project_guide.md') @'
+# Anchors
+[[guide:section anchors topic]]
+
+The third occurrence is cited by its own anchor. [authority: _strata/state/anchors.md#notes-3]
+
+The literal heading is cited by its collision-resolved anchor. [authority: _strata/state/anchors.md#notes-2-2]
+
+The level-three heading is addressable too. [authority: _strata/state/anchors.md#detail]
+'@
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "a citation to a later occurrence was refused: $($result.Output)"
+    }
+
+    Assert-Test 'watched red: a citation to an unallocated anchor fails generation' {
+        $root = New-CompositionFixture 'anchor-citation-red' ''
+        Add-AnchorRecord $root
+        Assert-GuideRefused $root @'
+# Anchors
+[[guide:section anchors topic]]
+
+There is no fourth occurrence. [authority: _strata/state/anchors.md#notes-4]
+'@ 'authority anchor not found' 'an anchor the map never allocated must refuse generation'
+        # A heading inside a fence is not a target: accepting it points a reference at a heading the
+        # renderer never emitted, which is the same defect as inventing the anchor outright.
+        Assert-GuideRefused $root @'
+# Anchors
+[[guide:section anchors topic]]
+
+The fenced heading is sample text. [authority: _strata/state/anchors.md#fenced-only]
+'@ 'authority anchor not found' 'a fenced heading must not be a citation target'
+    }
+
+    Assert-Test 'watched red: heading text supplied as a fragment does not resolve' {
+        # `#Verification:` is the heading, not the anchor it was allocated. Accepting it would mean
+        # slugging supplied fragments, which makes `#Notes 2` an alias for the second `Notes` - the
+        # one distinction a suffixed anchor exists to hold. The refusal names the record that wrote
+        # the link, the fragment and the record it points into.
+        $root = New-Fixture 'anchor-fragment-red'
+        Add-AnchorRecord $root
+        Replace-Utf8 (Join-Path $root '_strata\state\anchors.md') '[verification](#verification)' '[verification](#Verification:)'
+        $refused = $false; $message = ''
+        try { $null = Invoke-Context $root @('-GenerateGuide') }
+        catch { $refused = $true; $message = $_.Exception.Message }
+        Assert-True $refused 'heading text supplied as a fragment still generated a Guide'
+        Assert-True ($message -match 'unresolved link fragment') "the refusal did not name the fragment: $message"
+        Assert-True ($message -match 'state/anchors\.md links to #Verification:') "the refusal did not name the source link: $message"
+        Assert-True ($message -match 'not a heading anchor in state/anchors\.md') "the refusal did not name the target record: $message"
+    }
+
+    Assert-Test 'a stripped Contents index is not a citation target' {
+        # Compatibility note, pinned: `## Contents` is removed before a record renders, so no anchor
+        # for it exists on the page. A citation to #contents used to validate against the raw file
+        # and pass, pointing a reference at a heading no reader can reach.
+        $root = New-CompositionFixture 'anchor-contents' ''
+        Write-Utf8 (Join-Path $root '_strata\project_guide.md') @'
+# Anchors
+[[guide:section anchors topic]]
+
+The index record itself is citable by its own heading. [authority: _strata/state/index.md#state]
+'@
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "a heading the record does render was refused: $($result.Output)"
+        Assert-GuideRefused $root @'
+# Anchors
+[[guide:section anchors topic]]
+
+The stripped index is not a target. [authority: _strata/state/index.md#contents]
+'@ 'authority anchor not found' 'a stripped Contents index must not be a citation target'
+    }
+
+    Assert-Test 'watched red: navigation slugged apart from the map collapses onto the first occurrence' {
+        # The navigation test above went red before the shared map, but on the renderer's duplicate
+        # id - not on its own target failure. This breaks navigation alone: the map still allocates
+        # correctly and rendering still emits notes, notes-2 and notes-3, while the topic anchors go
+        # back to slugging the heading text. Generation succeeds and every nav href resolves to a
+        # real id, so Assert-GuideIntegrity passes; only the per-occurrence assertion can see it.
+        $root = New-Fixture 'anchor-navigation-red'
+        Add-AnchorRecord $root
+        Replace-Utf8 (Join-Path $root '_strata\universal\context.ps1') `
+            '[void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + $entry.Slug; Title = $entry.Title })' `
+            '[void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + (Get-HeadingSlug $entry.Title); Title = $entry.Title })'
+        $result = Invoke-Context $root @('-GenerateGuide')
+        Assert-True ($result.ExitCode -eq 0) "the break was meant to generate, not refuse: $($result.Output)"
+        $html = Get-GuideHtml $root
+        Assert-AnchorId $html 'notes-2'
+        Assert-AnchorId $html 'notes-3'
+        Assert-GuideIntegrity $html
+        # notes-2 is a poor witness: the literal "Notes 2" heading slugs to it directly, so it
+        # survives the break while pointing at the wrong occurrence - which is the original defect.
+        Assert-True (-not $html.Contains('data-target="' + $AnchorPrefix + 'notes-3"')) 'the navigation break did not take'
+        Assert-True (-not $html.Contains('data-target="' + $AnchorPrefix + 'notes-2-2"')) 'the collision-resolved topic survived the break'
+        Assert-True ([regex]::Matches($html, [regex]::Escape('data-target="' + $AnchorPrefix + 'notes"')).Count -gt 1) 'repeated topics did not collapse onto the first occurrence'
+    }
+
+    Assert-Test 'watched red: a map that stops counting a rendered level refuses generation' {
+        # The renderer consumes the map by position, which holds only while both walk the same
+        # headings. Dropping level three from the map leaves every heading after the first one
+        # misnumbered; rendering must say so rather than emit anchors nothing else resolves.
+        $root = New-Fixture 'anchor-alignment-red'
+        Add-AnchorRecord $root
+        Replace-Utf8 (Join-Path $root '_strata\universal\context.ps1') `
+            "if (`$line -match '^(#{1,6})\s+(.+?)\s*#*`$') {`n            `$level = `$Matches[1].Length" `
+            "if (`$line -match '^(#{1,2})\s+(.+?)\s*#*`$') {`n            `$level = `$Matches[1].Length"
+        $refused = $false; $message = ''
+        try { $null = Invoke-Context $root @('-GenerateGuide') }
+        catch { $refused = $true; $message = $_.Exception.Message }
+        Assert-True $refused 'a map that skips a rendered heading level still generated a Guide'
+        Assert-True ($message -match 'heading map disagrees with the renderer') "the refusal did not name the disagreement: $message"
+    }
 }
 finally {
     if (Test-Path -LiteralPath $TempRoot) {
