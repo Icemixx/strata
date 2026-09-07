@@ -66,7 +66,10 @@ SPECIFICATION: confirmed — implementation-ready
 choices, missing inputs, or unverified load-bearing claims keep the marker at `draft`.
 
 Unless the user or calling procedure selects another path, write the retained document at
-`_sediment/<subject>-spec.md`. The exact path must be known before inbound references are created.
+`_sediment/specs/<subject>-spec.md`. The exact path must be known before inbound references are created.
+Specifications have their own directory because the `_sediment/` root is deliberation — discussions,
+plans and undecided questions — and a confirmed specification is the opposite of undecided. A `draft`
+lives there too: it is on its way to being a contract, not a conversation about one.
 
 ## Content contract
 
@@ -156,7 +159,10 @@ Confirmation requires all of the following:
 - the live baseline, preservation rules, exact contract, validation, and completion conditions are
   sufficient for a fresh agent;
 - any required independent reviewer expressly accepts the revised specification; and
-- any contract another harness must execute has passed the execution check required by `kit-editing.md`.
+- any **claim about another harness's runtime** has been confirmed by an agent running it, per
+  `kit-editing.md`. That rule is scoped to runtime difference, not to reach: a procedure every harness
+  executes needs no second harness to accept it, and requiring one would stall every ordinary
+  specification on a round-trip that establishes nothing.
 
 Only then replace the draft marker with
 `SPECIFICATION: confirmed — implementation-ready`. Record any independently required confirmation in the

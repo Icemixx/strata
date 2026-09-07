@@ -35,8 +35,10 @@ procedure without overwriting anything.
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
    data file under `_sediment/reference/`. In an established repository, existing deliberation and
    reference material moves there during conversion rather than into `_strata/`.
-5. Run `_strata/universal/context.ps1 -CheckAll`, then perform the agent-internal Guide generation to
-   create the initial `_strata/project_guide.html`.
+5. Run `_strata/universal/context.ps1 -CheckAll`. **Do not generate a Guide.** Initialization creates
+   empty authority roots, and a Guide over them explains nothing while looking like a finished document;
+   generation is the user's to ask for, once records exist. A new repository correctly reports
+   `GUIDE_MISSING` until then.
 6. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
    `_strata/.kit-version`.
 
@@ -72,5 +74,5 @@ Project Instructions win on conflict. This file is only a router.
 ```
 
 Before reporting initialization complete, verify the shared payload, required files, router edges,
-authority graph, source/version markers, and generated Guide. Report literal check results and anything
+authority graph, and source/version markers. Report literal check results and anything
 intentionally left empty.

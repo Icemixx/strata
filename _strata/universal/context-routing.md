@@ -45,6 +45,7 @@ root:
 ```text
 _sediment/
 |-- <deliberation>.md      # discussions, decision trails, plans, open questions
+|-- specs/                 # retained specifications, draft and confirmed
 `-- reference/             # evidence ledgers, external specifications, source data
 ```
 
@@ -52,6 +53,11 @@ _sediment/
 undecided questions are not current truth, settled reason, or dated evidence. Placing them in an
 authority makes provisional thinking read as decided. A discussion stays after its outcome ships: the
 authority records what was decided, the discussion records how it was reached.
+
+**Retained specifications go in `_sediment/specs/`.** A specification is neither deliberation nor
+reference: it is a cold-start implementation contract, and `spec-building.md` owns its shape and its
+draft-to-confirmed marker. Keeping it out of the root is what stops a confirmed contract sitting among
+undecided questions and reading as one of them.
 
 **Stable domain material goes in `_sediment/reference/`.** Evidence ledgers, external and vendor
 specifications, and source data are consulted and maintained, but never decided. Files a build or test
@@ -217,7 +223,13 @@ before `GUIDE_GENERATED`.
 Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
 unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
 
-Guide generation is intentionally user-triggered. When the user asks to generate the Guide, **first say that the
+Guide generation is intentionally user-triggered, and **never part of initialization**. A newly initialized
+repository has empty authority roots; a Guide over them explains nothing while looking like a finished
+document, and the audit offered below has nothing to audit. `GUIDE_MISSING` is the correct state for a
+repository that has no records yet. Where a request arrives against a graph whose authority roots hold no
+records, say so and generate nothing.
+
+When the user asks to generate the Guide, **first say that the
 Guide can only be as current as the records it is built from, and offer an audit.** A Guide is derived,
 so a stale, duplicated or self-contradicting record produces a confidently wrong page that reads exactly
 like a right one, and generation cannot detect this: every structural check passes on a record that is

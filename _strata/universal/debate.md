@@ -107,7 +107,7 @@ place every settled item in the authority that owns it, then delete the branch.
 
 **Build the spec.** Follow `_strata/universal/spec-building.md`, using `settled.md` as the input ledger and
 the reports, cross-analyses and rounds as evidence for the reasoning and measurements that must survive.
-The output is `_sediment/<subject>-spec.md`. Debate is only the source of this specification; it does not
+The output is `_sediment/specs/<subject>-spec.md`. Debate is only the source of this specification; it does not
 change the shared content, traceability, ambiguity, readiness, or handoff requirements.
 
 **Place every settled item.** Decisions and their reasons go to Rationale. Remaining work goes to State as
