@@ -8,11 +8,32 @@ $Failed = 0
 function Write-Utf8([string]$Path, [string]$Text) {
     $parent = Split-Path -Parent $Path
     if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-    [IO.File]::WriteAllText($Path, $Text.Replace("`r`n","`n"), $Utf8)
+    # Preserve a byte-order mark the file already had. Windows PowerShell 5.1 reads a BOM-less UTF-8
+    # script as ANSI, which corrupts every non-ASCII literal in it - and context.ps1 ships WITH a BOM and
+    # matches on Unicode characters. A fixture that rewrote it stripped the BOM, so the generator it then
+    # invoked misparsed its own patterns and one watched-red case failed on 5.1 while passing on pwsh 7.
+    # The suite reported 55/0 and 54/1 on the same commit depending on which shell ran it.
+    $enc = $Utf8
+    if (Test-Path -LiteralPath $Path) {
+        $head = [byte[]]::new(3)
+        $fs = [IO.File]::OpenRead($Path)
+        try { $read = $fs.Read($head, 0, 3) } finally { $fs.Dispose() }
+        if ($read -eq 3 -and $head[0] -eq 0xEF -and $head[1] -eq 0xBB -and $head[2] -eq 0xBF) {
+            $enc = New-Object Text.UTF8Encoding($true)
+        }
+    }
+    [IO.File]::WriteAllText($Path, $Text.Replace("`r`n","`n"), $enc)
 }
 
 function Replace-Utf8([string]$Path, [string]$Old, [string]$New) {
     $text = [IO.File]::ReadAllText($Path, [Text.Encoding]::UTF8)
+    # String.Replace returns its input unchanged when the target is absent, so this helper used to
+    # rewrite the file identically and report success - the exact shape the kit forbids: "an operation
+    # that returns its input unchanged on a miss reports success while doing nothing". A fixture whose
+    # anchor had drifted would set up nothing and the test above it would pass on the untouched file.
+    if ($text.IndexOf($Old, [StringComparison]::Ordinal) -lt 0) {
+        throw "Replace-Utf8: anchor not found in $Path : $Old"
+    }
     Write-Utf8 $Path ($text.Replace($Old, $New))
 }
 
