@@ -93,19 +93,26 @@ both ends: a section scores badly because one sentence cites something big and u
 can look right by citing only small records. Splitting one record across three sections is fine; the
 three are measured together.
 
-**Below half of it, the section summarised its source instead of explaining it.** That is the single
-most reliable signal that a Guide is a shell, it needs no predecessor document to compute, and it is
-what every failed attempt has in common: 0.12x and 0.51x for two agents working from this procedure,
-against 1.04x for a Guide that reproduces its predecessor. Let the ratios be uneven — one subject needs
-1.3x and another 0.8x — but a section at 0.2x has not been written yet. Padding a thin section to reach
-a number is not depth either; the fix is always more of what the record actually says.
+**Around half the length of its records or below, a section has summarised its source instead of
+explaining it.** That is the single most reliable signal that a Guide is a shell, and it needs no
+predecessor document to compute: two agents working from this procedure produced 0.12x and 0.51x, against
+1.04x for a Guide that reproduces its predecessor. This is the one place the ratio is more than a
+diagnostic — not because a number was missed, but because at that length the explanation is absent rather
+than short, which reading the section confirms in seconds. Everywhere above it, let the ratios be uneven:
+one subject needs 1.3x and another 0.8x. Padding a thin section to reach a number is not depth either;
+the fix is always more of what the record actually says.
 
 **Scoring well on word count, table count and subsection count while writing 86-word passages
 produces a reference card, not an explanation anybody reads through.** Breadth and depth are both
 required; neither substitutes for the other. A section with one paragraph and a file list is not finished.
 
-Where a guide already exists — an older manual, a retired document, a predecessor generation — **measure
-against it per section, not in total.** A total hides which sections collapsed.
+Where a guide already exists — an older manual, a retired document, a predecessor generation — **also
+measure against it per section, not in total.** A total hides which sections collapsed.
+
+**The records govern; a predecessor only adds a second reading.** Both comparisons are useful and they
+answer different questions — did this section explain what its records hold, and did it keep what the
+last document covered — but only the first is always available, so acceptance rests on it. Say which
+comparison a reported number came from. A project with no predecessor is not missing a measurement.
 
 ### Detail to include
 
@@ -133,7 +140,9 @@ enforces them, and limitations stated plainly rather than omitted.
 Why labels, and never invent a justification to satisfy the structure. Prefer product philosophy over
 implementation mechanics — historical snapshots rather than silent rewrites, curated identities rather
 than near-duplicate spellings, one atomic save rather than partial records. Exact method order and
-repository internals belong in folded reference unless a reader needs them to understand a boundary.
+repository internals belong in the end-of-section reference area unless a reader needs them to understand
+a boundary. Not a fold: a composed section cannot fold, as "Section anatomy" says, so detail goes last
+where it is out of the reading path without being hidden from it.
 
 ## Deciding the sections
 
@@ -212,9 +221,16 @@ watch         a section whose kind is workflow, architecture or module-family de
               nobody reads. Omitting it only warns, and that leniency is not permission: **a section
               with no watch surface reports stale when someone edits its record and stays silent when
               the behaviour it describes is rewritten**, which is exactly the wrong way round. It is
-              the only thing that lets `-GuideStatus` see the code move. **The failure mode is
+              not the only freshness signal — a file named by a resolving [code:] citation is hashed
+              independently, so editing cited code reports GUIDE_STALE with no watch declared at all.
+              What a watch adds is the code the section does NOT cite: a sibling module, a file added
+              later, the implementation a claim depends on without naming. Citations track what you
+              pointed at; a watch tracks the surface. **The failure mode is
               inverted from everything else here**: omitting the directive warns, while declaring one
-              that matches no readable file refuses the whole document. Expansion comes from the
+              that matches no readable file refuses the whole document. Declaring nothing is correct
+              only where there is no code to watch at all, which is the case named earlier in this
+              procedure; anywhere else the omission is the leniency being taken as permission.
+              Expansion comes from the
               repository's tracked and non-ignored files, so a correct pattern starts failing the day
               its directory becomes git-ignored.
 citations     every evidence-bearing block ends with a resolving reference -- [authority: <path>] or
@@ -256,12 +272,18 @@ know the codebase; that is the one place a generated Guide must beat the manual 
 
 ## Before offering a version
 
-- headings balanced and the expected section and table counts present;
+- headings balanced, and every section named in the section record present, with the tables that record
+  says it owns — the record set in "Deciding the sections" is what establishes the expectation, so there
+  is something to check against rather than a remembered count;
 - **zero externally loaded resources**, so it opens offline;
-- no second encoding anywhere — no diagram, widget or simulation;
-- **no information loss** — every multi-word source line contiguously present;
-- a duplicated subject canonical in one section and cross-linked from the other, never stated twice;
-- **per-section density measured against the benchmark**, not totalled.
+- no second encoding anywhere — see "What must not happen", which owns that rule;
+- **per-section density measured against the records**, not totalled — and against a predecessor as well
+  where one exists;
+- **where a predecessor guide exists, no information loss against it** — every multi-word line of that
+  document contiguously present. This does not apply to the authorities: a Guide that reproduced its
+  records would be the mirror this procedure exists to prevent;
+- a duplicated subject canonical in one section and cross-linked from the other — see "Detail to
+  include", which owns that rule;
 - **exact identifiers measured against the records the page cites** — every symbol, path, file and
   threshold a cited record names appears in the page, unless it falls in one of five kinds that
   belong to the record and not to a manual: a rejected alternative, a superseded value, a ticket
@@ -272,8 +294,13 @@ know the codebase; that is the one place a generated Guide must beat the manual 
   and no other check notices, because the sentence is still true and still cited.
 
 Generation plumbing is not reader content. Internal source paths, unavailable commit placeholders,
-generator commands and staleness instructions stay out of the visible page; machine provenance belongs in
-metadata. A closing note about how the Guide was generated is not an application subject.
+generator commands and staleness instructions stay out of **the sections you compose**; machine provenance
+belongs in metadata. A closing note about how the Guide was generated is not an application subject.
+
+**This governs composed content, not the wrapper.** The shipped shell prints a permanent snapshot notice
+— which commit it came from, that it may be behind the authorities, and the `-GuideStatus` command that
+checks — and `context-routing.md` requires exactly that. It is chrome, identical on every page, written by
+nobody composing anything. The rule here is that a *section* must not explain how the Guide was made.
 
 ## What no check can catch
 
