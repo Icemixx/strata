@@ -69,11 +69,26 @@ A claim is settled only when the other participant expressly accepts it; silence
 acceptance given in the same round the claim was raised settles it at the end of that round. A settled
 claim is not reopened.
 
+Record a settlement in the round that accepts it, on its own line:
+
+```text
+SETTLED S07 (raised Round 3): The wait interval is harness-declared, not a constant.
+```
+
+The identifier is `S` followed by a number, unique across the debate and never reused for a different
+claim. The parenthetical names the round that raised the claim; a round that raises and accepts in the
+same exchange names its own number. What follows the colon is the settled statement on one line. Position
+within the round is free. Write the line only in the round where the acceptance happened, so each
+settlement is recorded exactly once and carries who accepted it and when.
+
 ## Outcomes
 
-- **Converged** — no unresolved HOLD and no open QUESTION remain. The next round is the settled list,
-  recorded as `settled.md`. That list is the input to the close procedure below, which distils it into a
-  spec and distributes it; it is not the lasting record.
+- **Converged** — no unresolved HOLD and no open QUESTION remain. `settled.md` is the `SETTLED` lines
+  collected from the rounds in order, verbatim; the closing round verifies that every accepted claim
+  appears there and introduces none that no round accepted. Collect the list that was written as the
+  debate ran rather than reconstructing one at the end: a reconstruction loses which participant accepted
+  what and in which round, and it is written when the evidence is furthest away. That list is the input to
+  the close procedure below, which distils it into a spec and distributes it; it is not the lasting record.
 - **Terminated** — the user declares the debate over. Settled items stand and remain usable. Every
   unresolved HOLD and open QUESTION returns to the user with both positions preserved and neither winning.
 - **Void** — the premise failed: one provider on both sides, or no shared verifiable ground. Nothing
