@@ -112,6 +112,12 @@ end a debate on their own, without a user message, and always have.
 responsive and interruptible, and never the total. When a participant stalls or exhausts its budget, the
 user ends the debate; that is the design, not a gap.
 
+**An interruption suspends a debate; it never concludes one.** A stopped session, an exhausted budget, a
+harness limit, or any other halt writes no outcome stamp and manufactures no agreement. Nothing becomes
+settled by having been interrupted while it was being argued, and a participant that resumes does not
+inherit agreement it did not receive. Say what was open when the halt happened; a suspended debate resumes
+from its files exactly where it stopped.
+
 Close `rounds.md` with exactly one stamp:
 
 - `DEBATE: converged — [count] settled — [subject]`

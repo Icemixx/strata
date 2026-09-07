@@ -86,6 +86,13 @@ portion needed for the task and verify all claimed artifacts in the live reposit
 ## Permissions, artifacts, and publication
 
 Claude Code permission modes and background execution govern what the harness can run; they do not grant
-task authority. Return useful artifacts through explicit results or stable repository paths. Commit and
+task authority.
+
+**Permission rules are a recognized-command filter, not isolation.** They match invocations against
+patterns; they are not a filesystem boundary. A path a rule denies through one command form remains
+reachable through a form the filter does not recognize, so permission rules cannot be relied on to make a
+directory unreadable. Where a procedure needs one participant not to read another's files - a blind phase,
+for instance - that separation is instruction-governed and has to be stated as a rule the agent keeps, not
+delegated to a permission entry that will not hold it. Return useful artifacts through explicit results or stable repository paths. Commit and
 publication remain governed by the user's request and Project Instructions, not by the ability of the
 harness to execute Git commands.

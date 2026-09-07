@@ -303,6 +303,8 @@ try {
         Assert-True ($debate -match 'Debate completion does not authorize implementation') 'debate completion authorization boundary missing'
         Assert-True ($debate -match '\*\*Then keep the branch\*\*') 'branch retention rule missing'
         Assert-True ([regex]::Matches($debate, 'delete the branch', 'IgnoreCase').Count -eq 0) 'debate still instructs branch deletion'
+        Assert-True ($debate -match 'An interruption suspends a debate; it never concludes one') 'interruption-suspends rule missing'
+        Assert-True ($debate -match 'writes no outcome stamp and manufactures no agreement') 'suspension must not manufacture agreement rule missing'
         Assert-True ($debate -match 'DEBATE: converged — \[count\] settled — \[subject\]') 'converged stamp shape changed'
         Assert-True ($debate -match 'DEBATE: terminated — \[reason\] — \[count\] settled, \[count\] open — \[subject\]') 'terminated stamp shape changed'
         Assert-True ($debate -match 'DEBATE: void — \[reason\] — \[subject\]') 'void stamp shape changed'
