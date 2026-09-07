@@ -95,8 +95,14 @@ settlement is recorded exactly once and carries who accepted it and when.
   produced is usable.
 
 A debate ends only by convergence or by the user declaring it terminated. No count of rounds or exchanges
-closes it, and no disagreement resolves itself by lasting. Either participant may call void on provider
-identity or absent verifiable ground.
+closes it, no elapsed time closes it, and no disagreement resolves itself by lasting. Either participant
+may call void on provider identity or absent verifiable ground.
+
+Do not add a deadline, a maximum wait, or any other automatic stop. A phase takes as long as the work
+takes - one minute or several hours - so any such limit eventually ends a debate that was merely slow.
+**A bounded wait that is re-issued is not a limit**: bound the individual call, so the session stays
+responsive and interruptible, and never the total. When a participant stalls or exhausts its budget, the
+user ends the debate; that is the design, not a gap.
 
 Close `rounds.md` with exactly one stamp:
 
