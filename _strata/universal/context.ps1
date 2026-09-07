@@ -2267,6 +2267,18 @@ function Test-GeneratedGuideHtml([string]$Html) {
         $fragment = [Net.WebUtility]::HtmlDecode($match.Groups[1].Value)
         if (-not $ids.ContainsKey($fragment)) { throw "Generated Guide contains unresolved fragment: #$fragment" }
     }
+    # The Guide is one self-contained file with nothing beside it, so a link that is still a file
+    # path resolves to nothing wherever the file is opened. Link rewriting turns a routed target into
+    # an in-page anchor, but it leaves an unrouted one as written and never runs over a composition
+    # source at all, so a path can reach this point. The fragment check above cannot see it: that
+    # check reads hrefs beginning with #, and this one begins with a path. Every href the Guide may
+    # carry is therefore an in-page anchor or scheme-qualified; anything else is dead on the page.
+    foreach ($match in [regex]::Matches($Html, 'href="([^"]*)"', 'IgnoreCase')) {
+        $href = [Net.WebUtility]::HtmlDecode($match.Groups[1].Value)
+        if ($href.StartsWith('#')) { continue }
+        if ($href -match '^[a-zA-Z][a-zA-Z0-9+.-]*:') { continue }
+        throw "Generated Guide contains a relative link: $href"
+    }
 }
 function Invoke-StrataContext {
     $modeCount = @($Check,$CheckAll,$GenerateGuide,$GuideStatus | Where-Object { $_ }).Count

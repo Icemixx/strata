@@ -1231,6 +1231,39 @@ The stripped index is not a target. [authority: _strata/state/index.md#contents]
         Assert-True $refused 'a map that skips a rendered heading level still generated a Guide'
         Assert-True ($message -match 'heading map disagrees with the renderer') "the refusal did not name the disagreement: $message"
     }
+    Assert-Test 'watched red: a relative link cannot ship in a self-contained Guide' {
+        # The Guide is one offline file with nothing beside it, so a link that is still a file path
+        # goes nowhere. Records are link-rewritten and a routed target becomes an in-page anchor, but
+        # a composition source is not rewritten at all and an unrouted target is left as written -
+        # either way the path survives into the page. The unresolved-fragment check cannot see it:
+        # that check only inspects hrefs beginning with #, and this one begins with a path.
+        $root = New-CompositionFixture 'relative-link' ''
+        Assert-GuideRefused $root @'
+# Anchors
+[[guide:section anchors topic]]
+
+A link to [a record](_strata/state/current.md) that stays a file path. [authority: _strata/state/current.md]
+'@ 'relative link' 'a relative link must not ship in the Guide'
+    }
+
+    Assert-Test 'an in-page anchor and an absolute link are both still allowed' {
+        # The guard refuses a path, not a link. Everything the Guide legitimately emits is either an
+        # in-page anchor or scheme-qualified, and this pins that so the guard cannot be tightened
+        # into refusing the Guide's own navigation.
+        $composed = New-ComposedGuide 'relative-link-allowed' @'
+# Anchors
+[[guide:section anchors topic]]
+
+The upstream project is public. [authority: _strata/state/current.md]
+
+See [the site](https://example.invalid/docs) for background. [authority: _strata/state/current.md]
+'@
+        $html = Get-GuideHtml $composed.Root
+        Assert-True ($html -match 'href="https://example\.invalid/docs"') 'an absolute link was not preserved'
+        # A composed Guide renders no authority sections, so its in-page anchors are its own sections.
+        Assert-True ($html -match 'href="#guide-section-anchors"') 'the Guide emits no in-page anchors'
+        Assert-GuideIntegrity $html
+    }
 }
 finally {
     if (Test-Path -LiteralPath $TempRoot) {
