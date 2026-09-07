@@ -323,6 +323,17 @@ function Test-State([object]$StateGraph, [object]$RationaleGraph, [object]$Build
                 $currentId = $null
                 continue
             }
+            # A malformed identifier escaped both patterns above, because both require the valid
+            # [A-Z][A-Z0-9]*-[0-9]+ shape: the first to accept an entry, the second to complain about
+            # one. `- BUG1 - OPEN - ...` matched neither and the tree validated clean, while
+            # context-routing.md promises "an identifier of any other shape is a validation finding".
+            # Recognize a ticket by its SHAPE - a list entry carrying one of the four statuses - and
+            # judge the identifier separately, so the check no longer depends on the thing it checks.
+            if ($line -match '^- (\S+) — (OPEN|IN PROGRESS|BLOCKED|DONE) — ') {
+                Add-Finding 'STATE_ID_INVALID' "${path}:$($i+1) has an invalid State ticket identifier: $($Matches[1])"
+                $currentId = $null
+                continue
+            }
             if ($line -match '^\s{2,}- (Why|How):\s+(.+)$') {
                 $kind = $Matches[1]
                 $linksText = $Matches[2]
