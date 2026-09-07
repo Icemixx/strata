@@ -32,7 +32,7 @@ Before drafting:
    Record drift-sensitive observations as a baseline to recheck, not timeless truth.
 
 The caller owns source-specific lifecycle. This procedure does not decide whether an audit closes, a
-debate branch is deleted, an authority changes, or an older specification is superseded.
+debate closes, an authority changes, or an older specification is superseded.
 
 ## Provenance recovery for an inherited specification
 
