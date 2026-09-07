@@ -160,9 +160,16 @@ in the description rather than minting a second ID:
 ```
 
 The first line is required. `Why:` and `How:` links are optional, may contain multiple targets, and are
-the only machine-readable associations Guide uses to combine Rationale and Build Log with a State ticket.
-Those target records require no backlinks or ticket metadata. Dependencies and blocker details are
-optional.
+the only **declared** associations between a ticket and its Rationale and Build Log records. Those target
+records require no backlinks or ticket metadata. Dependencies and blocker details are optional.
+
+Guide additionally surfaces **mentions**: a Rationale or Build Log paragraph naming a declared ticket id
+is shown under that ticket, with its source record and a statement that the relationship was inferred.
+Only ids State declares are matched, the snippet is the paragraph rather than the record, and a record
+already linked from the ticket is not repeated as a mention. **A mention is discovery, never evidence** —
+naming a ticket establishes no relationship to it, and *"unlike BUG-110, this approach…"* is not a reason
+for BUG-110. It is rendered apart from the typed links for that reason, so nothing inferred can be read as
+something an author declared.
 
 `state/current.md` contains `OPEN`, `IN PROGRESS`, and `BLOCKED` tickets. When every owned gate is
 complete, move the entry atomically to an appropriate indexed location under `state/completed/`, preserve

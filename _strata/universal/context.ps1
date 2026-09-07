@@ -1940,7 +1940,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
         $current = $null
         foreach ($line in @($text -split "`n")) {
             if ($line -match '^- ([A-Z][A-Z0-9]*-[0-9]+) — (OPEN|IN PROGRESS|BLOCKED|DONE) — (\S.+)$') {
-                $current = [pscustomobject]@{ Id=$Matches[1]; Status=$Matches[2]; Description=$Matches[3]; Source=$path; Body=(New-Object System.Collections.ArrayList); Why=(New-Object System.Collections.ArrayList); How=(New-Object System.Collections.ArrayList) }
+                $current = [pscustomobject]@{ Id=$Matches[1]; Status=$Matches[2]; Description=$Matches[3]; Source=$path; Body=(New-Object System.Collections.ArrayList); Why=(New-Object System.Collections.ArrayList); How=(New-Object System.Collections.ArrayList); Mentions=(New-Object System.Collections.ArrayList) }
                 [void]$tickets.Add($current)
                 continue
             }
@@ -1955,10 +1955,15 @@ function New-Guide([object]$Graphs, [string]$Digest) {
             }
         }
     }
-    # A record that names a declared ticket is a source for it. Only ids State declares are
-    # matched, so `SHA-256` and `UTF-8` cannot be mistaken for work items. The snippet is the
-    # paragraph carrying the mention, not the whole record: the Guide shows what an authority
-    # says about this ticket and points at the authority for the rest.
+    # A record that names a declared ticket is worth surfacing, but naming a ticket establishes no
+    # relationship to it. These land in Mentions, never in Why or How: those two buckets carry the
+    # typed links State declares, and context-routing.md calls them the only machine-readable
+    # association. Merging the two made "unlike TA-5, this approach..." arrive as reasoning supporting
+    # TA-5, indistinguishable from a link its author wrote deliberately.
+    #
+    # Only ids State declares are matched, so `SHA-256` and `UTF-8` cannot be mistaken for work items.
+    # The snippet is the paragraph carrying the mention, not the whole record. A record already linked
+    # explicitly is skipped: it is shown as evidence, and repeating it as a mention says nothing more.
     $declared = @{}
     foreach ($ticket in $tickets) { $declared[$ticket.Id] = $ticket }
     foreach ($graph in @($Graphs.Rationale,$Graphs.BuildLog)) {
@@ -1971,8 +1976,10 @@ function New-Guide([object]$Graphs, [string]$Digest) {
                 if ($trimmed.Length -lt 3) { continue }
                 foreach ($id in $declared.Keys) {
                     if ($trimmed -notmatch ('(?<![A-Za-z0-9-])' + [regex]::Escape($id) + '(?![A-Za-z0-9-])')) { continue }
-                    $bucket = if ($graph.Name -eq 'Rationale') { 'Why' } else { 'How' }
-                    [void]$declared[$id].$bucket.Add([pscustomobject]@{ Path=$recordPath; Text=$trimmed })
+                    $ticket = $declared[$id]
+                    $linked = @($ticket.Why) + @($ticket.How) | Where-Object { $_ -is [string] }
+                    if ($linked -contains $recordPath) { continue }
+                    [void]$ticket.Mentions.Add([pscustomobject]@{ Path=$recordPath; Text=$trimmed; Kind=$graph.Name })
                 }
             }
         }
@@ -2034,7 +2041,7 @@ function New-Guide([object]$Graphs, [string]$Digest) {
             foreach ($kind in @('Why','How')) {
                 $entries = @($ticket.$kind)
                 if ($entries.Count -eq 0) {
-                    [void]$body.AppendLine(('<h3>{0}</h3><p class="empty">No {1} record names {2}.</p>' -f $labels[$kind],$(if ($kind -eq 'Why') { 'Rationale' } else { 'Build Log' }),$ticketId))
+                    [void]$body.AppendLine(('<h3>{0}</h3><p class="empty">{2} links no {1} record.</p>' -f $labels[$kind],$(if ($kind -eq 'Why') { 'Rationale' } else { 'Build Log' }),$ticketId))
                     continue
                 }
                 [void]$body.AppendLine("<h3>$($labels[$kind])</h3>")
@@ -2049,6 +2056,24 @@ function New-Guide([object]$Graphs, [string]$Digest) {
                     $targetAnchor = $anchors[$target.ToLowerInvariant()]
                     $targetRelative = [Net.WebUtility]::HtmlEncode((Get-Relative $target $StrataRoot).Replace('\','/'))
                     [void]$body.AppendLine(('<div class="linked-record"><div class="source"><a href="#{0}">{1}</a></div>{2}</div>' -f $targetAnchor,$targetRelative,$rendered))
+                }
+            }
+            # Mentions are discovery, not evidence, and they say so on the page. A record that names this
+            # ticket without being linked from it may be about the ticket or may only refer to it in
+            # passing; the Guide cannot tell, so it shows the paragraph, points at the record, and states
+            # that the relationship was inferred rather than declared.
+            $mentions = @($ticket.Mentions)
+            if ($mentions.Count -gt 0) {
+                [void]$body.AppendLine('<h3>Mentions this ticket</h3>')
+                [void]$body.AppendLine(('<p class="inferred-note">Found by searching the authorities for <strong>{0}</strong>. These records are not linked from the ticket, so the relationship is inferred and is not evidence that they explain or implement it.</p>' -f $ticketId))
+                $mentionNumber = 0
+                foreach ($mention in $mentions) {
+                    $mentionNumber++
+                    $mentionPrefix = 'ticket-' + $ticket.Id.ToLowerInvariant() + '-mention-' + $mentionNumber + '-heading-'
+                    $mentionRendered = Rewrite-GuideLinks (Convert-Markdown $mention.Text $mentionPrefix) $mention.Path $anchors
+                    $mentionAnchor = $anchors[$mention.Path.ToLowerInvariant()]
+                    $mentionRelative = [Net.WebUtility]::HtmlEncode((Get-Relative $mention.Path $StrataRoot).Replace('\','/'))
+                    [void]$body.AppendLine(('<div class="linked-record inferred"><div class="source"><a href="#{0}">{1}</a> <span class="inferred-tag">inferred mention</span></div>{2}</div>' -f $mentionAnchor,$mentionRelative,$mentionRendered))
                 }
             }
             [void]$body.AppendLine('</article>')
