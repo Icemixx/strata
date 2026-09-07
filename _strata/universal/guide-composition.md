@@ -246,9 +246,10 @@ anchors       [authority: <path>#<heading-slug>] points at one heading inside a 
 list items    a list item's citation belongs on that item's own line.
 wrapping      a PARAGRAPH may wrap freely: continuation lines join it until a blank line, heading,
               fence, list marker, callout, directive or table, and one citation on its last line
-              covers the whole paragraph. A LIST ITEM and a CALLOUT get no continuation, so each
-              wrapped line is its own block and an uncited one fails the document. Wrap prose
-              normally; keep a list item on one line however long it runs.
+              covers the whole paragraph. A CALLOUT wraps too: consecutive `>` lines are one block,
+              and one citation anywhere in it covers all of them. A LIST ITEM gets no continuation,
+              so each wrapped line is its own block and an uncited one fails the document. Wrap prose
+              and callouts normally; keep a list item on one line however long it runs.
 routed only   an [authority:] target must be a record the discovery graph routes to. A file that hangs
               off Instructions rather than State, Rationale or Build Log is not routable and is refused.
 tables        a table may declare [[guide:table shared]] on the line AFTER the table, followed with no
