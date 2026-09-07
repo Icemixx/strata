@@ -88,9 +88,13 @@ sessions. Then:
   result.
 - Correct any contradiction the work created, now, in the same change.
 - Never let "shipped" imply "observed". Say which one you have.
-- Turn anything found-but-not-fixed into its own queue item immediately. A finding is a queue event, not a
-  reason to report.
-- Return to the queue rather than reporting. Report once, when no ready or in-flight item remains.
+- Turn anything found-but-not-fixed **in this project's own work** into its own queue item immediately. A
+  finding is a queue event, not a reason to report. A Strata recommendation is the exception and goes the
+  other way: common Instructions say to report it and not create backlog work, because it is the user's to
+  accept before it is anyone's to schedule.
+- Return to the **authorized** queue rather than reporting. Report once, when no ready or in-flight item
+  remains within it. Backlog presence is not authorization, so an empty authorized queue ends the run even
+  where the backlog holds more.
 - Run this check against the *previous* item before starting the next one.
 
 **The last step is mechanical because intention is not enough.** Diligence degrades exactly when
