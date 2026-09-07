@@ -992,8 +992,13 @@ Run `context.ps1 -CheckAll` and read `_strata/state/index.md` before deciding.
         $root = New-Fixture 'shell-url'
         Replace-Utf8 (Join-Path $root '_strata\universal\guide-shell.html') '</style>' "  body { background-image: url(evil.png); }`n</style>"
         $result = Invoke-GenerateGuideCapture $root
-        Assert-True ($result.ExitCode -ne 0) 'a CSS url() in a style block was allowed through'
+        # The previous assertion read $result.ExitCode, which this helper does not return: $null -ne 0 is
+        # always true, so the watched-red case could not go red and the message check below carried the
+        # whole test. Refused is wrong too - a shell url() is caught by Add-Finding, not by the throw in
+        # Test-GeneratedGuideHtml, so validation fails without an exception. What refusal actually means
+        # here is that no Guide was written, because generation replaces the file only after success.
         Assert-True ($result.Output -match 'CSS url\(\) resource') "the failure did not name the CSS url() guard: $($result.Output)"
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $root '_strata\project_guide.html'))) 'a CSS url() in a style block still produced a Guide'
     }
 }
 finally {
