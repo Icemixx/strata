@@ -334,6 +334,23 @@ try {
         Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
     }
 
+    Assert-Test 'additions and removals carry symmetric evidence burdens' {
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        Assert-True ($router -match 'Before deleting text or removing behavior') 'removal rule does not reach removed behavior'
+        Assert-True ($router -match 'survives at one named destination or implementation') 'removal rule does not accept a surviving implementation'
+        Assert-True ($router -match 'not a proof that no conceivable rule applies') 'removal check is unbounded'
+        Assert-True ($router -match 'whose sole or primary purpose is to prevent a failure') 'addition rule is not scoped to preventive behavior'
+        Assert-True ($router -match 'proportional to the behavior.s breadth, cost, reversibility, and maintenance burden') 'addition evidence is not proportional'
+        Assert-True ($router -match 'a reasoned failure is admissible') 'addition rule demands an observed failure'
+        Assert-True ($router -match 'does not require separate justification for ordinary functionality') 'addition rule reaches ordinary work'
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match 'CONCEDE`, `HOLD`, `NEW`, `SIMPLIFY`, or `QUESTION`') 'SIMPLIFY is not in the position vocabulary'
+        Assert-True ($debate -match 'SIMPLIFY proposes removing or consolidating a named existing element') 'SIMPLIFY is undefined'
+        Assert-True ($debate -match 'does not by itself authorize the removal') 'raising SIMPLIFY is not separated from executing it'
+        Assert-True ($debate -match 'no unresolved HOLD, no unresolved SIMPLIFY, and no open QUESTION remain') 'an unresolved SIMPLIFY does not block convergence'
+        Assert-True ($debate -match 'unresolved HOLD, unresolved SIMPLIFY, and open QUESTION returns to the user') 'an unresolved SIMPLIFY does not return on termination'
+    }
+
     Assert-Test 'harness dossiers stay level' {
         $headings = {
             param($name)

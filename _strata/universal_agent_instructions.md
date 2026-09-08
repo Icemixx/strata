@@ -74,8 +74,17 @@ cross-project justification.
   find anything.
 - An edit that targets existing text must fail when that text is absent. An operation that returns its
   input unchanged on a miss reports success while doing nothing; never pair one with a removal.
-- Before deleting text, confirm every substantive statement either survives at one named destination or
-  has an explicit removal reason.
+- Before deleting text or removing behavior, identify the substantive statements or stated rules it
+  carries. Confirm each survives at one named destination or implementation, or has an explicit,
+  authorized removal reason. Bound the check to the removal target, its owners, its references, and
+  the relevant tests; it is not a proof that no conceivable rule applies.
+- Before adding behavior whose sole or primary purpose is to prevent a failure, and which is not
+  already required by governing text, name the credible failure mode and the evidence for it. Make
+  that evidence proportional to the behavior's breadth, cost, reversibility, and maintenance burden,
+  weighed against the failure's likelihood and consequence. Prefer an observed failure or executed
+  counterexample; a reasoned failure is admissible when its mechanism is credible and the preventive
+  behavior is proportionate. This does not require separate justification for ordinary functionality
+  directly required by the task or its governing contract.
 
 For code changes only:
 

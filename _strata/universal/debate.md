@@ -60,7 +60,11 @@ Before writing, read the last turn marker. If it does not name you, say so in no
 participant whose turn it is, and stop. Being asked again does not make it your turn. When the file
 carries no marker yet, the participant asked first opens.
 
-Tag every position `CONCEDE`, `HOLD`, `NEW`, or `QUESTION`. A HOLD carries evidence, not restatement.
+Tag every position `CONCEDE`, `HOLD`, `NEW`, `SIMPLIFY`, or `QUESTION`. A HOLD carries evidence, not
+restatement. A SIMPLIFY proposes removing or consolidating a named existing element and carries the
+reasoning for it; raising one opens the question and does not by itself authorize the removal. Without
+this tag every available position adds or defends, so complexity ratchets by default and a round arguing
+for deletion has no vocabulary.
 Verify a contested claim yourself instead of accepting another participant's measurement, including your
 own from an earlier round. Distinguish a factual conflict from a severity, scope, or coverage difference;
 collapsing them wastes rounds. Concede only what the evidence requires.
@@ -89,14 +93,16 @@ settlement is recorded exactly once and carries who accepted it and when.
 
 ## Outcomes
 
-- **Converged** — no unresolved HOLD and no open QUESTION remain. `settled.md` is the `SETTLED` lines
+- **Converged** — no unresolved HOLD, no unresolved SIMPLIFY, and no open QUESTION remain. `settled.md`
+  is the `SETTLED` lines
   collected from the rounds in order, verbatim; the closing round verifies that every accepted claim
   appears there and introduces none that no round accepted. Collect the list that was written as the
   debate ran rather than reconstructing one at the end: a reconstruction loses which participant accepted
   what and in which round, and it is written when the evidence is furthest away. That list is the input to
   the close procedure below, which distils it into a spec and distributes it; it is not the lasting record.
 - **Terminated** — the user declares the debate over. Settled items stand and remain usable. Every
-  unresolved HOLD and open QUESTION returns to the user with both positions preserved and neither winning.
+  unresolved HOLD, unresolved SIMPLIFY, and open QUESTION returns to the user with both positions
+  preserved and neither winning.
 - **Void** — the premise failed: one provider on both sides, or no shared verifiable ground. Nothing
   produced is usable.
 
