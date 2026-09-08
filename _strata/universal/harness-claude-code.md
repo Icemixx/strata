@@ -93,6 +93,8 @@ patterns; they are not a filesystem boundary. A path a rule denies through one c
 reachable through a form the filter does not recognize, so permission rules cannot be relied on to make a
 directory unreadable. Where a procedure needs one participant not to read another's files - a blind phase,
 for instance - that separation is instruction-governed and has to be stated as a rule the agent keeps, not
-delegated to a permission entry that will not hold it. Return useful artifacts through explicit results or stable repository paths. Commit and
+delegated to a permission entry that will not hold it.
+
+Return useful artifacts through explicit results or stable repository paths. Commit and
 publication remain governed by the user's request and Project Instructions, not by the ability of the
 harness to execute Git commands.
