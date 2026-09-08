@@ -15,17 +15,18 @@ Whoever is editing it stops while a debate is running.
 A participant is the session itself. Do not spawn an agent to take a round; switch the session or do not
 debate.
 
-The user carries every exchange between providers. No agent invokes, polls, or notifies the other. The
-participant that creates a debate returns one ready-to-paste opening prompt for the other participant in
-normal chat; the user transports that prompt but does not have to reconstruct the handoff. The prompt
-names the repository and debate-branch path, phase, exact inputs and output file, and any blindness rule.
-It tells the recipient to re-read this procedure from disk. It does not quote or summarize an artifact the
-recipient must not yet see. After creation, the shared files and turn marker carry the handoff; a simple
-user instruction to proceed is sufficient. Do not provide another transport prompt.
+No agent invokes or controls the other. The participant that creates the debate is A; the participant the
+user seats from its opening prompt is B. A returns one ready-to-paste opening prompt in normal chat. The
+user transports that prompt but does not carry later exchanges or issue proceed messages. The prompt names
+the repository and debate-branch path and tells B to re-read this procedure from disk. It does not quote or
+summarize an artifact B must not yet see. After B joins, validated shared-file state carries every handoff.
+Do not provide another transport prompt.
 
 ## The brief
 
-A brief says which phase, the subject, and the question.
+A brief in `coordination.md` says the subject and question, names A and B by product, names A as the
+participant that opens rounds, and ends with `## Completion history`. It is fixed when A creates the debate;
+neither participant edits it afterwards. Completion records are appended beneath that heading.
 
 ## Phases
 
@@ -37,6 +38,95 @@ A brief says which phase, the subject, and the question.
 3. **Rounds.** Each participant reads everything, verifies contested claims against the repository, and
    appends one round. Never edit an earlier round, including your own; correct it by writing a new entry
    that names what it corrects.
+
+Reports release only when both report-completion records are valid. Cross-analyses release only when both
+cross-completion records are valid. File existence, file modification time, chat text, and a participant's
+claim that it finished release nothing. Before a release, each participant reads only its own subfolder and
+the shared root. After a release, both may read the completed artifacts for that phase in both subfolders.
+
+## Coordination and publication
+
+The shared completion history is append-only. Its two record forms are:
+
+```text
+STAMP | <report|cross>-complete | <participant> | <UTC timestamp> | END
+ALIVE | <participant> | <UTC timestamp> | END
+```
+
+`<participant>` is A or B's product name from the brief. A structurally valid record is one complete line
+matching its form in an LF-terminated file. `ALIVE` records may repeat and are excluded from completion
+ordering and duplicate checks; they never release an artifact.
+
+Classify the whole completion history before trusting any part of it. A valid completion sequence is a
+prefix of `A-report -> B-report -> A-cross -> B-cross`, with no duplicate phase-and-participant pair. A
+missing history heading, a completed malformed record, a duplicate completion, an out-of-order completion,
+or an unterminated tail that persists for 60 seconds is `Blocked`. Stop, report the exact reason,
+write nothing, and never repair shared history on another participant's behalf. Only a wholly valid history
+can release a phase.
+
+Finish and write the substantive artifact before publishing its completion. After publication, do not
+change that artifact. Before appending, re-read the current history, confirm that the record is still owed,
+and confirm that the file is LF-terminated. Use an append that excludes another writer, retry a sharing
+refusal for up to 1 second elapsed, then verify that exactly one complete record landed. Exhausted
+retry, ambiguous publication, or a conflicting record is `Blocked`; report it and stop. Never overwrite
+completion history or append from a snapshot taken before a failed attempt.
+
+Publication order is strict. A publishes `report-complete`; B may then publish `report-complete`. A may
+publish `cross-complete` only after both report records exist; B may publish `cross-complete` only after A.
+After both cross records exist, A opens Round 1. These dependencies serialize completion publication without
+serializing the independent work.
+
+## Automatic waiting and liveness
+
+When shared state says another participant owes the next completion or round, wait automatically. Use a
+bounded wait appropriate to the current harness and inspect shared state every 15 seconds inside it without
+returning to the model. Collect that same running wait until it finishes, and then re-issue the next bounded
+wait. Empty output from a still-running wait is not completion. Keep only one wait in flight. A message
+reporting progress while work remains must be followed by the next tool call in the same turn; it must never
+be the turn's last action.
+
+Each new wait starts its own widening schedule. Fire at these minute offsets from that wait's start:
+
+```text
+1, 2, 3, 4, 5, 7, 9, 11, 16, 21, 26, 31, 41, 51, 61, 71, ...
+```
+
+This is a 1-minute interval for the first 5 minutes, 2 minutes through minute 10, 5 minutes through minute
+30, and 10 minutes thereafter. A logical fire may span several harness calls; consult the applicable
+harness dossier rather than assuming one call. A completed turn ends the current wait and starts the next
+one at the 1-minute tier. A heartbeat does not reset this schedule. No number of fires and no total elapsed
+time ends a debate.
+
+The participant that owes the next completion or round owns liveness publication. Before any completion,
+A owns it. During reports and cross-analysis the strict completion sequence identifies the owner; during
+rounds the last turn marker names it. While it owns liveness, the participant appends one `ALIVE` record
+every 5 minutes. Re-verify ownership immediately before the append, and never have a heartbeat publication
+in flight while publishing the participant's completion or round.
+
+The inactivity anchor is the latest of three inputs: the current wait's unchanged start, the owning
+participant's newest valid `ALIVE`, and the newest completed turn. The wait start is always a floor, not a
+fallback, so resuming a suspended session grants a fresh inactivity window. A completion stamp supplies a
+completed turn during blind phases; during rounds the newest valid turn marker supplies it, using
+`rounds.md`'s modification time because the marker has no timestamp.
+
+Before using any activity time, verify that it parses as UTC and is not later than the observer's current
+UTC. This applies to `STAMP` and `ALIVE` timestamps and to `rounds.md`'s modification time. An unparseable or
+future activity time is `Blocked`, not fresh evidence: report its source and value, write nothing, and stop.
+Participants therefore share the repository host's clock for liveness; a multi-host debate requires a
+separately evidenced clock contract before it can use this procedure.
+
+At each check, continue while the anchor is less than 15 minutes old. Otherwise suspend: write no shared
+record and no Debate outcome, and report what was awaited, who owed liveness, their last valid activity,
+whether they ever participated, and what remains open. The user may resume the stopped participant or
+terminate the debate. If both sessions stop, neither remains to detect it.
+
+## User notifications
+
+After validating the brief, B announces once that Phase 1 has begun, both participants will continue
+automatically, no proceed messages are needed, and A will announce the result. B immediately continues its
+report and automatic waiting in the same turn. A alone announces convergence, termination, void, or a need
+for user action. B does not issue a competing final announcement, but reports its own blocker or interruption
+immediately.
 
 ## Rounds
 
@@ -56,9 +146,9 @@ Number rounds sequentially across the whole file, not per participant: read the 
 write N+1. The file is shared, so two participants numbering their own sequences produce two Round 2s that
 append-only forbids correcting.
 
-Before writing, read the last turn marker. If it does not name you, say so in normal chat, name the
-participant whose turn it is, and stop. Being asked again does not make it your turn. When the file
-carries no marker yet, the participant asked first opens.
+Before writing, read the last turn marker. If it does not name you, wait automatically; being asked again
+does not make it your turn. When the file carries no marker yet, A opens after both cross-completion records
+are valid. Stop waiting only for a valid Debate outcome, a user interruption, or a `Blocked` condition.
 
 Tag every position `CONCEDE`, `HOLD`, `NEW`, `SIMPLIFY`, or `QUESTION`. A HOLD carries evidence, not
 restatement. A SIMPLIFY proposes removing or consolidating a named existing element and carries the
@@ -115,8 +205,8 @@ a budget. A phase takes as long as the work takes - one minute or several hours 
 eventually ends a debate that was merely slow. **This forbids limits, not outcomes**: convergence and void
 end a debate on their own, without a user message, and always have.
 **A bounded wait that is re-issued is not a limit**: bound the individual call, so the session stays
-responsive and interruptible, and never the total. When a participant stalls or exhausts its budget, the
-user ends the debate; that is the design, not a gap.
+responsive and interruptible, and never the total. Liveness suspension reports missing participation but
+does not end the debate; only the user decides whether to resume or terminate it.
 
 **An interruption suspends a debate; it never concludes one.** A stopped session, an exhausted budget, a
 harness limit, or any other halt writes no outcome stamp and manufactures no agreement. Nothing becomes
@@ -137,10 +227,10 @@ participants read and write that exact path: a rendezvous both sides must find i
 description, and two participants who each pick their own scratch location run two monologues that never
 meet. A debate is deliberation, which is what `_sediment/` is for.
 
-The branch holds `index.md`, `rounds.md`, `settled.md`, and one subfolder per participant named by product
-- `codex/`, `claude-code/` - each holding that participant's `report.md` and `cross-analysis.md`. Shared
-records stay at the branch root; a participant writes only inside its own subfolder. Paths remain stable
-for the whole debate.
+The branch holds `index.md`, `coordination.md`, `rounds.md`, `settled.md`, and one subfolder per participant
+named by product - `codex/`, `claude-code/` - each holding that participant's `report.md` and
+`cross-analysis.md`. Shared records stay at the branch root; a participant writes only inside its own
+subfolder. Paths remain stable for the whole debate.
 
 **Files stay where they are written.** Releasing a blind phase permits reading; it never moves, copies, or
 renames anything.
@@ -195,5 +285,7 @@ attended one has, which is none beyond the debate itself.
 
 ## Limits
 
-Nothing detects a stalled debate; only the user can restart or close one. Two capable agents exchanging
-rounds is expensive: use DAP when one provider's scrutiny is enough.
+A live participant can detect that the peer owing the next turn stopped supplying liveness evidence; it
+cannot establish why the peer stopped, detect both sessions stopping, or judge the substance of an artifact
+a completion record names. Two capable agents exchanging rounds is expensive: use DAP when one provider's
+scrutiny is enough.

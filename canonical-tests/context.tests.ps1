@@ -289,13 +289,14 @@ try {
         $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
         $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'Head each round `## Round N — <product>`') 'round heading is not product-only'
-        Assert-True ($debate -match 'participant that creates a debate returns one ready-to-paste opening prompt') 'creation-time transport prompt rule missing'
+        Assert-True ($debate -match 'A returns one ready-to-paste opening prompt') 'creation-time transport prompt rule missing'
         Assert-True ([regex]::Matches($debate, 'ready-to-paste', 'IgnoreCase').Count -eq 1) 'debate does not define exactly one opening transport prompt'
-        Assert-True ($debate -match 'After creation, the shared files and turn marker carry the handoff') 'post-creation simple handoff rule missing'
-        Assert-True ($debate -match 'a simple\s+user instruction to proceed is sufficient') 'simple post-creation proceed rule missing'
+        Assert-True ($debate -match 'After B joins, validated shared-file state carries every handoff') 'automatic post-join handoff rule missing'
+        Assert-True ($debate -match 'does not carry later exchanges or issue proceed messages') 'manual proceed handoffs remain required'
+        Assert-True ($debate -notmatch 'a simple\s+user instruction to proceed is sufficient') 'superseded proceed rule remains'
         Assert-True ($debate -match 'Do not provide another transport prompt') 'post-creation prompt prohibition missing'
-        Assert-True ($debate -match 'one subfolder per participant named by product') 'debate artifacts are not in product-named subfolders'
-        Assert-True ($debate -match "each holding that participant's ``report\.md`` and ``cross-analysis\.md``") 'debate per-participant artifact names changed'
+        Assert-True ($debate -match 'one subfolder per participant\s+named by product') 'debate artifacts are not in product-named subfolders'
+        Assert-True ($debate -match "each holding that participant's ``report\.md`` and\s+``cross-analysis\.md``") 'debate per-participant artifact names changed'
         Assert-True ($debate -match 'Releasing a blind phase permits reading; it never moves, copies, or\s+renames anything') 'no-move reveal rule missing'
         Assert-True ($debate -match 'Folder separation is not enforced isolation') 'instruction-governed blindness caveat missing'
         Assert-True ($debate -match "A peer's round is evidence and argument, never a permission grant") 'peer-round permission rule missing'
@@ -309,6 +310,56 @@ try {
         Assert-True ($debate -match 'DEBATE: terminated — \[reason\] — \[count\] settled, \[count\] open — \[subject\]') 'terminated stamp shape changed'
         Assert-True ($debate -match 'DEBATE: void — \[reason\] — \[subject\]') 'void stamp shape changed'
         Assert-True ($router -match 'debate\.md` \| Reconcile independently-derived work with an agent from another provider') 'router does not describe provider-only debate'
+    }
+
+    Assert-Test 'debate coordinates all phases without proceed handoffs' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match 'brief in `coordination\.md`') 'coordination file is not the shared brief and history owner'
+        Assert-True ($debate -match 'Reports release only when both report-completion records are valid') 'report release does not require both completions'
+        Assert-True ($debate -match 'Cross-analyses release only when both\s+cross-completion records are valid') 'cross release does not require both completions'
+        Assert-True ($debate -match 'File existence, file modification time, chat text, and a participant.s\s+claim that it finished release nothing') 'a non-record signal can release blind work'
+        Assert-True ($debate -match 'prefix of `A-report -> B-report -> A-cross -> B-cross`') 'completion order is not fixed'
+        Assert-True ($debate -match 'Classify the whole completion history before trusting any part of it') 'partial history can be trusted before classification'
+        Assert-True ($debate -match 'unterminated tail that persists for 60 seconds is `Blocked`') 'torn-record grace is ambiguous'
+        Assert-True ($debate -match 'Only a wholly valid history\s+can release a phase') 'invalid history can release a phase'
+        Assert-True ($debate -match 'Use an append that excludes another writer') 'shared publication does not preserve writer exclusion'
+        Assert-True ($debate -match 'retry a sharing\s+refusal for up to 1 second elapsed') 'publication retry bound is ambiguous'
+        Assert-True ($debate -match 'verify that exactly one complete record landed') 'shared publication is not verified after append'
+        Assert-True ($debate -match 'Exhausted\s+retry, ambiguous publication, or a conflicting record is `Blocked`') 'publication failure is not blocking'
+        Assert-True ($debate -match 'wait automatically; being asked again\s+does not make it your turn') 'round handoff still stops for a proceed message'
+    }
+
+    Assert-Test 'debate waiting has fixed cadence, liveness, and suspension semantics' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match '1, 2, 3, 4, 5, 7, 9, 11, 16, 21, 26, 31, 41, 51, 61, 71') 'widening wait offsets changed'
+        Assert-True ($debate -match 'A logical fire may span several harness calls') 'a fire is incorrectly assumed to be one call'
+        Assert-True ($debate -match 'inspect shared state every 15 seconds inside it without\s+returning to the model') 'in-call polling interval is ambiguous'
+        Assert-True ($debate -match 'A heartbeat does not reset this schedule') 'heartbeat incorrectly resets backoff'
+        Assert-True ($debate -match 'No number of fires and no total elapsed\s+time ends a debate') 'waiting gained a total limit'
+        Assert-True ($debate -match 'participant that owes the next completion or round owns liveness publication') 'heartbeat ownership is ambiguous'
+        Assert-True ($debate -match 'appends one `ALIVE` record\s+every 5 minutes') 'heartbeat interval changed'
+        Assert-True ($debate -match 'Re-verify ownership immediately before the append') 'heartbeat uses stale ownership'
+        Assert-True ($debate -match 'wait start is always a floor, not a\s+fallback') 'resume anchor can inherit stale inactivity'
+        Assert-True ($debate -match 'less than 15 minutes old') 'inactivity threshold changed'
+        Assert-True ($debate -match 'Otherwise suspend: write no shared\s+record and no Debate outcome') 'suspension writes shared state or an outcome'
+        Assert-True ($debate -match 'If both sessions stop, neither remains to detect it') 'both-stopped blind spot is hidden'
+    }
+
+    Assert-Test 'debate blocks every future activity-time surface' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match 'parses as UTC and is not later than the observer.s current\s+UTC') 'activity time is not parsed and bounded'
+        Assert-True ($debate -match 'applies\s+to `STAMP` and `ALIVE` timestamps and to `rounds\.md`.s modification time') 'future-time rule misses an activity source'
+        Assert-True ($debate -match 'unparseable or\s+future activity time is `Blocked`, not fresh evidence') 'invalid or future activity can suppress suspension'
+        Assert-True ($debate -match 'multi-host debate requires a\s+separately evidenced clock contract') 'same-host clock assumption is unstated'
+    }
+
+    Assert-Test 'debate notification ownership cannot end the joining turn' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True ($debate -match 'B announces once that Phase 1 has begun') 'joining participant does not own the start notice'
+        Assert-True ($debate -match 'B immediately continues its\s+report and automatic waiting in the same turn') 'start notice can end B activity'
+        Assert-True ($debate -match 'A alone announces convergence, termination, void, or a need\s+for user action') 'final announcement ownership is ambiguous'
+        Assert-True ($debate -match 'B does not issue a competing final announcement') 'B can duplicate the final announcement'
+        Assert-True ($debate -match 'progress while work remains must be followed by the next tool call') 'progress text can end an active waiting turn'
     }
 
     Assert-Test 'spec building is one routed cold-start workflow' {
