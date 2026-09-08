@@ -334,6 +334,21 @@ try {
         Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
     }
 
+    Assert-Test 'harness dossiers stay level' {
+        $headings = {
+            param($name)
+            $text = [IO.File]::ReadAllText((Join-Path $StagedStrata "universal\$name"), [Text.Encoding]::UTF8)
+            ,@($text -split "`r?`n" | Where-Object { $_ -match '^## ' })
+        }
+        $claude = & $headings 'harness-claude-code.md'
+        $codex  = & $headings 'harness-codex.md'
+        Assert-True ($claude.Count -gt 0) 'claude dossier has no sections to compare'
+        Assert-True (($claude -join '|') -eq ($codex -join '|')) `
+            "harness dossiers no longer carry the same sections in the same order: claude=[$($claude -join ', ')] codex=[$($codex -join ', ')]"
+        $editing = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\kit-editing.md'), [Text.Encoding]::UTF8)
+        Assert-True ($editing -match 'The dossiers stay level') 'the levelling rule is missing from kit-editing'
+    }
+
     Assert-Test 'direct user Guide generation is rejected' {
         $root = New-Fixture 'user-generation-rejected'
         $contextScript = Join-Path $root '_strata\universal\context.ps1'

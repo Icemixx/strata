@@ -95,6 +95,11 @@ directory unreadable. Where a procedure needs one participant not to read anothe
 for instance - that separation is instruction-governed and has to be stated as a rule the agent keeps, not
 delegated to a permission entry that will not hold it.
 
+**A foreground command is moved to the background at 600 seconds.** It keeps running there and completes
+normally; a 590.527 s call returned in the foreground. So a single call can span any wait up to ten
+minutes, and a longer one is not one call. Treat 600 s as the ceiling of a bounded wait, not as a limit on
+waiting: the wait continues by re-issuing the call.
+
 Return useful artifacts through explicit results or stable repository paths. Commit and
 publication remain governed by the user's request and Project Instructions, not by the ability of the
 harness to execute Git commands.

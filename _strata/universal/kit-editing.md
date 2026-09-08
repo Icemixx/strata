@@ -21,6 +21,12 @@ its delegation and permission mechanisms do - only an agent running it can test 
 harness's dossier needs a runtime claim added or corrected, write the prompt and give it to the user, who
 carries it to that agent.
 
+**The dossiers stay level.** They carry the same section headings, in the same order, so the two can be
+read side by side and a gap in one is visible. Content differs - that is what they are for - but structure
+does not. When you record a runtime fact in your own dossier, check whether its counterpart exists in the
+other; if it does not, and the fact has an analogue there, route a prompt to that harness rather than
+guessing at its behaviour or leaving the gap silent.
+
 You may still read any dossier, correct a path or format the kit itself changed, and record that a claim
 is unverified or disputed. Flagging a claim is not asserting one, and a dossier nobody can currently reach
 should carry the doubt rather than keep the error silently.

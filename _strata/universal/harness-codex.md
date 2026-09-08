@@ -86,8 +86,23 @@ top-level sessions, but content and timestamps still require validation.
 Rollouts contain structured messages, tool calls, results, and compaction records. Recover only the
 portion needed for continuity and verify all claimed artifacts in the live repository.
 
+A Codex turn ends when the session emits a message with no tool call after it. Native rollout evidence on
+2026-09-07 recorded an `agent_message` with `phase: "final_answer"` at `18:45:11.463Z`, then
+`task_complete` 114 ms later with no intervening tool call. While work remains outstanding, a message must
+not be the turn's last action: report progress if useful, then issue the next call in the same turn.
+
 ## Permissions, artifacts, and publication
 
 Runtime sandbox and approval rules control execution; they do not grant task authority. Return useful
 artifacts through shared files or explicit worker reports. Repository authorization to commit or publish
 still governs publication; a runtime escalation is an execution mechanism, not a second policy decision.
+
+A yielded `exec_command` result with a `session_id` identifies a command that is still running, including
+when its `output` is empty. Empty output on a live session is not a completed command and must not be read
+as a finished check that found nothing. Preserve the complete result and collect that exact session with
+`write_stdin` until it reports completion before starting another wait.
+
+`write_stdin` collection returns after approximately 300 seconds while a command may continue running;
+measured returns were 300.007 s and 300.011 s. One launch plus two chained collections spanned a
+615.085-second command, which completed normally. A wait longer than five minutes therefore uses one
+launch plus as many collections as completion requires, not one blocking call.
