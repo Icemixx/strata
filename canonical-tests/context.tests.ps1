@@ -343,7 +343,7 @@ try {
         Assert-True ($debate -match 'wait start is always a floor, not a\s+fallback') 'resume anchor can inherit stale inactivity'
         Assert-True ($debate -match 'less than 15 minutes old') 'inactivity threshold changed'
         Assert-True ($debate -match 'Otherwise suspend: write no shared\s+record and no Debate outcome') 'suspension writes shared state or an outcome'
-        Assert-True ($debate -match 'If both sessions stop, neither remains to detect it') 'both-stopped blind spot is hidden'
+        Assert-True ($debate -match 'Two stopped sessions consume no tokens') 'both-stopped state is misclassified as a liveness failure'
     }
 
     Assert-Test 'debate blocks every future activity-time surface' {

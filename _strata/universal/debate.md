@@ -118,7 +118,8 @@ separately evidenced clock contract before it can use this procedure.
 At each check, continue while the anchor is less than 15 minutes old. Otherwise suspend: write no shared
 record and no Debate outcome, and report what was awaited, who owed liveness, their last valid activity,
 whether they ever participated, and what remains open. The user may resume the stopped participant or
-terminate the debate. If both sessions stop, neither remains to detect it.
+terminate the debate. If both sessions stop, token use stops with them, so this safeguard needs no remaining
+participant to detect that state. On resume, reconstruct the wait from files and start a fresh liveness window.
 
 ## User notifications
 
@@ -285,7 +286,8 @@ attended one has, which is none beyond the debate itself.
 
 ## Limits
 
-A live participant can detect that the peer owing the next turn stopped supplying liveness evidence; it
-cannot establish why the peer stopped, detect both sessions stopping, or judge the substance of an artifact
-a completion record names. Two capable agents exchanging rounds is expensive: use DAP when one provider's
-scrutiny is enough.
+A live participant can detect that the peer owing the next turn stopped supplying liveness evidence and
+suspend before one-sided waiting wastes more tokens. It cannot establish why the peer stopped or judge the
+substance of an artifact a completion record names. Two stopped sessions consume no tokens and are outside
+this liveness safeguard rather than an undetected failure. Two capable agents exchanging rounds is expensive:
+use DAP when one provider's scrutiny is enough.
