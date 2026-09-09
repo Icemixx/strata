@@ -91,11 +91,11 @@ Each new wait starts its own widening schedule. Fire at these minute offsets fro
 1, 2, 3, 4, 5, 7, 9, 11, 16, 21, 26, 31, 41, 51, 61, 71, ...
 ```
 
-This is a 1-minute interval for the first 5 minutes, 2 minutes through minute 10, 5 minutes through minute
-30, and 10 minutes thereafter. A logical fire may span several harness calls; consult the applicable
-harness dossier rather than assuming one call. A completed turn ends the current wait and starts the next
-one at the 1-minute tier. A heartbeat does not reset this schedule. No number of fires and no total elapsed
-time ends a debate.
+Fires at minutes 1 through 5 are one minute apart; fires at 7, 9, and 11 are two minutes apart; fires at 16,
+21, 26, and 31 are five minutes apart; later fires are ten minutes apart. A logical fire may span several
+harness calls; consult the applicable harness dossier rather than assuming one call. A completed turn ends
+the current wait and starts the next one at the 1-minute tier. A heartbeat does not reset this schedule. No
+number of fires and no total elapsed time ends a debate.
 
 The participant that owes the next completion or round owns liveness publication. Before any completion,
 A owns it. During reports and cross-analysis the strict completion sequence identifies the owner; during

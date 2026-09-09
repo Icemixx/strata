@@ -332,10 +332,11 @@ try {
     Assert-Test 'debate waiting has fixed cadence, liveness, and suspension semantics' {
         $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match '1, 2, 3, 4, 5, 7, 9, 11, 16, 21, 26, 31, 41, 51, 61, 71') 'widening wait offsets changed'
-        Assert-True ($debate -match 'A logical fire may span several harness calls') 'a fire is incorrectly assumed to be one call'
+        Assert-True ($debate -match 'fires at 7, 9, and 11 are two minutes apart; fires at 16,\s+21, 26, and 31 are five minutes apart; later fires are ten minutes apart') 'cadence tiers do not describe their boundary fires exactly'
+        Assert-True ($debate -match 'A logical fire may span several\s+harness calls') 'a fire is incorrectly assumed to be one call'
         Assert-True ($debate -match 'inspect shared state every 15 seconds inside it without\s+returning to the model') 'in-call polling interval is ambiguous'
         Assert-True ($debate -match 'A heartbeat does not reset this schedule') 'heartbeat incorrectly resets backoff'
-        Assert-True ($debate -match 'No number of fires and no total elapsed\s+time ends a debate') 'waiting gained a total limit'
+        Assert-True ($debate -match 'No\s+number of fires and no total elapsed time ends a debate') 'waiting gained a total limit'
         Assert-True ($debate -match 'participant that owes the next completion or round owns liveness publication') 'heartbeat ownership is ambiguous'
         Assert-True ($debate -match 'appends one `ALIVE` record\s+every 5 minutes') 'heartbeat interval changed'
         Assert-True ($debate -match 'Re-verify ownership immediately before the append') 'heartbeat uses stale ownership'
