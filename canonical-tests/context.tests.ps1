@@ -360,6 +360,8 @@ try {
         Assert-True ($debate -match 'One implementation serves both participants') 'debate does not require a single wait implementation'
         Assert-True ($debate -match '`_strata/universal/debate-wait\.ps1`') 'debate does not name the shipped wait'
         Assert-True ($debate -match 'Run that file; do not realize this loop from the text') 'debate still permits a per-harness realization of the wait'
+        Assert-True ($debate -match 'report-complete\|cross-complete\|round') 'the shipped wait cannot represent a rounds wait'
+        Assert-True ($debate -match 'round markers have no authority until both cross-completion stamps are valid') 'a premature round marker can affect protocol state'
         Assert-True ($debate -match 'One implementation cannot diverge from itself') 'the reason for a single implementation is unstated'
         # debate.md forbids any limit that ends a debate on elapsed time. The trial fence carried a
         # deadline exit; shipping it would have contradicted that rule from inside the kit.
@@ -429,6 +431,113 @@ try {
         Assert-True ($out -eq 'fire complete') 'a quiet fire did not complete'
         Assert-True ($sw.Elapsed.TotalSeconds -ge 2) "a 2-second fire returned early at $([Math]::Round($sw.Elapsed.TotalSeconds,3))s"
         Assert-True ($sw.Elapsed.TotalSeconds -lt 5) "a 2-second fire slept its poll interval, returning at $([Math]::Round($sw.Elapsed.TotalSeconds,3))s"
+
+        # A tail inside the grace window is a write in flight, not a defect: keep polling and let the
+        # next pass see the completed record. Only a tail that outlives the grace is Blocked.
+        Set-History (& $stamp 'Claude Code' 'report-complete' $now.AddSeconds(-10))
+        [IO.File]::WriteAllText($coord, [IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8).TrimEnd("`n"), $Utf8)
+        Assert-True ((Fire @{}) -eq 'fire complete') 'a write in flight was classified instead of waited out'
+    }
+
+    Assert-Test 'the shipped debate wait publishes, paces, and can fail to publish a heartbeat' {
+        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $bed = Join-Path $TempRoot 'debate-wait-heartbeat'
+        New-Item -ItemType Directory -Path $bed -Force | Out-Null
+        $coord = Join-Path $bed 'coordination.md'
+        $now = [datetime]::UtcNow
+        # Codex owes the next completion, so Codex owns liveness. It awaits a record its peer has not
+        # published, so the fire cannot release early and must reach the heartbeat branch.
+        $opened = "STAMP | report-complete | Claude Code | $($now.AddSeconds(-30).ToString('yyyy-MM-ddTHH:mm:ssZ')) | END`n"
+        function Reset-Bed { Write-Utf8 $coord ("# Brief`nA: Claude Code`nB: Codex`n`n## Completion history`n" + $opened) }
+        function Beat([hashtable]$Over) {
+            $a = @{ Product = 'Codex'; Await = 'cross-complete'; WaitStarted = $now.AddSeconds(-400); Interval = 2; DebatePath = $bed }
+            foreach ($k in $Over.Keys) { $a[$k] = $Over[$k] }
+            (& $waitScript @a) -join '|'
+        }
+        function Beats { @([IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8) -split "`n" | Where-Object { $_ -match '^ALIVE \| Codex \| ' }) }
+
+        # With no earlier heartbeat the wait start supplies the anchor, so one is due immediately.
+        Reset-Bed
+        Assert-True ((Beat @{}) -eq 'fire complete') 'the heartbeat fire did not complete'
+        Assert-True ((Beats).Count -eq 1) "the owing participant published $((Beats).Count) heartbeats instead of 1"
+        Assert-True ([IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8).EndsWith("`n")) 'the heartbeat left the history unterminated'
+
+        # A heartbeat is due every 5 minutes, not every fire. The record just written is the new anchor.
+        Assert-True ((Beat @{}) -eq 'fire complete') 'the second heartbeat fire did not complete'
+        Assert-True ((Beats).Count -eq 1) 'a heartbeat was republished before its interval elapsed'
+
+        # A participant that does not owe the next turn must never satisfy the peer's liveness with its
+        # own heartbeat. Claude Code completed the last turn, so Claude Code is not eligible here.
+        Reset-Bed
+        Assert-True ((Beat @{ Product = 'Claude Code'; Await = 'report-complete' }) -eq 'fire complete') 'the observer fire did not complete'
+        Assert-True (@([IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8) -split "`n" | Where-Object { $_ -match '^ALIVE \| ' }).Count -eq 0) 'an observer published liveness it does not own'
+
+        # Publication excludes another writer, retries a refusal for up to 1 second elapsed, and then
+        # reports rather than dropping the write. Holding the file for write with read sharing lets the
+        # fence read the history and denies only the append - the exact contention shape measured.
+        Reset-Bed
+        $held = [IO.File]::Open($coord, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::Read)
+        try { $blocked = Beat @{} } finally { $held.Dispose() }
+        Assert-True ($blocked -eq 'Blocked heartbeat could not be published') "a denied append returned '$blocked' instead of blocking"
+        Assert-True ((Beats).Count -eq 0) 'a blocked heartbeat still landed a record'
+    }
+
+    Assert-Test 'the shipped debate wait takes the latest turn from the rounds file' {
+        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $bed = Join-Path $TempRoot 'debate-wait-rounds'
+        New-Item -ItemType Directory -Path $bed -Force | Out-Null
+        $coord = Join-Path $bed 'coordination.md'
+        $rounds = Join-Path $bed 'rounds.md'
+        $now = [datetime]::UtcNow
+        $ts = { param($s) $now.AddSeconds(-$s).ToString('yyyy-MM-ddTHH:mm:ssZ') }
+        # Round markers have authority only after all four blind-phase stamps exist.
+        Write-Utf8 $coord ("# Brief`nA: Claude Code`nB: Codex`n`n## Completion history`n" +
+            "STAMP | report-complete | Claude Code | $(& $ts 2000) | END`n" +
+            "STAMP | report-complete | Codex | $(& $ts 1980) | END`n" +
+            "STAMP | cross-complete | Claude Code | $(& $ts 1960) | END`n" +
+            "STAMP | cross-complete | Codex | $(& $ts 1940) | END`n")
+        # The marker's separator is an em dash. It stopped matching once when the character was recoded
+        # in transport, so the pattern matches any single character there and this fixture writes the
+        # real one by code point rather than as a literal.
+        $dash = [char]0x2014
+        Write-Utf8 $rounds "## Round 1 $dash Codex`n`nRound 1 complete $dash next: Claude Code`n"
+        function Fire2([hashtable]$Over) {
+            $a = @{ Product = 'Codex'; Await = 'round'; WaitStarted = $now.AddSeconds(-1800); Interval = 2; DebatePath = $bed }
+            foreach ($k in $Over.Keys) { $a[$k] = $Over[$k] }
+            (& $waitScript @a) -join '|'
+        }
+        function Alive { @([IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8) -split "`n" | Where-Object { $_ -match '^ALIVE \| Codex \| ' }) }
+
+        # The marker's mtime is the latest completed turn, so its fresh value prevents a stale-history
+        # suspension. Codex is only observing here and must not publish Claude Code's liveness.
+        Assert-True ((Fire2 @{}) -eq 'fire complete') 'the rounds fire did not complete'
+        Assert-True ((Alive).Count -eq 0) "an observing participant published the round owner's liveness"
+
+        # A rounds wait releases for this participant's turn, not for the complete cross phase.
+        Write-Utf8 $rounds ((@("## Round 2 $dash Claude Code", '', "Round 2 complete $dash next: Codex", '') -join [char]10))
+        Assert-True ((Fire2 @{}) -eq 'FOUND') 'the next-round marker did not release the named participant'
+
+        # A closing outcome releases either participant without inventing another round marker.
+        Write-Utf8 $rounds ((@("## Round 2 $dash Claude Code", '', "DEBATE: converged $dash 1 settled $dash fixture", '') -join [char]10))
+        Assert-True ((Fire2 @{}) -eq 'FOUND') 'a valid Debate outcome did not release a rounds wait'
+
+        # A rounds file cannot advance protocol state before both cross-completion stamps exist.
+        Write-Utf8 $coord ("# Brief`nA: Claude Code`nB: Codex`n`n## Completion history`n" +
+            "STAMP | report-complete | Claude Code | $(& $ts 20) | END`n" +
+            "STAMP | report-complete | Codex | $(& $ts 10) | END`n")
+        Write-Utf8 $rounds ((@("## Round 1 $dash Claude Code", '', "Round 1 complete $dash next: Codex", '') -join [char]10))
+        Assert-True ((Fire2 @{ WaitStarted = [datetime]::UtcNow }) -eq 'fire complete') 'a premature round marker released before blind-phase completion'
+
+        # A marker carries no timestamp, so the file's modification time is the activity value - and it
+        # is an activity surface like any other, so a future one is Blocked rather than fresh evidence.
+        Write-Utf8 $coord ("# Brief`nA: Claude Code`nB: Codex`n`n## Completion history`n" +
+            "STAMP | report-complete | Claude Code | $(& $ts 2000) | END`n" +
+            "STAMP | report-complete | Codex | $(& $ts 1980) | END`n" +
+            "STAMP | cross-complete | Claude Code | $(& $ts 1960) | END`n" +
+            "STAMP | cross-complete | Codex | $(& $ts 1940) | END`n")
+        Write-Utf8 $rounds ((@("## Round 2 $dash Claude Code", '', "Round 2 complete $dash next: Codex", '') -join [char]10))
+        (Get-Item -LiteralPath $rounds).LastWriteTimeUtc = $now.AddHours(2)
+        Assert-True ((Fire2 @{}) -like 'Blocked future rounds.md modification time*') 'a future rounds file suppressed suspension'
     }
 
     Assert-Test 'debate notification ownership cannot end the joining turn' {

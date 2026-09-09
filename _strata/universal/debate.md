@@ -90,13 +90,15 @@ be the turn's last action.
 invocation:
 
 ```text
-debate-wait.ps1 -Product <this session's product> -Await <report-complete|cross-complete>
+debate-wait.ps1 -Product <this session's product> -Await <report-complete|cross-complete|round>
                 -WaitStarted <UTC instant this wait began> -Interval <seconds, from the schedule below>
                 -DebatePath <debate branch directory>
 ```
 
 It writes exactly one line - `FOUND`, `fire complete`, `SUSPENDED - ...`, or `Blocked ...` - and that line is
-the result. `-WaitStarted` is set once when the wait begins and passed unchanged to every later fire of that
+the result. For a rounds wait, `FOUND` means the latest valid marker names this participant or a valid Debate
+outcome is present; round markers have no authority until both cross-completion stamps are valid.
+`-WaitStarted` is set once when the wait begins and passed unchanged to every later fire of that
 wait; the script never assigns it. These rules were previously realized once per harness in two shell
 languages, and three defects followed, each one implementation differing from the other rather than either
 misreading the rule. One implementation cannot diverge from itself.

@@ -27,7 +27,8 @@
     This session's product name. It must match A or B in the brief; everything else is derived.
 
 .PARAMETER Await
-    The completion record this wait is for.
+    The completion record or round turn this wait is for. Round waiting releases when the latest valid
+    turn marker names this participant or a valid Debate outcome closes the rounds file.
 
 .PARAMETER WaitStarted
     UTC instant this wait began, set once by the caller and passed unchanged to every later fire of
@@ -51,7 +52,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$Product,
-    [Parameter(Mandatory)][ValidateSet('report-complete', 'cross-complete')][string]$Await,
+    [Parameter(Mandatory)][ValidateSet('report-complete', 'cross-complete', 'round')][string]$Await,
     [Parameter(Mandatory)][datetime]$WaitStarted,
     [Parameter(Mandatory)][ValidateRange(1, 600)][int]$Interval,
     [string]$DebatePath = '.'
@@ -96,6 +97,7 @@ $ts = '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
 $stampRe = "^STAMP \| (report|cross)-complete \| ($Ax|$Bx) \| $ts \| END$"
 $aliveRe = "^ALIVE \| ($Ax|$Bx) \| $ts \| END$"
 $markRe = "^Round \d+ complete . next: ($Ax|$Bx)$"
+$outcomeRe = '^DEBATE: (converged . \d+ settled . .+|terminated . .+ . \d+ settled, \d+ open . .+|void . .+ . .+)$'
 
 function Terminated {
     $s = [IO.File]::Open($script:f, 'Open', 'Read', 'ReadWrite')
@@ -142,6 +144,11 @@ function HistoryState {
     return 'Valid'
 }
 
+function BlindPhasesComplete {
+    $cross = @(Records | Where-Object { $_ -match $script:stampRe -and $_ -match '^STAMP \| cross-complete \| ' })
+    $cross.Count -eq 2
+}
+
 # The latest completed turn comes from two files: the newest STAMP during blind phases, and during
 # rounds the newest turn marker, whose completer is whoever the marker does not name. A marker carries
 # no timestamp, so rounds.md's modification time supplies one; 15-minute staleness needs no finer
@@ -154,7 +161,7 @@ function LatestTurn {
         $sa = [pscustomobject]@{ Author = $x[2]; Time = [datetime]::Parse($x[3]).ToUniversalTime() }
     }
     $ra = $null
-    if (Test-Path -LiteralPath $script:r) {
+    if ((BlindPhasesComplete) -and (Test-Path -LiteralPath $script:r)) {
         $m = Get-Content -LiteralPath $script:r -Encoding utf8 | Where-Object { $_ -match $script:markRe } | Select-Object -Last 1
         if ($m) {
             $nxt = ($m -split 'next: ')[1]
@@ -189,7 +196,7 @@ function ActivityState {
         # pass would otherwise compare against an older instant and read as future.
         if ($at -gt [datetime]::UtcNow) { return "Blocked future $kind timestamp $($at.ToString('yyyy-MM-ddTHH:mm:ssZ'))" }
     }
-    if (Test-Path -LiteralPath $script:r) {
+    if ((BlindPhasesComplete) -and (Test-Path -LiteralPath $script:r)) {
         $marker = Get-Content -LiteralPath $script:r -Encoding utf8 | Where-Object { $_ -match $script:markRe } | Select-Object -Last 1
         $roundTime = (Get-Item -LiteralPath $script:r).LastWriteTimeUtc
         if ($marker -and $roundTime -gt [datetime]::UtcNow) {
@@ -199,8 +206,22 @@ function ActivityState {
     return 'Credible'
 }
 
+function RoundReady {
+    param($product)
+    if (-not (BlindPhasesComplete) -or -not (Test-Path -LiteralPath $script:r)) { return $false }
+    $lines = @(Get-Content -LiteralPath $script:r -Encoding utf8)
+    if (@($lines | Where-Object { $_ -match $script:outcomeRe }).Count -eq 1) { return $true }
+    $marker = $lines | Where-Object { $_ -match $script:markRe } | Select-Object -Last 1
+    if (-not $marker) { return $false }
+    (($marker -split 'next: ')[1] -eq $product)
+}
+
 # Only a Valid history can release anything; the loop establishes that before calling this.
-function Accepted { param($phase, $product) @(Records | Where-Object { $_ -match "^STAMP \| $phase \| $([regex]::Escape($product)) \| " }).Count -eq 1 }
+function Accepted {
+    param($phase, $product)
+    if ($phase -eq 'round') { return (RoundReady $product) }
+    @(Records | Where-Object { $_ -match "^STAMP \| $phase \| $([regex]::Escape($product)) \| " }).Count -eq 1
+}
 
 # Sleep no further than this fire's end. The interval is a wall-clock bound, so per-pass work - file
 # reads, validation, a heartbeat append - is absorbed by the sleep rather than added to the fire. A
@@ -224,7 +245,8 @@ while ([datetime]::UtcNow -lt $end) {
     $activityState = ActivityState
     if ($activityState -like 'Blocked*') { $activityState; $fireEnded = $true; break }
 
-    if (Accepted $Await $peer) { 'FOUND'; $fireEnded = $true; break }
+    $acceptedFor = if ($Await -eq 'round') { $me } else { $peer }
+    if (Accepted $Await $acceptedFor) { 'FOUND'; $fireEnded = $true; break }
 
     if (Eligible $me) {
         $mine = LastAlive $me
