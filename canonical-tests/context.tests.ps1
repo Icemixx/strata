@@ -354,6 +354,83 @@ try {
         Assert-True ($debate -match 'multi-host debate requires a\s+separately evidenced clock contract') 'same-host clock assumption is unstated'
     }
 
+    Assert-Test 'debate waiting has exactly one shipped implementation' {
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True (Test-Path -LiteralPath (Join-Path $StagedStrata 'universal\debate-wait.ps1')) 'the shipped wait implementation is missing'
+        Assert-True ($debate -match 'One implementation serves both participants') 'debate does not require a single wait implementation'
+        Assert-True ($debate -match '`_strata/universal/debate-wait\.ps1`') 'debate does not name the shipped wait'
+        Assert-True ($debate -match 'Run that file; do not realize this loop from the text') 'debate still permits a per-harness realization of the wait'
+        Assert-True ($debate -match 'One implementation cannot diverge from itself') 'the reason for a single implementation is unstated'
+        # debate.md forbids any limit that ends a debate on elapsed time. The trial fence carried a
+        # deadline exit; shipping it would have contradicted that rule from inside the kit.
+        $wait = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate-wait.ps1'), [Text.Encoding]::UTF8)
+        Assert-True ($wait -notmatch 'DEADLINE') 'the shipped wait can end a debate on elapsed time'
+    }
+
+    Assert-Test 'the shipped debate wait honours its contract when executed' {
+        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $bed = Join-Path $TempRoot 'debate-wait'
+        New-Item -ItemType Directory -Path $bed -Force | Out-Null
+        $coord = Join-Path $bed 'coordination.md'
+        $now = [datetime]::UtcNow
+        function Set-History([string]$Body) { Write-Utf8 $coord ("# Brief`nA: Claude Code`nB: Codex`n`n## Completion history`n" + $Body) }
+        function Fire([hashtable]$Over) {
+            $a = @{ Product = 'Codex'; Await = 'report-complete'; WaitStarted = $now; Interval = 2; DebatePath = $bed }
+            foreach ($k in $Over.Keys) { $a[$k] = $Over[$k] }
+            (& $waitScript @a) -join '|'
+        }
+        $stamp = { param($who, $phase, $at) "STAMP | $phase | $who | $($at.ToString('yyyy-MM-ddTHH:mm:ssZ')) | END`n" }
+
+        Set-History (& $stamp 'Claude Code' 'report-complete' $now.AddSeconds(-10))
+        Assert-True ((Fire @{}) -eq 'FOUND') 'a valid peer completion did not release'
+
+        Set-History "STAMP | report-complete | Claude Code | not-a-time | END`n"
+        Assert-True ((Fire @{}) -eq 'Blocked completed malformed record') 'a malformed record did not block'
+
+        Write-Utf8 $coord "# Brief`nA: Claude Code`nB: Codex`n"
+        Assert-True ((Fire @{}) -eq 'Blocked completion-history heading missing') 'a missing history heading did not block'
+
+        Set-History ((& $stamp 'Claude Code' 'report-complete' $now.AddSeconds(-20)) + (& $stamp 'Claude Code' 'report-complete' $now.AddSeconds(-10)))
+        Assert-True ((Fire @{}) -eq 'Blocked duplicate completion') 'a duplicate completion did not block'
+
+        Set-History (& $stamp 'Codex' 'report-complete' $now.AddSeconds(-10))
+        Assert-True ((Fire @{}) -eq 'Blocked out-of-order completion history') 'an out-of-order history did not block'
+
+        # Every timestamp-bearing activity surface, not only the heartbeat.
+        Set-History "ALIVE | Claude Code | $($now.AddHours(2).ToString('yyyy-MM-ddTHH:mm:ssZ')) | END`n"
+        Assert-True ((Fire @{}) -like 'Blocked future ALIVE timestamp*') 'a future heartbeat did not block'
+        Set-History (& $stamp 'Claude Code' 'report-complete' $now.AddHours(2))
+        Assert-True ((Fire @{}) -like 'Blocked future STAMP timestamp*') 'a future completion stamp did not block'
+
+        Set-History (& $stamp 'Claude Code' 'report-complete' $now.AddSeconds(-10))
+        [IO.File]::WriteAllText($coord, [IO.File]::ReadAllText($coord, [Text.Encoding]::UTF8).TrimEnd("`n"), $Utf8)
+        (Get-Item -LiteralPath $coord).LastWriteTimeUtc = $now.AddSeconds(-120)
+        Assert-True ((Fire @{}) -eq 'Blocked persistent unterminated record') 'a persistently torn tail did not block'
+
+        # The wait start is a floor, not a fallback: the same stale history suspends an old wait and
+        # does not suspend a wait that has just begun. Without the floor a resumed session re-suspends
+        # on the very activity that suspended it.
+        Set-History "ALIVE | Claude Code | $($now.AddSeconds(-1800).ToString('yyyy-MM-ddTHH:mm:ssZ')) | END`n"
+        Assert-True ((Fire @{ WaitStarted = $now.AddSeconds(-1800) }) -like 'SUSPENDED - no activity from Claude Code since*') 'stale activity did not suspend'
+        Assert-True ((Fire @{ WaitStarted = $now }) -eq 'fire complete') 'a freshly started wait re-suspended on activity that predates it'
+
+        # An unrecognized product otherwise resolves its peer to A, so the session keeps A's liveness
+        # and reads A's eligibility while believing it is someone else.
+        Set-History ''
+        Assert-True ((Fire @{ Product = 'Gemini' }) -eq 'Blocked Product is not a participant named in the brief') 'an unknown product was accepted as a participant'
+        Assert-True ((Fire @{ WaitStarted = [datetime]::SpecifyKind($now, [DateTimeKind]::Local) }) -eq 'Blocked WaitStarted must be a UTC [datetime]') 'a non-UTC wait start was accepted'
+
+        # The interval is a wall-clock bound, so a fire lasts its interval rather than the poll grid it
+        # sleeps on. A loop that sleeps a whole poll instead returns late by its own work, and the
+        # offsets above are absolute positions from the wait's start, so that error accumulates.
+        $sw = [Diagnostics.Stopwatch]::StartNew()
+        $out = Fire @{ Interval = 2 }
+        $sw.Stop()
+        Assert-True ($out -eq 'fire complete') 'a quiet fire did not complete'
+        Assert-True ($sw.Elapsed.TotalSeconds -ge 2) "a 2-second fire returned early at $([Math]::Round($sw.Elapsed.TotalSeconds,3))s"
+        Assert-True ($sw.Elapsed.TotalSeconds -lt 5) "a 2-second fire slept its poll interval, returning at $([Math]::Round($sw.Elapsed.TotalSeconds,3))s"
+    }
+
     Assert-Test 'debate notification ownership cannot end the joining turn' {
         $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'B announces once that Phase 1 has begun') 'joining participant does not own the start notice'

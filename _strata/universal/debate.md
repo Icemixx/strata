@@ -85,6 +85,22 @@ wait. Empty output from a still-running wait is not completion. Keep only one wa
 reporting progress while work remains must be followed by the next tool call in the same turn; it must never
 be the turn's last action.
 
+**One implementation serves both participants.** The kit ships the wait as
+`_strata/universal/debate-wait.ps1`. Run that file; do not realize this loop from the text. One fire is one
+invocation:
+
+```text
+debate-wait.ps1 -Product <this session's product> -Await <report-complete|cross-complete>
+                -WaitStarted <UTC instant this wait began> -Interval <seconds, from the schedule below>
+                -DebatePath <debate branch directory>
+```
+
+It writes exactly one line - `FOUND`, `fire complete`, `SUSPENDED - ...`, or `Blocked ...` - and that line is
+the result. `-WaitStarted` is set once when the wait begins and passed unchanged to every later fire of that
+wait; the script never assigns it. These rules were previously realized once per harness in two shell
+languages, and three defects followed, each one implementation differing from the other rather than either
+misreading the rule. One implementation cannot diverge from itself.
+
 Each new wait starts its own widening schedule. Fire at these minute offsets from that wait's start:
 
 ```text
