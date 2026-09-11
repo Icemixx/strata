@@ -1,82 +1,37 @@
-# Audit
+# Truth audit
 
-Use this method for a seasonal, full-application, or refactor audit, and for auditing the authority
-records themselves. The audit is read-only unless the user separately authorizes remediation.
+Use this procedure for an unqualified, seasonal, full-application, or post-conversion audit, and for auditing the authority records. It examines whether records are accurate and sufficiently complete for their declared scope, and whether the application satisfies its governing requirements. The audit is read-only unless the user separately authorizes remediation.
 
-Two objects, audited together because the second is nearly free once the first is under way: the
-**application**, and the **authorities that describe it**. Verifying a record against the code is the same
-reading as auditing the code, done from the other direction.
+Code is evidence of what happens, not automatic proof of what should happen. A record can describe a defective implementation accurately, and code and prose can agree while both violate a governing requirement. Those are correctness findings. A request for code simplification, maintainability, dead-code, or optimization opportunities uses `refactor.md`; do not start that separate review from this procedure unless the user asks for both.
 
 ## Set the depth before starting
 
-The record checks below do not degrade gracefully. Finding candidates is mechanical and cheap, but
-deciding whether a candidate is a real duplicate, a live contradiction, or a superseded ruling is one
-judgement over two texts, and a truth check is that judgement against the code. Run shallow, those checks
-do not return fewer findings — they return clean, which is indistinguishable from a tree that has none.
+Record the actual reasoning depth for each pass. Before beginning, read the applicable harness dossier for its audit guidance. If this session is below the stated level, tell the user and let them raise it; where the harness permits it, a delegated worker may run at a chosen level. Depth does not replace coverage: narrow a pass and say so rather than reading a broad scope shallowly.
 
-Before beginning, read your harness dossier for the reasoning-depth setting it recommends for an audit.
-If this session is below it, say so to the user in one line and let them raise it before you start: on
-some harnesses a session cannot change its own depth, and on none of them is it yours to change silently.
-Delegation is the exception. Where a harness lets a parent choose the depth a delegated worker runs at,
-that choice is yours and you are accountable for it.
+## Declare coverage
 
-Depth is not one value per audit. It can differ between turns, between passes, and between a parent and
-the workers it dispatches. Record what each pass actually ran at, not a single figure for the whole.
+Record the revision and worktree state, requested roots, records and flows, exclusions, available environments, selected checks, and gates that cannot run. Read Project Instructions and their routed audit supplement. Inventory material first-party surfaces and classify generated, vendor, archive, and test material by role. Every declared area ends reviewed, excluded with a reason, or not assessed with a named blocker. The archive is provenance only when the requested audit includes it.
 
-Depth is bounded by coverage, not bought by it. A pass reading a fraction of the tree at maximum depth
-establishes less than several bounded passes over disjoint scopes. Prefer narrowing the scope and saying
-so to widening it and thinning every judgement inside it.
+## Establish governing claims
 
-## Establish coverage
+Read the relevant Instructions, technical State, tickets, Rationale, and Build Log with their different time meanings. A dated Build Log event remains a dated observation; its disagreement with current State does not establish a conflict merely because one is newer. Establish which requirements and invariants govern before treating an implementation, comment, or test as a pass.
 
-Record the repository revision, requested scope, explicit exclusions, available environments, and every
-important gate that will not be run. Read Project Instructions and follow any routed stack-, domain-, or
-product-specific audit checks. Do not imply coverage of an unexamined surface.
+## Check claims and behavior in both directions
 
-Inspect applicable behavior, data integrity, architecture, maintainability, tests, security and privacy,
-dependencies, and dead or duplicated code. Use direct evidence where possible and label inference,
-uncertainty, and environmental limitations.
+Trace material requirements through entry points, validation, calculations, state transitions, persistence, reload or synchronization, failure handling, and user-visible outcomes. Inspect implementing code and callers; comments, test names, and passing tests are claims or evidence, not self-proving contracts. Also identify material behavior absent from the records when it exposes a missing claim within the declared scope.
 
-## Audit the records
+Apply the relevant correctness lenses: data, schema, and access integrity; versioning and migration contracts; resource ownership and lifecycle; concurrency; error handling; security and privacy boundaries; and dependency behavior against required invariants. Test whether a relevant check can detect the claimed failure. Do not imply current external advisory research or runtime/device validation unless performed. Project hard constraints cannot be waived by refactor economics: report a demonstrated defect even when correction is expensive, and do not weaken a checker or substitute an unrelated green test for a required observation. Performance belongs here only for a demonstrated contract violation or unbounded resource behavior that threatens required operation; discretionary speedups belong to `refactor.md`.
 
-`consolidation.md` already says what to do with a duplicated, superseded or conflicting claim once it is
-in front of you. **Nothing otherwise sends anyone to look**, which is how a repository carries records
-that flatly contradict each other for months. Looking is this procedure's job; fixing is that one's.
+## Compare records
 
-- **Duplicates.** One claim stated in two places drifts the moment either is edited.
-- **Contradictions.** Two records disagreeing about one fact. A conversion conserves, and conservation
-  preserves an error as faithfully as a fact, so a converted tree is where these collect. They survive
-  every structural check ever written: both statements are present, both are cited, both resolve.
-- **Superseded claims.** A record stating what was decided, where a later decision reversed it and left
-  the older one live. Date order is evidence, not proof — say which ruling governs and why.
-- **Truth.** A record's claim about the software, checked against the software. This is the one no
-  structural check can approach and the reason the audit reads both objects at once: a claim can be
-  current, cited, unique, uncontradicted, and false.
+Find duplicates, overlapping or contradictory claims, superseded claims left live, wrong current/completed status, missing qualifications, and broken evidence relationships. Use `consolidation.md` for the semantic definitions. Do not select the newest record merely to resolve a conflict: preserve competing claims and request the decision that evidence cannot supply. Intentional complementary records remain distinct.
 
-Report each as a finding with its two locations. Do not resolve a conflict by picking the newer text and
-moving on — `consolidation.md` step 3 ends at *surface the competing claims and ask the user*, and that
-holds here.
+## Report without fixing
 
-## Classify findings
+Use the report path supplied by the user or project. Otherwise write `_sediment/truth-audit-YYYY-MM-DD.md`, adding the next unused `-2`, `-3` suffix on a same-day collision. Preserve an earlier-revision report rather than overwriting it, and link the report from the owning project work record under its recording rules.
 
-- **Verified defect:** directly demonstrated incorrect behavior or violated contract.
-- **Probable defect:** evidence strongly indicates a defect, but a required observation is missing.
-- **Maintainability issue:** current behavior may work, but the design imposes a concrete ongoing cost or
-  risk.
-- **Optional improvement:** useful polish with no present correctness or maintenance failure.
+For every finding, identify the claim or requirement, record and code or evidence locations (both records for a record conflict), observed result, verified or probable status, consequence, affected scope, missing evidence, and smallest correction. An absence finding names the searched scope and expected source. Deduplicate one cause while retaining affected occurrences. Refer an incidental structural opportunity to `refactor.md` without expanding this pass.
 
-Prioritize by impact, likelihood, scope, and remediation cost. Deduplicate findings that share one cause.
-Recommend a refactor only when its expected benefit exceeds migration and regression cost. Do not
-manufacture findings, inflate severity, or treat fashionable architecture as evidence.
+The report records revision, scope, coverage, prioritized findings, literal verification, exclusions, blockers, and supported strengths. It is **Complete for declared scope** when every required area was reviewed or explicitly excluded and findings were recorded; defects may remain unfixed. It is **Partial** when a required area was not assessed. Remediation status is separate. Do not claim whole-application correctness beyond the covered scope.
 
-Report strengths and areas that should remain unchanged alongside the prioritized findings. For each
-finding, provide its evidence, affected scope, confidence, consequence, and smallest credible next step.
-
-## What a clean result means
-
-A tool that reports nothing has either found nothing or cannot see anything, and the two are
-indistinguishable from the outside. Say which checks ran, over what, and what each could not see. A record
-audit that reports clean without naming its blind spots claims more than it established.
-
-Name the records the pass did not read, and the depth it ran at. An unread record is not a clean record,
-and the report is the only place that difference survives.
+Close with up to five supported material correctness risks if the application ships as examined; fewer or none are valid. For the first post-conversion use, follow the project migration-audit supplement for its archive and conversion-evidence comparison. Completing that report does not complete migration, launch a refactor review, or generate a Guide.

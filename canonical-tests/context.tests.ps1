@@ -572,6 +572,36 @@ try {
         Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
     }
 
+    Assert-Test 'truth and refactor reviews have separate routed boundaries' {
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'core.md'), [Text.Encoding]::UTF8)
+        $auditPath = Join-Path $StagedStrata 'procedures\audit.md'
+        $refactorPath = Join-Path $StagedStrata 'procedures\refactor.md'
+        Assert-True (Test-Path -LiteralPath $auditPath -PathType Leaf) 'truth-audit procedure is missing'
+        Assert-True (Test-Path -LiteralPath $refactorPath -PathType Leaf) 'refactor-review procedure is missing'
+        $audit = [IO.File]::ReadAllText($auditPath, [Text.Encoding]::UTF8)
+        $refactor = [IO.File]::ReadAllText($refactorPath, [Text.Encoding]::UTF8)
+        Assert-True ($router -match 'audit\.md` \| Audit authority truth or application correctness') 'truth audit is not routed as a truth/correctness review'
+        Assert-True ($router -match 'refactor\.md` \| Review code structure, simplification, maintainability, or optimization opportunities when explicitly requested') 'refactor review is not explicitly routed'
+        Assert-True ($router -match 'does not require an audit first') 'refactor review incorrectly implies an audit prerequisite'
+        Assert-True ($audit -match 'code and prose can agree while both violate a governing requirement') 'truth audit treats agreeing code and prose as conclusive'
+        Assert-True ($audit -match 'does not establish a conflict merely because one is newer') 'truth audit selects between records by date'
+        Assert-True ($audit -match 'Do not imply current external advisory research or runtime/device validation unless performed') 'truth audit overclaims external or runtime validation'
+        Assert-True ($audit -match 'Project hard constraints cannot be waived by refactor economics') 'truth audit permits discretionary economics to waive a hard constraint'
+        Assert-True ($audit -match 'do not weaken a checker or substitute an unrelated green test') 'truth audit permits a checker to be weakened or replaced by unrelated green output'
+        Assert-True ($audit -match 'Complete for declared scope') 'truth audit does not separate coverage completion from remediation'
+        Assert-True ($audit -match 'structural opportunity to `refactor\.md`') 'truth audit does not refer structural opportunities to refactor review'
+        Assert-True ($audit -match '_sediment/truth-audit-YYYY-MM-DD\.md') 'truth audit has no default report path'
+        Assert-True ($audit -match 'Preserve an earlier-revision report') 'truth audit can overwrite prior evidence'
+        Assert-True ($refactor -match 'does not start an unsolicited whole-codebase review') 'named refactor implementation launches an unsolicited review'
+        Assert-True ($refactor -match 'does not change production code, records, tests, dependencies, configuration, or project authorities') 'refactor review silently authorizes changes'
+        Assert-True ($refactor -match 'correctness, security, or data-integrity failure') 'refactor review does not preserve correctness classification'
+        Assert-True ($refactor -match 'project hard constraints are not tradeable against refactor economics') 'refactor review permits hard constraints to be traded for refactor economics'
+        Assert-True ($refactor -match 'worth doing.*,.*only when touching this area.*,.*leave unchanged') 'refactor review lacks its required decision outcomes'
+        Assert-True ($refactor -match '_sediment/code-refactor-review-YYYY-MM-DD\.md') 'refactor review has no default report path'
+        Assert-True ($refactor -match 'Complete for declared scope') 'refactor review has no completion boundary'
+        Assert-True ($refactor -match 'not a correctness certificate or a completed refactor') 'refactor review overstates its conclusion'
+    }
+
     Assert-Test 'additions and removals carry symmetric evidence burdens' {
         $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'core.md'), [Text.Encoding]::UTF8)
         Assert-True ($router -match 'Before deleting text or removing behavior') 'removal rule does not reach removed behavior'
