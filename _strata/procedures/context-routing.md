@@ -73,7 +73,7 @@ generation, and is not validated by `context.ps1`. Records link into it by ordin
 ## Instruction audiences
 
 Every agent loads common Universal Instructions and common Project Instructions. The user-facing Active
-Agent additionally loads `_strata/universal/active-agent.md` and, when present,
+Agent additionally loads `_strata/procedures/active-agent.md` and, when present,
 `_strata/project_instructions_active_agent.md`. Delegated agents do not load either Active Agent file;
 their relevant context arrives through the delegation brief.
 
@@ -178,7 +178,7 @@ only for historical need. Reopened work moves back to current storage.
 
 ## Guide and `context.ps1`
 
-The kit ships one dependency-free Windows PowerShell tool at `_strata/universal/context.ps1`. It resolves
+The kit ships one dependency-free Windows PowerShell tool at `_strata/procedures/context.ps1`. It resolves
 project paths relative to itself and requires exactly one explicit mode:
 
 ```powershell

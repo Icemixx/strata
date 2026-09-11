@@ -1,10 +1,10 @@
 # Universal Instructions
 
-Shared, project-agnostic instructions for every supported agent. This file and `_strata/universal/`
+Shared, project-agnostic instructions for every supported agent. This file and `_strata/procedures/`
 are copied unchanged between repositories. Project-specific rules belong in
 `_strata/project_instructions.md` and win on conflict.
 
-If you are the user-facing agent, read `_strata/universal/active-agent.md` before substantive work. A
+If you are the user-facing agent, read `_strata/procedures/active-agent.md` before substantive work. A
 delegated agent does not read Active Agent Instructions; its assignment supplies the routed context it
 needs.
 
@@ -12,7 +12,7 @@ needs.
 
 Instructions is the only authority loaded merely because a session starts. Do not automatically load
 State, Rationale, Build Log, or the generated Guide. Route additional context under
-`_strata/universal/context-routing.md` when the task needs it.
+`_strata/procedures/context-routing.md` when the task needs it.
 
 Read routed procedures silently. Visible load announcements are not required. Announce a material new
 discovery promptly when it changes an accepted conclusion, plan, risk, scope, or unresolved item. A
@@ -27,7 +27,7 @@ into extending it, which is what one normative owner per rule requires; a rule r
 literal search is a finding about that search. Then state the evidence, affected procedure, proposed kind of
 change, likely consequence, and urgency. Do not silently expand the current task, modify the kit, or create
 backlog work. An accepted recommendation becomes separately authorized kit work routed through
-`_strata/universal/kit-editing.md`. Do not promote a project-specific preference into a universal rule without
+`_strata/procedures/kit-editing.md`. Do not promote a project-specific preference into a universal rule without
 cross-project justification.
 
 ## Scope and authority

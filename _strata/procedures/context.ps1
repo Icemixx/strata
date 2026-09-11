@@ -245,10 +245,10 @@ function Build-AuthorityGraph([string]$Name, [string]$DirectoryName) {
 
 function Test-RequiredFiles {
     foreach ($relative in @(
-        'universal_agent_instructions.md',
-        'universal\active-agent.md',
-        'universal\context-routing.md',
-        'universal\guide-shell.html',
+        'core.md',
+        'procedures\active-agent.md',
+        'procedures\context-routing.md',
+        'procedures\guide-shell.html',
         'project_instructions.md'
     )) {
         $path = Join-Path $StrataRoot $relative
@@ -262,7 +262,7 @@ function Test-RequiredFiles {
         }
         $text = Read-Utf8 $path
         if ($null -eq $text) { continue }
-        foreach ($required in @('_strata/universal_agent_instructions.md','_strata/project_instructions.md')) {
+        foreach ($required in @('_strata/core.md','_strata/project_instructions.md')) {
             if ($text -notmatch [regex]::Escape($required)) { Add-Finding 'ROUTER_EDGE' "$router does not route $required" }
         }
         if ($text -match 'active-agent|harness-(?:codex|claude-code)|project_instructions_active_agent') {

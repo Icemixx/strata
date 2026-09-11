@@ -3,7 +3,7 @@
     One bounded liveness fire for the unattended Debate procedure.
 
 .DESCRIPTION
-    `_strata/universal/debate.md` prescribes automatic file-backed coordination: a participant that
+    `_strata/procedures/debate.md` prescribes automatic file-backed coordination: a participant that
     owes nothing waits, re-reading validated shared state until the record it awaits appears. This
     script is that wait, and it is the only implementation. Both participants run this same file.
 

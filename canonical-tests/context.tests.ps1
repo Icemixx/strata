@@ -44,13 +44,13 @@ function New-Fixture([string]$Name) {
     Write-Utf8 (Join-Path $root 'AGENTS.md') @'
 # Agent Instructions Router
 
-1. `_strata/universal_agent_instructions.md`
+1. `_strata/core.md`
 2. `_strata/project_instructions.md`
 '@
     Write-Utf8 (Join-Path $root 'CLAUDE.md') @'
 # Agent Instructions Router
 
-@_strata/universal_agent_instructions.md
+@_strata/core.md
 
 @_strata/project_instructions.md
 '@
@@ -97,7 +97,7 @@ function New-BrokenFixture([string]$Name) {
 }
 
 function Invoke-Context([string]$Root, [string[]]$Arguments) {
-    $script = Join-Path $Root '_strata\universal\context.ps1'
+    $script = Join-Path $Root '_strata\procedures\context.ps1'
     $bound = @{}
     for ($i = 0; $i -lt $Arguments.Count; $i++) {
         switch ($Arguments[$i]) {
@@ -122,7 +122,7 @@ function Invoke-Context([string]$Root, [string[]]$Arguments) {
 }
 
 function Invoke-GenerateGuideCapture([string]$Root) {
-    $script = Join-Path $Root '_strata\universal\context.ps1'
+    $script = Join-Path $Root '_strata\procedures\context.ps1'
     $captured = New-Object System.Collections.ArrayList
     $refused = $false
     $message = ''
@@ -142,7 +142,7 @@ function Invoke-PublicContext([string]$Root, [string[]]$Arguments) {
     # The public path: the shipped script run exactly as README documents it.
     # The single-process contract above forbids the launch cmdlet in this file
     # and any child launch inside context.ps1; running the script is neither.
-    $target = Join-Path $Root '_strata\universal\context.ps1'
+    $target = Join-Path $Root '_strata\procedures\context.ps1'
     $previous = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
     try { $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $target @Arguments 2>&1 }
@@ -277,7 +277,7 @@ try {
         $launchToken = 'Start-' + 'Process'
         $powershellToken = 'power' + 'shell.exe'
         $scriptHostToken = 'c' + 'script.exe'
-        $contextSource = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\context.ps1'), [Text.Encoding]::UTF8)
+        $contextSource = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\context.ps1'), [Text.Encoding]::UTF8)
         $testSource = [IO.File]::ReadAllText($PSCommandPath, [Text.Encoding]::UTF8)
         Assert-True ($contextSource -notmatch [regex]::Escape($launchToken)) 'context.ps1 starts a child process'
         Assert-True ($contextSource -notmatch [regex]::Escape($powershellToken)) 'context.ps1 starts child PowerShell'
@@ -286,8 +286,8 @@ try {
     }
 
     Assert-Test 'debate uses provider sessions and supplies only the opening transport prompt' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
-        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'core.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'Head each round `## Round N — <product>`') 'round heading is not product-only'
         Assert-True ($debate -match 'A returns one ready-to-paste opening prompt') 'creation-time transport prompt rule missing'
         Assert-True ([regex]::Matches($debate, 'ready-to-paste', 'IgnoreCase').Count -eq 1) 'debate does not define exactly one opening transport prompt'
@@ -313,7 +313,7 @@ try {
     }
 
     Assert-Test 'debate coordinates all phases without proceed handoffs' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'brief in `coordination\.md`') 'coordination file is not the shared brief and history owner'
         Assert-True ($debate -match 'Reports release only when both report-completion records are valid') 'report release does not require both completions'
         Assert-True ($debate -match 'Cross-analyses release only when both\s+cross-completion records are valid') 'cross release does not require both completions'
@@ -330,7 +330,7 @@ try {
     }
 
     Assert-Test 'debate waiting has fixed cadence, liveness, and suspension semantics' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match '1, 2, 3, 4, 5, 7, 9, 11, 16, 21, 26, 31, 41, 51, 61, 71') 'widening wait offsets changed'
         Assert-True ($debate -match 'fires at 7, 9, and 11 are two minutes apart; fires at 16,\s+21, 26, and 31 are five minutes apart; later fires are ten minutes apart') 'cadence tiers do not describe their boundary fires exactly'
         Assert-True ($debate -match 'A logical fire may span several\s+harness calls') 'a fire is incorrectly assumed to be one call'
@@ -347,7 +347,7 @@ try {
     }
 
     Assert-Test 'debate blocks every future activity-time surface' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'parses as UTC and is not later than the observer.s current\s+UTC') 'activity time is not parsed and bounded'
         Assert-True ($debate -match 'applies\s+to `STAMP` and `ALIVE` timestamps and to `rounds\.md`.s modification time') 'future-time rule misses an activity source'
         Assert-True ($debate -match 'unparseable or\s+future activity time is `Blocked`, not fresh evidence') 'invalid or future activity can suppress suspension'
@@ -355,22 +355,22 @@ try {
     }
 
     Assert-Test 'debate waiting has exactly one shipped implementation' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
-        Assert-True (Test-Path -LiteralPath (Join-Path $StagedStrata 'universal\debate-wait.ps1')) 'the shipped wait implementation is missing'
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
+        Assert-True (Test-Path -LiteralPath (Join-Path $StagedStrata 'procedures\debate-wait.ps1')) 'the shipped wait implementation is missing'
         Assert-True ($debate -match 'One implementation serves both participants') 'debate does not require a single wait implementation'
-        Assert-True ($debate -match '`_strata/universal/debate-wait\.ps1`') 'debate does not name the shipped wait'
+        Assert-True ($debate -match '`_strata/procedures/debate-wait\.ps1`') 'debate does not name the shipped wait'
         Assert-True ($debate -match 'Run that file; do not realize this loop from the text') 'debate still permits a per-harness realization of the wait'
         Assert-True ($debate -match 'report-complete\|cross-complete\|round') 'the shipped wait cannot represent a rounds wait'
         Assert-True ($debate -match 'round markers have no authority until both cross-completion stamps are valid') 'a premature round marker can affect protocol state'
         Assert-True ($debate -match 'One implementation cannot diverge from itself') 'the reason for a single implementation is unstated'
         # debate.md forbids any limit that ends a debate on elapsed time. The trial fence carried a
         # deadline exit; shipping it would have contradicted that rule from inside the kit.
-        $wait = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate-wait.ps1'), [Text.Encoding]::UTF8)
+        $wait = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate-wait.ps1'), [Text.Encoding]::UTF8)
         Assert-True ($wait -notmatch 'DEADLINE') 'the shipped wait can end a debate on elapsed time'
     }
 
     Assert-Test 'the shipped debate wait honours its contract when executed' {
-        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $waitScript = Join-Path $StagedStrata 'procedures\debate-wait.ps1'
         $bed = Join-Path $TempRoot 'debate-wait'
         New-Item -ItemType Directory -Path $bed -Force | Out-Null
         $coord = Join-Path $bed 'coordination.md'
@@ -440,7 +440,7 @@ try {
     }
 
     Assert-Test 'the shipped debate wait publishes, paces, and can fail to publish a heartbeat' {
-        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $waitScript = Join-Path $StagedStrata 'procedures\debate-wait.ps1'
         $bed = Join-Path $TempRoot 'debate-wait-heartbeat'
         New-Item -ItemType Directory -Path $bed -Force | Out-Null
         $coord = Join-Path $bed 'coordination.md'
@@ -483,7 +483,7 @@ try {
     }
 
     Assert-Test 'the shipped debate wait takes the latest turn from the rounds file' {
-        $waitScript = Join-Path $StagedStrata 'universal\debate-wait.ps1'
+        $waitScript = Join-Path $StagedStrata 'procedures\debate-wait.ps1'
         $bed = Join-Path $TempRoot 'debate-wait-rounds'
         New-Item -ItemType Directory -Path $bed -Force | Out-Null
         $coord = Join-Path $bed 'coordination.md'
@@ -541,7 +541,7 @@ try {
     }
 
     Assert-Test 'debate notification ownership cannot end the joining turn' {
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'B announces once that Phase 1 has begun') 'joining participant does not own the start notice'
         Assert-True ($debate -match 'B immediately continues its\s+report and automatic waiting in the same turn') 'start notice can end B activity'
         Assert-True ($debate -match 'A alone announces convergence, termination, void, or a need\s+for user action') 'final announcement ownership is ambiguous'
@@ -550,11 +550,11 @@ try {
     }
 
     Assert-Test 'spec building is one routed cold-start workflow' {
-        $specPath = Join-Path $StagedStrata 'universal\spec-building.md'
+        $specPath = Join-Path $StagedStrata 'procedures\spec-building.md'
         Assert-True (Test-Path -LiteralPath $specPath -PathType Leaf) 'shared specification procedure is missing'
         $spec = [IO.File]::ReadAllText($specPath, [Text.Encoding]::UTF8)
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
-        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'core.md'), [Text.Encoding]::UTF8)
         Assert-True ($router -match 'spec-building\.md` \| Create, revise, review, confirm, or hand off a retained specification') 'specification procedure is not routed'
         Assert-True ($spec -match 'A specification is a cold-start implementation contract') 'cold-start contract is missing'
         Assert-True ($spec -match 'SPECIFICATION: draft') 'draft marker is missing'
@@ -566,14 +566,14 @@ try {
         Assert-True ($router -match 'adding, changing, simplifying,\s+replacing, or removing an instruction') 'Strata recommendation signal does not cover additions and changes'
         Assert-True ($router -match 'report it promptly\s+as a separate Strata recommendation') 'reusable Strata recommendation signal is missing'
         Assert-True ($router -match 'accepted recommendation becomes separately authorized kit work') 'recommendation does not preserve authorization boundary'
-        $active = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\active-agent.md'), [Text.Encoding]::UTF8)
+        $active = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\active-agent.md'), [Text.Encoding]::UTF8)
         Assert-True ($active -match 'reusable Strata improvement that has not yet been reported') 'closing recommendation backstop is missing'
-        Assert-True ($debate -match 'Follow `_strata/universal/spec-building\.md`') 'debate does not invoke the shared workflow'
+        Assert-True ($debate -match 'Follow `_strata/procedures/spec-building\.md`') 'debate does not invoke the shared workflow'
         Assert-True ([regex]::Matches($debate, 'written to be implemented by someone', 'IgnoreCase').Count -eq 0) 'debate still owns a parallel specification workflow'
     }
 
     Assert-Test 'additions and removals carry symmetric evidence burdens' {
-        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal_agent_instructions.md'), [Text.Encoding]::UTF8)
+        $router = [IO.File]::ReadAllText((Join-Path $StagedStrata 'core.md'), [Text.Encoding]::UTF8)
         Assert-True ($router -match 'Before deleting text or removing behavior') 'removal rule does not reach removed behavior'
         Assert-True ($router -match 'survives at one named destination or implementation') 'removal rule does not accept a surviving implementation'
         Assert-True ($router -match 'not a proof that no conceivable rule applies') 'removal check is unbounded'
@@ -581,7 +581,7 @@ try {
         Assert-True ($router -match 'proportional to the behavior.s breadth, cost, reversibility, and maintenance burden') 'addition evidence is not proportional'
         Assert-True ($router -match 'a reasoned failure is admissible') 'addition rule demands an observed failure'
         Assert-True ($router -match 'does not require separate justification for ordinary functionality') 'addition rule reaches ordinary work'
-        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\debate.md'), [Text.Encoding]::UTF8)
+        $debate = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\debate.md'), [Text.Encoding]::UTF8)
         Assert-True ($debate -match 'CONCEDE`, `HOLD`, `NEW`, `SIMPLIFY`, or `QUESTION`') 'SIMPLIFY is not in the position vocabulary'
         Assert-True ($debate -match 'SIMPLIFY proposes removing or consolidating a named existing element') 'SIMPLIFY is undefined'
         Assert-True ($debate -match 'does not by itself authorize the removal') 'raising SIMPLIFY is not separated from executing it'
@@ -592,7 +592,7 @@ try {
     Assert-Test 'harness dossiers stay level' {
         $headings = {
             param($name)
-            $text = [IO.File]::ReadAllText((Join-Path $StagedStrata "universal\$name"), [Text.Encoding]::UTF8)
+            $text = [IO.File]::ReadAllText((Join-Path $StagedStrata "procedures\$name"), [Text.Encoding]::UTF8)
             ,@($text -split "`r?`n" | Where-Object { $_ -match '^## ' })
         }
         $claude = & $headings 'harness-claude-code.md'
@@ -600,13 +600,13 @@ try {
         Assert-True ($claude.Count -gt 0) 'claude dossier has no sections to compare'
         Assert-True (($claude -join '|') -eq ($codex -join '|')) `
             "harness dossiers no longer carry the same sections in the same order: claude=[$($claude -join ', ')] codex=[$($codex -join ', ')]"
-        $editing = [IO.File]::ReadAllText((Join-Path $StagedStrata 'universal\kit-editing.md'), [Text.Encoding]::UTF8)
+        $editing = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\kit-editing.md'), [Text.Encoding]::UTF8)
         Assert-True ($editing -match 'The dossiers stay level') 'the levelling rule is missing from kit-editing'
     }
 
     Assert-Test 'direct user Guide generation is rejected' {
         $root = New-Fixture 'user-generation-rejected'
-        $contextScript = Join-Path $root '_strata\universal\context.ps1'
+        $contextScript = Join-Path $root '_strata\procedures\context.ps1'
         $escapedScript = $contextScript.Replace("'", "''")
         $runspace = [PowerShell]::Create()
         try {
@@ -640,13 +640,13 @@ try {
         @{ Name='broken link'; Code='BROKEN_LINK'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\rationale\index.md') 'R1.md' 'missing.md' } },
         @{ Name='unindexed record'; Code='UNINDEXED_RECORD'; Mutate={ param($r) Write-Utf8 (Join-Path $r '_strata\rationale\orphan.md') "# Orphan`n" } },
         @{ Name='DONE in current'; Code='DONE_IN_CURRENT'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\state\current.md') 'IN PROGRESS' 'DONE' } },
-        @{ Name='router imports harness'; Code='ROUTER_NOT_THIN'; Mutate={ param($r) $p=Join-Path $r 'AGENTS.md'; Write-Utf8 $p ([IO.File]::ReadAllText($p,[Text.Encoding]::UTF8) + "`n_strata/universal/harness-codex.md`n") } },
+        @{ Name='router imports harness'; Code='ROUTER_NOT_THIN'; Mutate={ param($r) $p=Join-Path $r 'AGENTS.md'; Write-Utf8 $p ([IO.File]::ReadAllText($p,[Text.Encoding]::UTF8) + "`n_strata/procedures/harness-codex.md`n") } },
         @{ Name='Contents lacks description'; Code='CONTENTS_ENTRY'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\build-log\index.md') ' — How the fixture was built.' '' } },
         @{ Name='typed Why targets HOW'; Code='TYPED_LINK_TARGET'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\state\current.md') '../rationale/R1.md' '../build-log/BUG-1.md' } },
-        @{ Name='missing Guide shell'; Code='MISSING_REQUIRED_FILE'; Mutate={ param($r) Remove-Item -LiteralPath (Join-Path $r '_strata\universal\guide-shell.html') -Force } },
-        @{ Name='duplicate Guide shell placeholder'; Code='GUIDE_SHELL_PLACEHOLDER'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\universal\guide-shell.html') '<!--STRATA_CONTENT-->' '<!--STRATA_CONTENT--><!--STRATA_CONTENT-->' } },
-        @{ Name='external Guide shell resource'; Code='GUIDE_SHELL_EXTERNAL'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\universal\guide-shell.html') '<body ' '<img src="https://example.invalid/a.png"><body ' } },
-        @{ Name='duplicate Guide manifest placeholder'; Code='GUIDE_SHELL_PLACEHOLDER'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\universal\guide-shell.html') '<!--STRATA_MANIFEST-->' '<!--STRATA_MANIFEST--><!--STRATA_MANIFEST-->' } }
+        @{ Name='missing Guide shell'; Code='MISSING_REQUIRED_FILE'; Mutate={ param($r) Remove-Item -LiteralPath (Join-Path $r '_strata\procedures\guide-shell.html') -Force } },
+        @{ Name='duplicate Guide shell placeholder'; Code='GUIDE_SHELL_PLACEHOLDER'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\procedures\guide-shell.html') '<!--STRATA_CONTENT-->' '<!--STRATA_CONTENT--><!--STRATA_CONTENT-->' } },
+        @{ Name='external Guide shell resource'; Code='GUIDE_SHELL_EXTERNAL'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\procedures\guide-shell.html') '<body ' '<img src="https://example.invalid/a.png"><body ' } },
+        @{ Name='duplicate Guide manifest placeholder'; Code='GUIDE_SHELL_PLACEHOLDER'; Mutate={ param($r) Replace-Utf8 (Join-Path $r '_strata\procedures\guide-shell.html') '<!--STRATA_MANIFEST-->' '<!--STRATA_MANIFEST--><!--STRATA_MANIFEST-->' } }
     )
     foreach ($case in $redCases) {
         Assert-Test ("watched red: " + $case.Name) {
@@ -1028,7 +1028,7 @@ try {
         $before = Get-GuideHtml $composed.Root
         Assert-True ($before -match 'generator_version') 'the manifest does not record a generator version'
         Assert-True ($before -notmatch 'STRATA-RERENDER-PROOF') 'the proof marker was already present'
-        $script = Join-Path $composed.Root '_strata/universal/context.ps1'
+        $script = Join-Path $composed.Root '_strata/procedures/context.ps1'
         $text = [IO.File]::ReadAllText($script, [Text.Encoding]::UTF8)
         $changed = $text.Replace('<summary>Watched sources</summary>', '<summary>STRATA-RERENDER-PROOF</summary>')
         Assert-True ($changed -cne $text) 'the rendering string was not found'
@@ -1183,7 +1183,7 @@ try {
         Write-Utf8 $guide 'SENTINEL'
         # A tampered shell injects a section boundary the manifest cannot account
         # for. The candidate must be refused before it replaces anything.
-        Replace-Utf8 (Join-Path $root '_strata\universal\guide-shell.html') '<!--STRATA_MANIFEST-->' '<section class="guide-topic" data-guide-section-id="ghost" data-guide-section-kind="topic"><div>ghost</div></section><!--STRATA_MANIFEST-->'
+        Replace-Utf8 (Join-Path $root '_strata\procedures\guide-shell.html') '<!--STRATA_MANIFEST-->' '<section class="guide-topic" data-guide-section-id="ghost" data-guide-section-kind="topic"><div>ghost</div></section><!--STRATA_MANIFEST-->'
         $result = Invoke-GenerateGuideCapture $root
         Assert-True $result.Refused "a malformed candidate was not refused: $($result.Output)"
         Assert-True ($result.Message -match 'provenance is invalid: rendered-digest-mismatch') "unexpected refusal: $($result.Message)"
@@ -1231,7 +1231,7 @@ try {
 
     Assert-Test 'public invocation prints findings and exits non-zero' {
         $root = New-BrokenFixture 'public-fail'
-        $target = Join-Path $root '_strata\universal\context.ps1'
+        $target = Join-Path $root '_strata\procedures\context.ps1'
         $out = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $target -CheckAll 2>&1
         $exit = $LASTEXITCODE
         $text = ($out | ForEach-Object { $_.ToString() }) -join "`n"
@@ -1262,7 +1262,7 @@ try {
     }
 
     Assert-Test 'the shipped script decodes as UTF-8 on the documented host' {
-        $bytes = [IO.File]::ReadAllBytes((Join-Path $StagedStrata 'universal\context.ps1'))
+        $bytes = [IO.File]::ReadAllBytes((Join-Path $StagedStrata 'procedures\context.ps1'))
         Assert-True ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) `
             'context.ps1 has no UTF-8 BOM, so PowerShell 5.1 mis-decodes its Unicode literals'
     }
@@ -1297,7 +1297,7 @@ Run `context.ps1 -CheckAll` and read `_strata/state/index.md` before deciding.
 
     Assert-Test 'watched red: a CSS url() in the shell still fails generation' {
         $root = New-Fixture 'shell-url'
-        Replace-Utf8 (Join-Path $root '_strata\universal\guide-shell.html') '</style>' "  body { background-image: url(evil.png); }`n</style>"
+        Replace-Utf8 (Join-Path $root '_strata\procedures\guide-shell.html') '</style>' "  body { background-image: url(evil.png); }`n</style>"
         $result = Invoke-GenerateGuideCapture $root
         # The previous assertion read $result.ExitCode, which this helper does not return: $null -ne 0 is
         # always true, so the watched-red case could not go red and the message check below carried the
@@ -1480,7 +1480,7 @@ The stripped index is not a target. [authority: _strata/state/index.md#contents]
         # real id, so Assert-GuideIntegrity passes; only the per-occurrence assertion can see it.
         $root = New-Fixture 'anchor-navigation-red'
         Add-AnchorRecord $root
-        Replace-Utf8 (Join-Path $root '_strata\universal\context.ps1') `
+        Replace-Utf8 (Join-Path $root '_strata\procedures\context.ps1') `
             '[void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + $entry.Slug; Title = $entry.Title })' `
             '[void]$topics.Add([pscustomobject]@{ Anchor = $safePrefix + (Get-HeadingSlug $entry.Title); Title = $entry.Title })'
         $result = Invoke-Context $root @('-GenerateGuide')
@@ -1502,7 +1502,7 @@ The stripped index is not a target. [authority: _strata/state/index.md#contents]
         # misnumbered; rendering must say so rather than emit anchors nothing else resolves.
         $root = New-Fixture 'anchor-alignment-red'
         Add-AnchorRecord $root
-        Replace-Utf8 (Join-Path $root '_strata\universal\context.ps1') `
+        Replace-Utf8 (Join-Path $root '_strata\procedures\context.ps1') `
             "if (`$line -match '^(#{1,6})\s+(.+?)\s*#*`$') {`n            `$level = `$Matches[1].Length" `
             "if (`$line -match '^(#{1,2})\s+(.+?)\s*#*`$') {`n            `$level = `$Matches[1].Length"
         $refused = $false; $message = ''

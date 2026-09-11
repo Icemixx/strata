@@ -25,12 +25,12 @@ Copy exactly this, and copy it by the directory rather than by the list below:
 
 ```text
 _strata/
-|-- universal_agent_instructions.md
-`-- universal/            # every regular file in it, whatever they are today
+|-- core.md
+`-- procedures/           # every regular file in it, whatever they are today
 ```
 
-**The payload is whatever `_strata/universal/` contains**, plus
-`_strata/universal_agent_instructions.md`. This README used to enumerate it, and by the time anyone
+**The payload is whatever `_strata/procedures/` contains**, plus
+`_strata/core.md`. This README used to enumerate it, and by the time anyone
 noticed, the list had drifted two files behind the directory — omitting `guide-composition.md` and
 `spec-building.md`, so "copy exactly" would have installed a kit whose routers point at procedures that
 are not there. `kit-editing.md` states the rule this violated: *a declared list is a stale copy of the
@@ -43,7 +43,7 @@ repository records the canonical source and synced revision in `_strata/.kit-sou
 
 ## Initialize a new repository
 
-Read `_strata/universal/initialize.md`. It creates thin root routers, Project Instructions, and the State,
+Read `_strata/procedures/initialize.md`. It creates thin root routers, Project Instructions, and the State,
 Rationale, and Build Log roots and indexes. **It does not generate a Guide.** A new repository's
 authorities are empty, and a Guide over them explains nothing while looking finished; `GUIDE_MISSING` is
 the correct state until there are records and the user asks.
@@ -58,9 +58,9 @@ The dependency-free tool runs on Windows PowerShell 5.1 and PowerShell 7. It exp
 modes:
 
 ```powershell
-_strata/universal/context.ps1 -Check -Paths <changed paths>
-_strata/universal/context.ps1 -CheckAll
-_strata/universal/context.ps1 -GuideStatus
+_strata/procedures/context.ps1 -Check -Paths <changed paths>
+_strata/procedures/context.ps1 -CheckAll
+_strata/procedures/context.ps1 -GuideStatus
 ```
 
 These modes validate an initialized consuming repository. In this canonical source checkout, which has no
@@ -90,7 +90,7 @@ Canonical tool tests are outside the copied payload:
 
 ## Canonical editing
 
-Read `_strata/universal/kit-editing.md` before changing or synchronizing the shared payload. Canonical
+Read `_strata/procedures/kit-editing.md` before changing or synchronizing the shared payload. Canonical
 editing, consuming-repository synchronization, and commit are separate authorization boundaries. Push is
 not a fourth: Active Agent Instructions own that rule, and they say an authorized commit carries its push
 unless the user asks for a local-only one.

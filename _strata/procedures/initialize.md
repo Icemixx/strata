@@ -11,7 +11,7 @@ procedure without overwriting anything.
 
 ## Create the topology
 
-1. Copy the complete shared payload as `_strata/universal/kit-editing.md` defines it.
+1. Copy the complete shared payload as `_strata/procedures/kit-editing.md` defines it.
 2. Create `_strata/project_instructions.md` with only project-specific conduct, constraints, and routes.
    Create `_strata/project_instructions_active_agent.md` only for genuinely Active-Agent-only rules.
 3. Create these mandatory authority roots and indexes:
@@ -29,13 +29,13 @@ procedure without overwriting anything.
        `-- index.md
    ```
 
-   Indexes follow the index contract in `_strata/universal/context-routing.md`. An empty index keeps its
+   Indexes follow the index contract in `_strata/procedures/context-routing.md`. An empty index keeps its
    `## Contents` heading with no invented records.
 4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
    data file under `_sediment/reference/`. In an established repository, existing deliberation and
    reference material moves there during conversion rather than into `_strata/`.
-5. Run `_strata/universal/context.ps1 -CheckAll`. **Do not generate a Guide.** Initialization creates
+5. Run `_strata/procedures/context.ps1 -CheckAll`. **Do not generate a Guide.** Initialization creates
    empty authority roots, and a Guide over them explains nothing while looking like a finished document;
    generation is the user's to ask for, once records exist. A new repository correctly reports
    `GUIDE_MISSING` until then.
@@ -57,7 +57,7 @@ Active Agent instruction files.
 
 Read and follow:
 
-1. `_strata/universal_agent_instructions.md`
+1. `_strata/core.md`
 2. `_strata/project_instructions.md`
 
 Project Instructions win on conflict. This file is only a router.
@@ -68,7 +68,7 @@ Project Instructions win on conflict. This file is only a router.
 ```markdown
 # Agent Instructions Router
 
-@_strata/universal_agent_instructions.md
+@_strata/core.md
 
 @_strata/project_instructions.md
 ```

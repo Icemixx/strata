@@ -47,7 +47,7 @@ Substitute only within the same role. A DAP council is invalid if a required sea
 
 ## Decisions
 
-Use `_strata/universal/dap.md` for consequential decisions. Coding-specific review lenses apply only to
+Use `_strata/procedures/dap.md` for consequential decisions. Coding-specific review lenses apply only to
 code-affecting decisions.
 
 ## Authority transaction and continuity
@@ -59,8 +59,8 @@ Update each authority in the same meaningful transaction that changes its inform
 - implementation and evidence update Build Log; and
 - Guide is generated only when the user explicitly asks to generate the Guide.
 
-When Guide generation is requested, follow `_strata/universal/context-routing.md` and invoke the internal
-generator in a child scope with `& { . .\_strata\universal\context.ps1 -GenerateGuide }`, then verify the
+When Guide generation is requested, follow `_strata/procedures/context-routing.md` and invoke the internal
+generator in a child scope with `& { . .\_strata\procedures\context.ps1 -GenerateGuide }`, then verify the
 result.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
@@ -108,7 +108,7 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 - Once commit is authorized, treat commit and push as one operation unless the user requests a local-only
   commit.
 - Preserve the user's configured authorship and add agent co-author attribution.
-- After each authorized commit, run `_strata/universal/context.ps1 -GuideStatus` once. If it reports
+- After each authorized commit, run `_strata/procedures/context.ps1 -GuideStatus` once. If it reports
   `GUIDE_STALE`, remind the user once in that commit handoff that Guide may be behind and can be
   explicitly regenerated. Do not persist separate reminder state.
 - After an authorized push, verify remote receipt from the successful push result and local
@@ -121,4 +121,4 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 Before closing meaningful work, confirm no required gate was weakened, discoveries were dispositioned,
 authority records are current, and omissions or unverified surfaces are stated plainly. Check whether the
 evidence exposed a reusable Strata improvement that has not yet been reported. For long or high-stakes work,
-also load `_strata/universal/self-critique.md`.
+also load `_strata/procedures/self-critique.md`.

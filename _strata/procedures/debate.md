@@ -86,7 +86,7 @@ reporting progress while work remains must be followed by the next tool call in 
 be the turn's last action.
 
 **One implementation serves both participants.** The kit ships the wait as
-`_strata/universal/debate-wait.ps1`. Run that file; do not realize this loop from the text. One fire is one
+`_strata/procedures/debate-wait.ps1`. Run that file; do not realize this loop from the text. One fire is one
 invocation:
 
 ```text
@@ -265,7 +265,7 @@ not a wall that keeps it for you.
 A converged debate is closed, not archived. Build the spec through the shared specification workflow and
 place every settled item in the authority that owns it.
 
-**Build the spec.** Follow `_strata/universal/spec-building.md`, using `settled.md` as the input ledger and
+**Build the spec.** Follow `_strata/procedures/spec-building.md`, using `settled.md` as the input ledger and
 the reports, cross-analyses and rounds as evidence for the reasoning and measurements that must survive.
 The output is `_sediment/specs/<subject>-spec.md`. Debate is only the source of this specification; it does not
 change the shared content, traceability, ambiguity, readiness, or handoff requirements.
