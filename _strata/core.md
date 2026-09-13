@@ -121,7 +121,7 @@ Read the mapped file before acting when its trigger applies:
 | `spec-building.md` | Create, revise, review, confirm, or hand off a retained specification |
 | `session-pickup.md` | Examine or continue another harness session |
 | `self-critique.md` | Review long or high-stakes work, or when the user requests deeper critique |
-| `audit.md` | Audit authority truth or application correctness — unqualified, seasonally, full-application, or after a conversion |
+| `audit.md` | Audit authority truth or application correctness — unqualified, seasonal, or full-application |
 | `kit-editing.md` | Change the shared kit or synchronize a consuming copy |
 | `refactor.md` | Review code structure, simplification, maintainability, or optimization opportunities when explicitly requested |
 | `harness-codex.md` | Codex mechanics or Codex cross-harness continuity are needed |

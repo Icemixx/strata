@@ -1,6 +1,6 @@
 # Truth audit
 
-Use this procedure for an unqualified, seasonal, full-application, or post-conversion audit, and for auditing the authority records. It examines whether records are accurate and sufficiently complete for their declared scope, and whether the application satisfies its governing requirements. The audit is read-only unless the user separately authorizes remediation.
+Use this procedure for an unqualified, seasonal, or full-application audit, and for auditing the authority records. It examines whether records are accurate and sufficiently complete for their declared scope, and whether the application satisfies its governing requirements. The audit is read-only unless the user separately authorizes remediation.
 
 Code is evidence of what happens, not automatic proof of what should happen. A record can describe a defective implementation accurately, and code and prose can agree while both violate a governing requirement. Those are correctness findings. A request for code simplification, maintainability, dead-code, or optimization opportunities uses `refactor.md`; do not start that separate review from this procedure unless the user asks for both.
 
@@ -34,4 +34,4 @@ For every finding, identify the claim or requirement, record and code or evidenc
 
 The report records revision, scope, coverage, prioritized findings, literal verification, exclusions, blockers, and supported strengths. It is **Complete for declared scope** when every required area was reviewed or explicitly excluded and findings were recorded; defects may remain unfixed. It is **Partial** when a required area was not assessed. Remediation status is separate. Do not claim whole-application correctness beyond the covered scope.
 
-Close with up to five supported material correctness risks if the application ships as examined; fewer or none are valid. For the first post-conversion use, follow the project migration-audit supplement for its archive and conversion-evidence comparison. Completing that report does not complete migration, launch a refactor review, or generate a Guide.
+Close with up to five supported material correctness risks if the application ships as examined; fewer or none are valid. Completing a report does not authorize remediation, launch a refactor review, or generate a Guide.

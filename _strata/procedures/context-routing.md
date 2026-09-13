@@ -274,6 +274,6 @@ a Build Log entry records what was true on a day and is not maintained afterward
 
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
-An established repository's separately authorized conversion preserves its legacy material until
-reconciliation is verified and asks the user about conflicting claims; no legacy source wins
-automatically.
+An established repository's separately authorized conversion preserves its legacy material, records
+conflicting claims without choosing a winner, and asks the user for any decision the evidence cannot
+supply. A later audit or remediation is separately authorized.
