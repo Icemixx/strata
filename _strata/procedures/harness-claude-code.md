@@ -47,15 +47,17 @@ Claude Code exposes a reasoning-effort ladder: `low`, `medium`, `high`, `xhigh`,
 much thinking happens per step. It does not make the session read more files — coverage comes from tool
 calls, depth from this setting, and neither substitutes for the other.
 
+Suggested levels are advisory. Work proceeds at the user's chosen effort; an audit reports the actual
+depth when available, or marks it unverified.
+
 | Work | Level |
 | --- | --- |
 | Mechanical passes: inventory, running a check, recording coverage | `low` or `medium` |
 | Anything that rules on evidence; the working default for an audit | `high` |
 | The record checks in `audit.md`, and any truth check against code | `xhigh` |
 
-Where one level must serve a whole audit, use `xhigh`. The failure modes are not symmetric: too much depth
-costs time and money visibly, while too little returns a clean report and says nothing about what it could
-not think through.
+For a whole audit, `xhigh` may be useful. Depth does not supply coverage or determine whether work may
+proceed.
 
 `max` buys depth per judgement, not reach. Prefer a second bounded pass over raising a single pass to it.
 
@@ -69,9 +71,8 @@ than depth, that second one is the distinction that matters.
 Recorded from the extension's own interface rather than from behaviour. What the workflow half changes is
 not established here; a session that determines it should say so and correct this.
 
-The setting belongs to the user and no session tool changes it. Report that the session is below the
-recommended level and let the user raise it; do not proceed quietly and do not claim a depth you did not
-run at.
+The setting belongs to the user and no session tool changes it. Report actual depth when it is available;
+otherwise mark it unverified.
 
 ## Native sessions and continuity
 

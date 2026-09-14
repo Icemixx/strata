@@ -58,12 +58,15 @@ per-turn fact. Do not infer it from the user config, a model default, or a previ
 unambiguous rollout is unavailable, report the depth as unverified. The user may change the chat's depth
 with `/reasoning`; the agent cannot invoke that composer command for them.
 
+Suggested levels are advisory. Work proceeds at the user's chosen effort; an audit reports the actual
+depth when available, or marks it unverified.
+
 | Work | Level |
 | --- | --- |
 | Deterministic inventory or running an already-defined check | `low` |
 | Coordinating inventory and recording complete coverage | `medium` |
 | Judgement over evidence | `high` |
-| The record checks in `audit.md`, truth checks against code, or one level for a whole audit | `xhigh` |
+| The record checks in `audit.md` or truth checks against code | `xhigh` |
 
 Use `max` only for an unusually hard bounded judgement where the extra latency is warranted. It deepens
 one agent's work; it does not add coverage.

@@ -4,9 +4,9 @@ Use this procedure for an unqualified, seasonal, or full-application audit, and 
 
 Code is evidence of what happens, not automatic proof of what should happen. A record can describe a defective implementation accurately, and code and prose can agree while both violate a governing requirement. Those are correctness findings. A request for code simplification, maintainability, dead-code, or optimization opportunities uses `refactor.md`; do not start that separate review from this procedure unless the user asks for both.
 
-## Set the depth before starting
+## Record reasoning depth
 
-Record the actual reasoning depth for each pass. Before beginning, read the applicable harness dossier for its audit guidance. If this session is below the stated level, tell the user and let them raise it; where the harness permits it, a delegated worker may run at a chosen level. Depth does not replace coverage: narrow a pass and say so rather than reading a broad scope shallowly.
+Record the actual reasoning depth for each pass when it is available; otherwise record it as unverified. Before beginning, read the applicable harness dossier for its advisory audit guidance. Work proceeds at the user's chosen effort; an audit does not pause or request a change solely because it differs from a recommendation. Depth does not replace coverage: narrow a pass and say so rather than reading a broad scope shallowly.
 
 ## Declare coverage
 
