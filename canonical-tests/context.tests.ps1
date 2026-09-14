@@ -642,6 +642,19 @@ try {
         Assert-True ($editing -match 'The dossiers stay level') 'the levelling rule is missing from kit-editing'
     }
 
+    Assert-Test 'a consuming-copy sync is a pull and overwrite, not a verification pass' {
+        # One sync ran to thirty-three tool calls because this section read as a comparison problem:
+        # drift check, diff review, reference grep, re-compare, a control for the compare, a Build Log
+        # entry. Deleting before copying is what makes the inventories equal, so none of it is needed.
+        $editing = [IO.File]::ReadAllText((Join-Path $StagedStrata 'procedures\kit-editing.md'), [Text.Encoding]::UTF8)
+        Assert-True ($editing -match 'Run this in the consuming repository, never in canonical') 'sync does not say which repository it runs in'
+        Assert-True ($editing -match 'pull the newest canonical revision, overwrite the local copy, record the revision') 'sync is not stated in its simple form'
+        Assert-True ($editing -match 'Delete\s+before copying') 'sync does not require delete-before-copy, so a payload file canonical removed would linger'
+        Assert-True ($editing -match 'Replace nothing else under') 'sync does not bound its delete to the payload, so it can overwrite project-owned files'
+        Assert-True ($editing -match 'Do not add a verification pass') 'sync can re-expand into a comparison procedure'
+        Assert-True ($editing -notmatch 'normalized content') 'the removed content comparison is back'
+    }
+
     Assert-Test 'direct user Guide generation is rejected' {
         $root = New-Fixture 'user-generation-rejected'
         $contextScript = Join-Path $root '_strata\procedures\context.ps1'

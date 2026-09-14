@@ -65,7 +65,28 @@ as a list of payload files it may not.
 
 ## Consuming-copy sync
 
-Verify the configured source and target revision. Replace only the complete shared payload; preserve all
-project-owned instructions, authorities, provenance markers, routers, and other files. Compare relative
-file inventory and normalized content against the canonical source, then update `.kit-version` only to
-the exact revision actually copied. Report changed, added, removed, and mismatched payload files.
+**Run this in the consuming repository, never in canonical.** It is a pull: the consuming repo overwrites
+its own payload from the source named in `_strata/.kit-source` and writes its own `_strata/.kit-version`.
+
+**A sync is: pull the newest canonical revision, overwrite the local copy, record the revision.** That is
+the whole operation. Three steps:
+
+1. Fetch the canonical source at `_strata/.kit-source` and resolve the exact revision being installed.
+2. Delete exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from canonical. Delete
+   before copying, or a file canonical removed lingers. Replace nothing else under `_strata/` — Project
+   Instructions, the routers, `.kit-source`, and the authority directories are project-owned, and a sync
+   that rewrites one of them has overwritten the project with the kit.
+3. Write the exact revision installed to `_strata/.kit-version`. Report `git status`; that is the report.
+
+**Do not add a verification pass.** Not a drift check before overwriting, because the copy is about to
+replace whatever it would find. Not a review of the incoming diff, because canonical reviewed it when it
+was committed. Not a search for inbound references to renamed payload headings, because the section above
+already guarantees a consuming repository never needs an edit for one. Not a re-comparison after copying,
+nor a control demonstrating that such a comparison works. Not a Build Log entry: `.kit-version` records
+the installed revision and `git log -- _strata/.kit-version` records every sync before it.
+
+Deleting before copying is what makes the inventories equal, so nothing has to confirm afterwards that
+they are. The evidence rules in `core.md` govern work that *authors* a change; a sync authors nothing, it
+installs bytes canonical already reviewed, and `git status` is the literal result. One consuming
+repository's sync took thirty-three tool calls for an operation that needs three, because this section
+read as a comparison problem and every clause above was absent.
