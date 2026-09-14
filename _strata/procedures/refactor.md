@@ -4,7 +4,7 @@ Use this procedure for an explicit code refactor review, refactor audit, simplif
 
 This is a review of application code, architecture, data-access structure, dependency usage, and test maintainability. It is not documentation consolidation. `consolidation.md` owns authorized record repair; `audit.md` owns governing-claim and behavioral correctness findings. A demonstrated correctness, security, or data-integrity failure is reported under its own classification rather than presented as a refactor; project hard constraints are not tradeable against refactor economics.
 
-The review reports proposals and structures to leave unchanged. It does not change production code, records, tests, dependencies, configuration, or project authorities unless the user separately authorizes that remediation.
+The review reports proposals and structures to leave unchanged. It does not change production code, records, tests, dependencies, configuration, or project authorities unless the user separately authorizes that remediation. The first pass writes nothing: it delivers its proposals in the reply. A written report is separately authorized.
 
 ## Declare coverage
 
@@ -32,12 +32,14 @@ For each proposal, name the behavior, interfaces, failure modes, data or persist
 
 State the present cost and its evidence, smallest proposed change, alternative including leaving it alone, expected benefit, affected callers, migration and test effort, regression and complexity risk, and the cost of doing nothing. Performance proposals name the workload and a measured baseline when available; otherwise label the benefit unverified and name the measurement needed before choosing it.
 
-## Report without implementing
+## Assess without changing anything
 
-Use the report path supplied by the user or project. Otherwise write `_sediment/code-refactor-review-YYYY-MM-DD.md`, adding the next unused `-2`, `-3` suffix on a same-day collision. Preserve an earlier-revision report rather than overwriting it, and link the report from the owning project work record under its recording rules.
-
-The report contains coverage, literal measurements and checks, proposals with engineering-value assessments, incidental verified or probable defects, blockers and unrun gates, and structures worth preserving. Each proposal names stable code paths or symbols, affected callers or flows, evidence, assumptions, behavioral constraints, and a verification plan that could reject it. Prioritize as **worth doing**, **only when touching this area**, or **leave unchanged**. Report up to five supported highest-value improvements and explicit structures that should not be refactored; fewer or none are valid. These labels never authorize implementation.
+The first pass delivers the assessment in the reply. It states coverage, literal measurements and checks, proposals with engineering-value assessments, incidental verified or probable defects, blockers and unrun gates, and structures worth preserving. Each proposal names stable code paths or symbols, affected callers or flows, evidence, assumptions, behavioral constraints, and a verification plan that could reject it. Prioritize as **worth doing**, **only when touching this area**, or **leave unchanged**. Report up to five supported highest-value improvements and explicit structures that should not be refactored; fewer or none are valid. These labels never authorize implementation.
 
 Report an incidental correctness defect promptly with its own classification and link to `audit.md`; do not suppress it or expand into an unrequested truth audit. One underlying issue has one primary finding with cross-references, not duplicate mandatory ledgers.
 
 The review is **Complete for declared scope** when every required area was reviewed or explicitly excluded and proposals and limitations were recorded, including when it recommends no refactor. It is **Partial** when a required area was not assessed. It is not a correctness certificate or a completed refactor. A later authorized implementation verifies preserved behavior with applicable existing tests and focused regression, characterization, or benchmark evidence; deleting an obligation to obtain green output is not success.
+
+### When a written report is authorized
+
+A user request for a written report, or a report path supplied by Project Instructions, authorizes one; nothing else does. Use the supplied path. Otherwise write `_sediment/code-refactor-review-YYYY-MM-DD.md`, adding the next unused `-2`, `-3` suffix on a same-day collision. Preserve an earlier-revision report rather than overwriting it, and link the report from the owning project work record under its recording rules — a report no record names is lost.

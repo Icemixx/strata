@@ -600,6 +600,14 @@ try {
         Assert-True ($refactor -match '_sediment/code-refactor-review-YYYY-MM-DD\.md') 'refactor review has no default report path'
         Assert-True ($refactor -match 'Complete for declared scope') 'refactor review has no completion boundary'
         Assert-True ($refactor -match 'not a correctness certificate or a completed refactor') 'refactor review overstates its conclusion'
+        # A review that files a report and edits a record has changed the repository it was asked only to
+        # examine. Both procedures used to mandate exactly that before the pass was finished, so the path
+        # rules above now live behind an authorization gate and the first pass reports in the reply.
+        Assert-True ($router -match 'creates or changes no file in the repository') 'read-only requests may still write a report artifact'
+        Assert-True ($audit -match 'first pass is read-only') 'truth audit does not gate its first pass'
+        Assert-True ($audit -match 'A user request for a written report, or a report path supplied by Project Instructions, authorizes one') 'truth audit writes its report unauthorized'
+        Assert-True ($refactor -match 'first pass writes nothing') 'refactor review does not gate its first pass'
+        Assert-True ($refactor -match 'A user request for a written report, or a report path supplied by Project Instructions, authorizes one') 'refactor review writes its report unauthorized'
     }
 
     Assert-Test 'additions and removals carry symmetric evidence burdens' {

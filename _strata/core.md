@@ -32,7 +32,10 @@ cross-project justification.
 
 ## Scope and authority
 
-- Answer, explanation, review, diagnosis, and planning requests are read-only.
+- Answer, explanation, review, audit, diagnosis, and planning requests are read-only. The first pass
+  delivers its assessment in the reply and creates or changes no file in the repository. Writing that
+  assessment to a report file, or linking it from a record, is separate work the user authorizes.
+  Working notes outside the repository are not a repository change.
 - Change, build, implementation, and fix requests authorize only the necessary in-scope local edits.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
 - Editing never implies authority to commit, publish, spend money, change external state, or expand

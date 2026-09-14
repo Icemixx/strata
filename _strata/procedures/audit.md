@@ -1,6 +1,6 @@
 # Truth audit
 
-Use this procedure for an unqualified, seasonal, or full-application audit, and for auditing the authority records. It examines whether records are accurate and sufficiently complete for their declared scope, and whether the application satisfies its governing requirements. The audit is read-only unless the user separately authorizes remediation.
+Use this procedure for an unqualified, seasonal, or full-application audit, and for auditing the authority records. It examines whether records are accurate and sufficiently complete for their declared scope, and whether the application satisfies its governing requirements. The first pass is read-only: it assesses and reports in the reply, and writes nothing. Remediation and a written report are each separately authorized.
 
 Code is evidence of what happens, not automatic proof of what should happen. A record can describe a defective implementation accurately, and code and prose can agree while both violate a governing requirement. Those are correctness findings. A request for code simplification, maintainability, dead-code, or optimization opportunities uses `refactor.md`; do not start that separate review from this procedure unless the user asks for both.
 
@@ -26,12 +26,14 @@ Apply the relevant correctness lenses: data, schema, and access integrity; versi
 
 Find duplicates, overlapping or contradictory claims, superseded claims left live, wrong current/completed status, missing qualifications, and broken evidence relationships. Use `consolidation.md` for the semantic definitions. Do not select the newest record merely to resolve a conflict: preserve competing claims and request the decision that evidence cannot supply. Intentional complementary records remain distinct.
 
-## Report without fixing
+## Assess without changing anything
 
-Use the report path supplied by the user or project. Otherwise write `_sediment/truth-audit-YYYY-MM-DD.md`, adding the next unused `-2`, `-3` suffix on a same-day collision. Preserve an earlier-revision report rather than overwriting it, and link the report from the owning project work record under its recording rules.
+The first pass delivers the assessment in the reply. For every finding, identify the claim or requirement, record and code or evidence locations (both records for a record conflict), observed result, verified or probable status, consequence, affected scope, missing evidence, and smallest correction. An absence finding names the searched scope and expected source. Deduplicate one cause while retaining affected occurrences. Refer an incidental structural opportunity to `refactor.md` without expanding this pass.
 
-For every finding, identify the claim or requirement, record and code or evidence locations (both records for a record conflict), observed result, verified or probable status, consequence, affected scope, missing evidence, and smallest correction. An absence finding names the searched scope and expected source. Deduplicate one cause while retaining affected occurrences. Refer an incidental structural opportunity to `refactor.md` without expanding this pass.
+The assessment states revision, scope, coverage, prioritized findings, literal verification, exclusions, blockers, and supported strengths. It is **Complete for declared scope** when every required area was reviewed or explicitly excluded and findings were recorded; defects may remain unfixed. It is **Partial** when a required area was not assessed. Remediation status is separate. Do not claim whole-application correctness beyond the covered scope.
 
-The report records revision, scope, coverage, prioritized findings, literal verification, exclusions, blockers, and supported strengths. It is **Complete for declared scope** when every required area was reviewed or explicitly excluded and findings were recorded; defects may remain unfixed. It is **Partial** when a required area was not assessed. Remediation status is separate. Do not claim whole-application correctness beyond the covered scope.
+Close with up to five supported material correctness risks if the application ships as examined; fewer or none are valid. Completing the assessment does not authorize remediation, launch a refactor review, or generate a Guide.
 
-Close with up to five supported material correctness risks if the application ships as examined; fewer or none are valid. Completing a report does not authorize remediation, launch a refactor review, or generate a Guide.
+### When a written report is authorized
+
+A user request for a written report, or a report path supplied by Project Instructions, authorizes one; nothing else does. Use the supplied path. Otherwise write `_sediment/truth-audit-YYYY-MM-DD.md`, adding the next unused `-2`, `-3` suffix on a same-day collision. Preserve an earlier-revision report rather than overwriting it, and link the report from the owning project work record under its recording rules — a report no record names is lost.
