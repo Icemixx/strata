@@ -11,8 +11,12 @@ Instructions governs conduct and routing. Project information has three authorit
 - **Rationale** owns WHY decisions were made.
 - **Build Log** owns HOW work was performed and the evidence observed.
 
-`_strata/project_guide.html` is not an authority. It is a generated user-facing wrapper over those three
-sources. Agents read the Markdown authorities, not Guide.
+There are four authorities: Instructions, State, Rationale, Build Log. **The code is what makes technical
+claims true**, so no authority owns the explanation of how the software behaves — the implementation does.
+
+`_strata/project_guide.html` is not an authority. It is written by an agent from the code and these
+records, for people, at the user's explicit request. It owns nothing, and nothing is true because it says
+so. Agents read the code and the records rather than the Guide.
 
 ## Project layout
 
@@ -29,8 +33,7 @@ _strata/
 |   `-- index.md
 |-- build-log/
 |   `-- index.md
-|-- project_guide.md                        # composed explanation, generated projects only
-`-- project_guide.html
+`-- project_guide.html                      # generated for people on request; not an authority
 ```
 
 State, Rationale, and Build Log roots and their `index.md` files always exist. Deeper branches are
@@ -184,74 +187,40 @@ project paths relative to itself and requires exactly one explicit mode:
 ```powershell
 context.ps1 -Check -Paths <changed paths>
 context.ps1 -CheckAll
-context.ps1 -GuideStatus
 ```
 
 The graph modes target an initialized repository. A checkout holding only the shared payload reports the
 missing project surfaces rather than a benign result; a missing project graph is never assumed to be a kit
-checkout. No arguments displays help and changes nothing. Every user-callable mode is read-only. Guide generation
-is an internal agent operation: it validates the complete graph first and atomically replaces
-`_strata/project_guide.html` only after success. Direct user invocation of the internal generation mode
-is rejected. Validation and rendering do not open child console windows.
+checkout. No arguments displays help and changes nothing. Every user-callable mode is read-only, and
+validation does not open child console windows.
 
-Discovery begins at the three authority root indexes and follows `## Contents` in declared order.
-Filesystem records absent from that graph are validation findings, not implicitly included content.
+Discovery begins at the authority root indexes and follows `## Contents` in declared order. Filesystem
+records absent from that graph are validation findings, not implicitly included content.
 
-Guide is a committed, visibly generated, self-contained HTML snapshot with no server, network resource,
-or directly maintained content. Its explanatory prose is owned by the derived Markdown composition source;
-its rendering, source map, hashes and manifest are generated. It includes the short descriptions
-owned by indexes and authority introductions, gives State tickets stable ID-derived anchors, combines
-their typed WHY and HOW targets, and embeds offline search. Empty Rationale or Build Log sections display
-`No records yet`.
+**The tool does not produce the Guide.** `_strata/project_guide.html` is written by an agent from the code
+and the records at the user's explicit request, under `_strata/procedures/guide-generation.md`. Nothing
+generates it mechanically, nothing renders an authority into it, and no composition source exists.
 
-`_strata/project_guide.md` is the composed explanation the Guide renders. It is derived, non-authoritative,
-machine-composed during an explicit Guide generation, and not routed as agent context. Generation reads it by
-exact path when it exists. Both Guide files are project surfaces; the canonical kit carries neither.
+`context.ps1` still carries the retired composition-era Guide surface — an internal generation mode, a
+`-GuideStatus` mode, and the renderer behind them. **Those modes are retired: do not invoke them and do
+not document them as available.** `-GuideStatus` reports staleness of a composed document that no longer
+exists, and the generation mode would write one. Removing that surface from the tool, and replacing it
+with a read-only check that resolves the Guide's citations and validates its self-containment, is
+outstanding work.
 
-Guide embeds a deterministic digest, generator version, generation date, and available Git snapshot
-information. Its permanent notice says which commit supplied the snapshot and that it may be behind
-current authorities. `-GuideStatus` is read-only and its first token is always one of `GUIDE_MISSING`,
-`GUIDE_CURRENT`, `GUIDE_STALE` or `GUIDE_INVALID`.
+Authority records use ordinary Markdown. Where the tool renders Markdown for validation it disables raw
+HTML and unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
 
-Which digest and which record fields follow that token depend on whether `_strata/project_guide.md`
-exists.
+Guide generation is intentionally user-triggered and **never part of initialization or conversion**. A
+newly initialized repository has no software explained yet and no Guide; that is the correct state, not a
+gap to fill.
 
-When it does not exist, the digest is of routed source content and the authority-only records, field
-sets and optional `GUIDE_CHANGE` advisories are unchanged.
+Generation has no audit prerequisite and offers no audit. The failure an audit offer once guarded —
+prose recomposed from records during generation — cannot occur, because nothing is recomposed. A later
+audit remains separately authorized and is not a gate on writing the Guide.
 
-When it exists, the digest is derived from the composed sections, the HTML carries an embedded
-`strata-guide-manifest/v1` provenance manifest, and status adds `sections`, `changed_sections`,
-`changed_paths` and one `GUIDE_SECTION_STALE id=<section-id> changed_paths_json=<array>` record per
-stale section. Absent or corrupt embedded provenance is `GUIDE_INVALID`, which is distinct from stale.
-Generation of a composed Guide also emits `GUIDE_WARNING` records for a `workflow`, `architecture` or
-`module-family` section with no declared watch surface, and one `GUIDE_COVERAGE` record per section,
-before `GUIDE_GENERATED`.
-
-Authority records use ordinary Markdown. The dependency-free in-process renderer disables raw HTML and
-unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
-
-Guide generation is intentionally user-triggered, and **never part of initialization**. A newly initialized
-repository has empty authority roots; a Guide over them explains nothing while looking like a finished
-document, and the audit offered below has nothing to audit. `GUIDE_MISSING` is the correct state for a
-repository that has no records yet. Where a request arrives against a graph whose authority roots hold no
-records, say so and generate nothing.
-
-When the user asks to generate the Guide, **first say that the
-Guide can only be as current as the records it is built from, and offer an audit.** A Guide is derived,
-so a stale, duplicated or self-contradicting record produces a confidently wrong page that reads exactly
-like a right one, and generation cannot detect this: every structural check passes on a record that is
-cited, unique, well-formed and false. Name what an audit would cover — `audit.md` — and accept a plain
-no. Ask once and do not repeat it on a later generation in the same session.
-
-State in the generation report how many findings were open when it ran, where they are recorded, and
-whether an offered audit was declined. Declining is the user's to make and generation proceeds either
-way — but a Guide built over records that are known to contradict each other must leave a trace saying so,
-or the page and its report are the two places the contradiction becomes invisible.
-
-Then review the owning index descriptions and authority introductions and improve their concise
-human-language summaries where the authoritative meaning warrants it. Do not invent project facts. Then
-perform the internal generation and verification. Do not generate Guide merely because code or an
-authority changed, and never present the internal generation mode to the user as a command.
+State in the generation report how many findings were open when it ran and where they are recorded. A
+Guide written over records known to contradict each other must leave a trace saying so.
 
 ## Validation and authority updates
 
