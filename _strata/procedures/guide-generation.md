@@ -34,6 +34,10 @@ not a converted copy of one. After the first generation there is always a previo
 that reads its own last output compounds drift until nothing traces to anything. A previous Guide is
 output, never input.
 
+**Delete the previous Guide before generating, and keep no copy of it.** Remove
+`_strata/project_guide.html`, and any draft, fragment or backup of an earlier generation, wherever it sits.
+The new Guide replaces the old one; it is never kept beside it.
+
 ## What a claim must carry
 
 **Cite the implementation for any claim that can drift** — behaviour, defaults, thresholds, paths, schema,
