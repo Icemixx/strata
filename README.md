@@ -17,7 +17,7 @@ the task needs it.
   file a record still needs is named by that record.
 
 Each authority is a recursively indexed Markdown tree. Every routed directory has an `index.md`, and
-only described links inside `## Contents` define ownership, traversal, and Guide order.
+only described links inside `## Contents` define ownership and traversal.
 
 ## Shared payload
 
@@ -45,48 +45,22 @@ repository records the canonical source and synced revision in `_strata/.kit-sou
 
 Read `_strata/procedures/initialize.md`. It creates thin root routers, Project Instructions, and the State,
 Rationale, and Build Log roots and indexes. **It does not generate a Guide.** A new repository's
-authorities are empty, and a Guide over them explains nothing while looking finished; `GUIDE_MISSING` is
+authorities are empty, and a Guide over them explains nothing while looking finished; having no Guide is
 the correct state until there are records and the user asks.
 
 Established repositories do not use the empty-repository procedure. They require a separately authorized,
 project-specific archive-seeded migration that preserves and reconciles their legacy material before
 cutover.
 
-## Validate and generate Guide
+## Guide
 
-The dependency-free tool runs on Windows PowerShell 5.1 and PowerShell 7. It exposes three read-only
-modes:
+`_strata/project_guide.html` is written by an agent from the code and the records, only when the user asks,
+under `_strata/procedures/guide-generation.md`. Ordinary code and authority changes do not regenerate it.
 
-```powershell
-_strata/procedures/context.ps1 -Check -Paths <changed paths>
-_strata/procedures/context.ps1 -CheckAll
-_strata/procedures/context.ps1 -GuideStatus
-```
+## Validation
 
-These modes validate an initialized consuming repository. In this canonical source checkout, which has no
-Project Instructions, routers, or authority roots, `-CheckAll` reports those as missing and exits non-zero.
-Validate the kit itself with `.\canonical-tests\context.tests.ps1`.
-
-All public modes are read-only. Guide generation is agent-internal and direct user invocation is rejected.
-It writes `_strata/project_guide.html` only after full graph validation, using an atomic replacement.
-Rendering is offline; raw HTML and unsafe link schemes are sanitized. The generated page includes its
-source digest and available commit snapshot information so `-GuideStatus` can report whether the Guide
-has fallen behind. Without a `_strata/project_guide.md` composition source that digest covers the routed
-authority content. With one, the page also embeds a per-section provenance manifest, the digest is
-derived from the composed sections, and `-GuideStatus` reports which sections are stale and which paths
-changed.
-
-Guide refresh is user-triggered. When the user asks to update Guide, the agent reviews concise human-language
-descriptions in the owning authority indexes and introductions, then regenerates the snapshot. Ordinary
-code and authority changes do not regenerate it, and users do not run the internal generator themselves.
-After an authorized commit, the Active Agent checks Guide status once and includes one reminder in the
-handoff if the snapshot is stale.
-
-Canonical tool tests are outside the copied payload:
-
-```powershell
-.\canonical-tests\context.tests.ps1
-```
+The kit is Markdown only. It ships no scripts, validator, or test suite. The agent that changes a record
+keeps the authority graph valid; `_strata/procedures/context-routing.md` lists what that covers.
 
 ## Canonical editing
 

@@ -59,9 +59,7 @@ Update each authority in the same meaningful transaction that changes its inform
 - implementation and evidence update Build Log; and
 - Guide is generated only when the user explicitly asks to generate the Guide.
 
-When Guide generation is requested, follow `_strata/procedures/context-routing.md` and invoke the internal
-generator in a child scope with `& { . .\_strata\procedures\context.ps1 -GenerateGuide }`, then verify the
-result.
+When Guide generation is requested, follow `_strata/procedures/guide-generation.md`.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
 next meaningful step, or exact blocker. A temporary handoff is needed only for important transient state
@@ -108,9 +106,6 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 - Once commit is authorized, treat commit and push as one operation unless the user requests a local-only
   commit.
 - Preserve the user's configured authorship and add agent co-author attribution.
-- After each authorized commit, run `_strata/procedures/context.ps1 -GuideStatus` once. If it reports
-  `GUIDE_STALE`, remind the user once in that commit handoff that Guide may be behind and can be
-  explicitly regenerated. Do not persist separate reminder state.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state.
 - Run applicable implementation verification locally. Do not create, enable, dispatch, wait for, or

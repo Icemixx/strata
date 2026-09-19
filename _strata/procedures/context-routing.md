@@ -37,7 +37,7 @@ _strata/
 ```
 
 State, Rationale, and Build Log roots and their `index.md` files always exist. Deeper branches are
-project-defined.
+project-defined. Authority records use ordinary Markdown.
 
 ## Supporting material: `_sediment/`
 
@@ -70,8 +70,8 @@ loads at runtime are code, not reference, and stay where the toolchain expects t
 serves — the State ticket whose work it belongs to, the Rationale record it produced, or the Instructions
 clause governing its use. A file no record names is lost whether or not it exists.
 
-`_sediment/` is not an authority. It has no `index.md`, is not routed, is not traversed for Guide
-generation, and is not validated by `context.ps1`. Records link into it by ordinary relative path.
+`_sediment/` is not an authority. It has no `index.md`, is not routed, and is not traversed for Guide
+generation. Records link into it by ordinary relative path.
 
 ## Instruction audiences
 
@@ -106,7 +106,7 @@ description sufficient to judge relevance:
 - [R125](drive-sync/R125.md) — Why failed refreshes preserve settled status.
 ```
 
-Only links in `## Contents` define routed children and Guide order. Other links are ordinary references.
+Only links in `## Contents` define routed children. Other links are ordinary references.
 An additional reference never creates another routing owner. Links use stable paths and may use stable
 heading anchors; never use literal line numbers. Leaf filenames and tree depth are project-defined.
 
@@ -166,50 +166,16 @@ The first line is required. `Why:` and `How:` links are optional, may contain mu
 the only **declared** associations between a ticket and its Rationale and Build Log records. Those target
 records require no backlinks or ticket metadata. Dependencies and blocker details are optional.
 
-Guide additionally surfaces **mentions**: a Rationale or Build Log paragraph naming a declared ticket id
-is shown under that ticket, with its source record and a statement that the relationship was inferred.
-Only ids State declares are matched, the snippet is the paragraph rather than the record, and a record
-already linked from the ticket is not repeated as a mention. **A mention is discovery, never evidence** —
-naming a ticket establishes no relationship to it, and *"unlike BUG-110, this approach…"* is not a reason
-for BUG-110. It is rendered apart from the typed links for that reason, so nothing inferred can be read as
-something an author declared.
-
 `state/current.md` contains `OPEN`, `IN PROGRESS`, and `BLOCKED` tickets. When every owned gate is
 complete, move the entry atomically to an appropriate indexed location under `state/completed/`, preserve
 its ID, description, and links, and ensure it appears exactly once. Completed storage is cold and loads
 only for historical need. Reopened work moves back to current storage.
 
-## Guide and `context.ps1`
+## Guide
 
-The kit ships one dependency-free Windows PowerShell tool at `_strata/procedures/context.ps1`. It resolves
-project paths relative to itself and requires exactly one explicit mode:
-
-```powershell
-context.ps1 -Check -Paths <changed paths>
-context.ps1 -CheckAll
-```
-
-The graph modes target an initialized repository. A checkout holding only the shared payload reports the
-missing project surfaces rather than a benign result; a missing project graph is never assumed to be a kit
-checkout. No arguments displays help and changes nothing. Every user-callable mode is read-only, and
-validation does not open child console windows.
-
-Discovery begins at the authority root indexes and follows `## Contents` in declared order. Filesystem
-records absent from that graph are validation findings, not implicitly included content.
-
-**The tool does not produce the Guide.** `_strata/project_guide.html` is written by an agent from the code
-and the records at the user's explicit request, under `_strata/procedures/guide-generation.md`. Nothing
-generates it mechanically, nothing renders an authority into it, and no composition source exists.
-
-`context.ps1` still carries the retired composition-era Guide surface — an internal generation mode, a
-`-GuideStatus` mode, and the renderer behind them. **Those modes are retired: do not invoke them and do
-not document them as available.** `-GuideStatus` reports staleness of a composed document that no longer
-exists, and the generation mode would write one. Removing that surface from the tool, and replacing it
-with a read-only check that resolves the Guide's citations and validates its self-containment, is
-outstanding work.
-
-Authority records use ordinary Markdown. Where the tool renders Markdown for validation it disables raw
-HTML and unsafe link schemes; unexpected HTML-like text is displayed rather than executed.
+`_strata/project_guide.html` is written by an agent from the code and the records at the user's explicit
+request, under `_strata/procedures/guide-generation.md`. Nothing generates it mechanically, nothing renders
+an authority into it, and no composition source exists.
 
 Guide generation is intentionally user-triggered and **never part of initialization or conversion**. A
 newly initialized repository has no software explained yet and no Guide; that is the correct state, not a
@@ -224,14 +190,13 @@ Guide written over records known to contradict each other must leave a trace say
 
 ## Validation and authority updates
 
-Mechanical validation covers required roots and indexes, valid links, reachability, exactly-one routing
-ownership, unique State IDs, exactly-one current/completed placement, approved statuses, required
-instruction-audience files, and thin-router edges. It does not validate semantic accuracy, context
-budgets, commit-provenance grammar, project gates, or harness certification. A structurally valid graph
-and fresh Guide do not prove that human-authored claims are correct.
+The kit ships no validator. The agent that changes a record keeps the structure valid: required roots
+and indexes, links that resolve, reachability, exactly-one routing ownership, unique State IDs,
+exactly-one current/completed placement, approved statuses, required instruction-audience files, and
+thin-router edges. A structurally valid graph does not prove that its claims are correct.
 
-Use the smallest check relevant to touched paths. Run full validation for topology, shared validation or
-generation logic, conversion, or an explicit full audit.
+Check what the touched paths affect. Check the whole graph after a topology change, a conversion, or in
+an explicit full audit.
 
 **A record cites code by file and symbol, never by line number.** A line citation is broken by the same
 change that made it worth writing: one project audited every `file:NNN` reference in its live records and

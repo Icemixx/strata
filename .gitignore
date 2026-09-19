@@ -9,7 +9,7 @@
 # the kit actually publishes, so a new file is private unless someone deliberately
 # adds it below.
 #
-# Published: the shared payload under _strata/, its canonical tests, README, LICENSE,
+# Published: the shared payload under _strata/, README, LICENSE,
 # and the two git control files. Everything else — reports, plans, ledgers, fixtures,
 # tooling, scratch — stays local.
 
@@ -24,6 +24,3 @@
 
 !_strata/
 !_strata/**
-
-!canonical-tests/
-!canonical-tests/**

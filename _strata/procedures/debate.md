@@ -85,23 +85,22 @@ wait. Empty output from a still-running wait is not completion. Keep only one wa
 reporting progress while work remains must be followed by the next tool call in the same turn; it must never
 be the turn's last action.
 
-**One implementation serves both participants.** The kit ships the wait as
-`_strata/procedures/debate-wait.ps1`. Run that file; do not realize this loop from the text. One fire is one
-invocation:
+Each participant realizes the wait in its own harness's shell. One fire ends when the awaited record is
+present in a wholly valid history, when a `Blocked` condition or a liveness suspension occurs, or when its
+interval elapses with nothing found, after which the next fire starts immediately. For a rounds wait, the
+awaited record is a latest valid turn marker naming this participant or a valid Debate outcome; round
+markers have no authority until both cross-completion records are valid.
 
-```text
-debate-wait.ps1 -Product <this session's product> -Await <report-complete|cross-complete|round>
-                -WaitStarted <UTC instant this wait began> -Interval <seconds, from the schedule below>
-                -DebatePath <debate branch directory>
-```
+Two faithful implementations of this wait have diverged at exactly three points, so each is pinned:
 
-It writes exactly one line - `FOUND`, `fire complete`, `SUSPENDED - ...`, or `Blocked ...` - and that line is
-the result. For a rounds wait, `FOUND` means the latest valid marker names this participant or a valid Debate
-outcome is present; round markers have no authority until both cross-completion stamps are valid.
-`-WaitStarted` is set once when the wait begins and passed unchanged to every later fire of that
-wait; the script never assigns it. These rules were previously realized once per harness in two shell
-languages, and three defects followed, each one implementation differing from the other rather than either
-misreading the rule. One implementation cannot diverge from itself.
+- **The wait start is set once.** Record the UTC instant a wait begins and reuse it unchanged for every
+  later fire of that wait; never re-anchor it on a new fire. It is the floor of the inactivity anchor below.
+- **A fire is bounded by wall-clock time.** A fire ends at its start plus its interval, however long each
+  re-read or heartbeat took; do not sum requested sleeps. The schedule's offsets are absolute positions from
+  the wait's start, so a fire that adds its own work time drifts later on every fire.
+- **A turn marker matches on its shape, not on its dash.** A turn marker is a whole line reading
+  `Round <N> complete <any one character> next: <participant>`, and the last such line in `rounds.md` is the
+  latest marker. The dash can be recoded in transport, and a marker that stops matching strands the debate.
 
 Each new wait starts its own widening schedule. Fire at these minute offsets from that wait's start:
 
