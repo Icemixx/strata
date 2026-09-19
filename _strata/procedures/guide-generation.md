@@ -22,6 +22,7 @@ changed, or as part of initialization or conversion.
 
 Read the codebase, and read the project's records: Rationale for settled decisions and rejected
 alternatives, Build Log for dated actions and observed results, State for current reality and open work.
+Read the records in full; if one is too large to read whole, say in the report which parts you read.
 
 The records are not optional. Code alone cannot distinguish a deliberate constraint from a defect. In the
 measured case that established this, a Guide written from code alone reported three of that project's
