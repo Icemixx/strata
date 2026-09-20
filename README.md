@@ -10,8 +10,9 @@ the task needs it.
 - **State** records WHAT is current, using compact ticket entries and routed completed history.
 - **Rationale** records WHY decisions were made.
 - **Build Log** records HOW work was performed and the evidence observed.
-- **Guide** is a generated, self-contained HTML explanation built from those three project authorities and
-  the application's code. It is not an authority and contains no directly maintained content.
+- **Guide** is a self-contained HTML explanation of the software, written by an agent from the code and
+  those records when the user asks for it. It is not an authority, because the code is what makes a
+  technical claim true. Nothing reads it as context; it is written for people.
 - **`_sediment/`** holds project material that is not an authority: deliberation at its root, retained
   specifications under `specs/`, stable domain material under `reference/`. It is not routed, and every
   file a record still needs is named by that record.
@@ -61,6 +62,16 @@ under `_strata/procedures/guide-generation.md`. Ordinary code and authority chan
 
 The kit is Markdown only. It ships no scripts, validator, or test suite. The agent that changes a record
 keeps the authority graph valid; `_strata/procedures/context-routing.md` lists what that covers.
+
+## What this repository holds
+
+The kit and nothing else: the payload, this README, the two routers, the licence and the git control
+files. Project work lives in each consuming repository, in its own records.
+
+Working material — plans, audits, trials and evidence — used to live in a nested `workbench/` repository
+here. Both it and its remote were deleted on 2026-09-20, once the Guide capability it was carrying had
+reached the kit and the remaining work had been filed as tickets in the consuming repositories. What it
+concluded survives in this kit and in those repositories' records; the working material itself does not.
 
 ## Canonical editing
 

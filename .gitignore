@@ -1,7 +1,8 @@
 # Default deny. The kit is public and deliberately project-agnostic, while this
-# working tree also holds audit, debate, sweep and repair artifacts that describe
+# working tree has held audit, debate, sweep and repair artifacts describing
 # private consuming repositories, including unremediated security findings. Those
-# must never be published here.
+# must never be published here, and anything similar that lands here later is
+# private by default rather than by someone remembering to exclude it.
 #
 # This file previously listed the artifacts to exclude, which fails open: any new
 # artifact whose name matched no pattern became publishable, and a `git add -A` did
