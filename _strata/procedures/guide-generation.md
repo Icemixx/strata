@@ -38,6 +38,9 @@ output, never input.
 `_strata/project_guide.html`, and any draft, fragment or backup of an earlier generation, wherever it sits.
 The new Guide replaces the old one; it is never kept beside it.
 
+A manual the project archived before it adopted this kit is preserved history, not an earlier generation:
+leave it where it is. The rule above already forbids reading it.
+
 ## What a claim must carry
 
 **Cite the implementation for any claim that can drift** — behaviour, defaults, thresholds, paths, schema,
