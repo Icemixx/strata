@@ -204,7 +204,19 @@ found eighteen wrong, and the pattern was that nearly every one had been written
 renamed or moved the very thing it cited, as part of implementing itself. The citation was accurate when
 typed and wrong the moment its own work shipped, and nothing re-reads it. A symbol name survives the edit
 that moves it; a line number silently points at whatever slid into its place. Dated evidence is exempt —
-a Build Log entry records what was true on a day and is not maintained afterwards.
+a Build Log entry records what was true on a day.
+
+**A Build Log entry is never edited to reflect later events.** A later decision that supersedes or
+overrules it, and an error in it found later, are both recorded in a new entry that names the one it
+supersedes or corrects; State and Rationale carry the current answer. Until its work item closes, an
+entry may still be completed — with the commit that shipped the work, for example — because that
+records the same work rather than a later event. Adding an entry leaves every earlier entry
+byte-unchanged, so in the change that adds it, the file it is added to shows only added lines; a removed
+line there means an earlier entry was altered. Repairing damage to an entry, such as text a misplaced
+insertion displaced, is not maintenance: it is a deliberate edit that restores the original wording and
+is itself recorded in a new entry. One project's appended entry landed mid-line inside its predecessor and
+carried that entry's closing paragraph beneath itself, and nothing noticed until a later review read
+the log.
 
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
