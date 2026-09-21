@@ -206,17 +206,10 @@ typed and wrong the moment its own work shipped, and nothing re-reads it. A symb
 that moves it; a line number silently points at whatever slid into its place. Dated evidence is exempt —
 a Build Log entry records what was true on a day.
 
-**A Build Log entry is never edited to reflect later events.** A later decision that supersedes or
-overrules it, and an error in it found later, are both recorded in a new entry that names the one it
-supersedes or corrects; State and Rationale carry the current answer. Until its work item closes, an
-entry may still be completed — with the commit that shipped the work, for example — because that
-records the same work rather than a later event. Adding an entry leaves every earlier entry
-byte-unchanged, so in the change that adds it, the file it is added to shows only added lines; a removed
-line there means an earlier entry was altered. Repairing damage to an entry, such as text a misplaced
-insertion displaced, is not maintenance: it is a deliberate edit that restores the original wording and
-is itself recorded in a new entry. One project's appended entry landed mid-line inside its predecessor and
-carried that entry's closing paragraph beneath itself, and nothing noticed until a later review read
-the log.
+**A Build Log entry is never edited to reflect later events.** A later decision, supersession or
+correction goes in a new entry that names the one it replaces; an entry may still be completed before its
+work item closes. Adding an entry therefore shows only added lines in that file's diff. Repairing
+accidental damage restores the original wording.
 
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
