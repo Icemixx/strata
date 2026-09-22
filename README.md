@@ -39,8 +39,8 @@ directory it claims to describe, so it fails on the next release instead of on a
 to the README all along.
 
 The payload is copied unchanged. Project rules and authorities remain project-owned. A consuming
-repository records the canonical source and synced revision in `_strata/.kit-source` and
-`_strata/.kit-version`.
+repository records each canonical commit it installs as a `## Strata sync <commit> (<YYYY-MM-DD>)` entry
+in its own Build Log; `_strata/procedures/kit-editing.md` owns that format and the sync procedure.
 
 ## Initialize a new repository
 

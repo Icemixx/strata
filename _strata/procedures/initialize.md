@@ -38,8 +38,9 @@ procedure without overwriting anything.
 5. **Do not generate a Guide.** Initialization creates empty authority roots, and a Guide over them
    explains nothing while looking like a finished document; generation is the user's to ask for, once
    records exist. A new repository correctly has no Guide until then.
-6. Record the canonical source and exact copied revision as one line each in `_strata/.kit-source` and
-   `_strata/.kit-version`.
+6. Record the copied canonical commit as a Build Log entry headed `## Strata sync <commit> (<YYYY-MM-DD>)`,
+   in the form `_strata/procedures/kit-editing.md` defines, in a Build Log leaf listed in
+   `_strata/build-log/index.md`.
 
 Project-owned or harness-native procedures may be routed from Project Instructions. Do not create a
 universal project-skill directory, trigger-map format, or audit addendum merely to satisfy Strata.
@@ -73,5 +74,5 @@ Project Instructions win on conflict. This file is only a router.
 ```
 
 Before reporting initialization complete, verify the shared payload, required files, router edges,
-authority graph, and source/version markers. Report literal check results and anything
+authority graph, and the Strata sync entry. Report literal check results and anything
 intentionally left empty.

@@ -10,10 +10,10 @@ apart from the `harness-<product>.md` dossiers, which exist to carry exactly tho
 project discovery before proposing it for the shared kit; keep project-specific realization in Project
 Instructions or project records.
 
-The canonical repository is the source. Consuming repositories hold copies identified by
-`_strata/.kit-source` and `_strata/.kit-version`. Never edit a consuming copy incidentally during
-project work. A canonical change or a consuming-repository sync requires deliberate authorization for
-that scope.
+The canonical repository, `https://github.com/Icemixx/strata.git`, is the source. Consuming repositories
+hold copies, and each records the canonical commit it installed in its own Build Log. Never edit a
+consuming copy incidentally during project work. A canonical change or a consuming-repository sync
+requires deliberate authorization for that scope.
 
 Each `harness-<product>.md` is owned by an agent running that product. **Do not write a claim about
 another harness's runtime into its dossier.** How it identifies its model, where its sessions live, what
@@ -66,27 +66,36 @@ as a list of payload files it may not.
 ## Consuming-copy sync
 
 **Run this in the consuming repository, never in canonical.** It is a pull: the consuming repo overwrites
-its own payload from the source named in `_strata/.kit-source` and writes its own `_strata/.kit-version`.
+its own payload from the canonical repository and records the commit it installed in its own Build Log.
 
-**A sync is: pull the newest canonical revision, overwrite the local copy, record the revision.** That is
-the whole operation. Three steps:
+**A sync is: compare the installed commit with the live one; if they differ, overwrite the local copy and
+record the new commit.** That is the whole operation. Four steps:
 
-1. Fetch the canonical source at `_strata/.kit-source` and resolve the exact revision being installed.
-2. Delete exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from canonical. Delete
-   before copying, or a file canonical removed lingers. Replace nothing else under `_strata/` — Project
-   Instructions, the routers, `.kit-source`, and the authority directories are project-owned, and a sync
-   that rewrites one of them has overwritten the project with the kit.
-3. Write the exact revision installed to `_strata/.kit-version`. Report `git status`; that is the report.
+1. Read the installed commit: the newest-dated Build Log heading of the form
+   `## Strata sync <commit> (<YYYY-MM-DD>)`, anywhere under `_strata/build-log/`. `<commit>` is the
+   canonical commit's 7-character short hash, as GitHub shows it.
+2. Read the live commit: the first 7 characters of
+   `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If it equals the installed commit, stop;
+   there is nothing to sync. No such heading at all means sync.
+3. Delete exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from canonical at the live
+   commit. Delete before copying, or a file canonical removed lingers. Replace nothing else under
+   `_strata/` — Project Instructions, the routers, and the authority directories are project-owned, and a
+   sync that rewrites one of them has overwritten the project with the kit.
+4. Append a Build Log entry headed `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the
+   sync date, for example `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry.
+   Report `git status`; that is the report.
+
+Two syncs on the same date need no ordering rule. Canonical only moves forward, so reading the older of the
+pair costs at most one redundant sync, never a missed one.
 
 **Do not add a verification pass.** Not a drift check before overwriting, because the copy is about to
 replace whatever it would find. Not a review of the incoming diff, because canonical reviewed it when it
 was committed. Not a search for inbound references to renamed payload headings, because the section above
 already guarantees a consuming repository never needs an edit for one. Not a re-comparison after copying,
-nor a control demonstrating that such a comparison works. Not a Build Log entry: `.kit-version` records
-the installed revision and `git log -- _strata/.kit-version` records every sync before it.
+nor a control demonstrating that such a comparison works.
 
 Deleting before copying is what makes the inventories equal, so nothing has to confirm afterwards that
 they are. The evidence rules in `core.md` govern work that *authors* a change; a sync authors nothing, it
 installs bytes canonical already reviewed, and `git status` is the literal result. One consuming
-repository's sync took thirty-three tool calls for an operation that needs three, because this section
+repository's sync took thirty-three tool calls for an operation of a few steps, because this section
 read as a comparison problem and every clause above was absent.
