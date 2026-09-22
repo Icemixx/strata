@@ -143,8 +143,8 @@ participant to detect that state. On resume, reconstruct the wait from files and
 After validating the brief, B announces once that Phase 1 has begun, both participants will continue
 automatically, no proceed messages are needed, and A will announce the result. B immediately continues its
 report and automatic waiting in the same turn. A alone announces convergence, termination, void, or a need
-for user action. B does not issue a competing final announcement, but reports its own blocker or interruption
-immediately.
+for user action, and posts the result (*On close*), unless the user asks B to close the debate. B does not
+issue a competing final announcement, but reports its own blocker or interruption immediately.
 
 ## Rounds
 
@@ -206,8 +206,8 @@ settlement is recorded exactly once and carries who accepted it and when.
   collected from the rounds in order, verbatim; the closing round verifies that every accepted claim
   appears there and introduces none that no round accepted. Collect the list that was written as the
   debate ran rather than reconstructing one at the end: a reconstruction loses which participant accepted
-  what and in which round, and it is written when the evidence is furthest away. That list is the input to
-  the close procedure below, which distils it into a spec and distributes it; it is not the lasting record.
+  what and in which round, and it is written when the evidence is furthest away. That list is what the
+  closing participant posts in chat (*On close*).
 - **Terminated** — the user declares the debate over. Settled items stand and remain usable. Every
   unresolved HOLD, unresolved SIMPLIFY, and open QUESTION returns to the user with both positions
   preserved and neither winning.
@@ -261,45 +261,25 @@ not a wall that keeps it for you.
 
 ## On close
 
-A converged debate is closed, not archived. Build the spec through the shared specification workflow and
-place every settled item in the authority that owns it.
+**A debate is read-only.** Apart from its own files under `_sediment/debate-<subject>/`, it creates and changes
+nothing: no specification, no authority record, no ticket, no code, no commit.
 
-**Build the spec.** Follow `_strata/procedures/spec-building.md`, using `settled.md` as the input ledger and
-the reports, cross-analyses and rounds as evidence for the reasoning and measurements that must survive.
-The output is `_sediment/specs/<subject>-spec.md`. Debate is only the source of this specification; it does not
-change the shared content, traceability, ambiguity, readiness, or handoff requirements.
+**When the debate ends, the participant that opened it — or whichever participant the user asks to close it —
+posts the result in chat. That is the end of the debate.** The post carries:
 
-**Place every settled item.** Decisions and their reasons go to Rationale. Remaining work goes to State as
-tickets. A dated entry goes to Build Log recording that the debate ran, between which products, over how
-many rounds, and **what it measured** - counts, verified figures, defects found. Those measurements are
-dated evidence and are the part of a debate worth keeping.
+- the outcome stamp;
+- for a converged debate, every settled item, verbatim from `settled.md`;
+- for a terminated debate, the settled items and every open HOLD, SIMPLIFY and QUESTION, with both positions
+  and neither winning;
+- for a void debate, the reason.
 
-**Confirm the spec.** The other participant performs the independent confirmation required by
-`spec-building.md`. Silence agrees to nothing, and the author's review of its own document is not
-independent confirmation. The close procedure may continue only after the specification carries
-`SPECIFICATION: confirmed — implementation-ready` and records the required agreement. Nothing detects a
-stalled confirmation; only the user can end one, and ending it does not promote a draft or authorize its
-implementation.
+The debate's files stay where they are.
 
-**Then keep the branch**: the reports, the cross-analyses, `rounds.md`, `settled.md` and `index.md` all
-remain in place. A closed debate stays in `_sediment/` - the authority records what was decided, the
-branch records how it was reached.
-
-**Close nothing until every settled item has a home.** An item with no destination was not settled; it was
-agreed and forgotten. This is a completeness check on the close, not a gate before deletion: verify the
-placements because an unplaced item is a defect in the close, whether or not anything is removed.
-
-A void debate produces no spec and no authority record.
-
-**Reaching an outcome does not start this procedure.** Convergence, termination, and void each end the
-debate and nothing more. The close procedure above is separately authorized work that the user starts;
-an outcome stamp is not that authorization, and neither is a participant proposing to continue.
-
-**Debate completion does not authorize implementation.** A converged debate has produced agreement about
-what should be true, not permission to make it true. Building the spec, placing items in authorities, and
-implementing anything are each separately authorized. This holds however the debate ran - an unattended
-exchange that reaches convergence with no user message between rounds has exactly the authority an
-attended one has, which is none beyond the debate itself.
+**What follows is the user's decision.** Whether to write a specification, record decisions, open tickets or
+implement anything is for the user to decide separately, after reading the result. A participant may say what
+it would recommend next; the recommendation authorizes nothing. This holds however the debate ran: an
+unattended exchange that reaches convergence with no user message between rounds has exactly the authority of
+an attended one, which is none beyond the debate itself.
 
 ## Limits
 
