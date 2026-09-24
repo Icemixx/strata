@@ -5,11 +5,11 @@ for a Codex session.
 
 ## Roles and delegation
 
-| Role | Cached model family | Recognized runtime model id |
+| Role | Model family | Recognized runtime model id |
 | --- | --- | --- |
-| Architect | Sol | `gpt-5.6-sol` |
-| Engineer | Terra | `gpt-5.6-terra` |
-| Technician | Luna | `gpt-5.6-luna` |
+| Architect | Astra | `gpt-6-astra` |
+| Engineer | Sol | `gpt-6-sol` |
+| Technician | Luna | `gpt-6-luna` |
 
 **Model self-identification.** A Codex session's reliable self-identification source is the runtime's
 `turn_context` record for the current turn. In a native rollout, this is persisted as JSONL at
@@ -20,7 +20,7 @@ It wins over session-start metadata, model catalogs or caches, requested thread 
 model lists, and inference from behavior; none of those identifies the model executing the current turn.
 
 Map the returned id to a role only by exact match with the recognized runtime-model-id column above. The
-shared `sol`, `terra`, and `luna` spelling in those ids is a current naming convention, not a guaranteed
+shared `astra`, `sol`, and `luna` spelling in those ids is a current naming convention, not a guaranteed
 id-to-family contract: do not parse an unlisted id's suffix or display name. If the current rollout cannot
 be selected unambiguously, has no current-turn `turn_context.payload.model`, or returns an unlisted id,
 state the exact available fact and what cannot be determined; if no source is available, disclose
@@ -38,17 +38,17 @@ Codex exposes `/reasoning` as the current-chat control. The persistent configura
 changes its own effort; selecting `reasoning_effort` when spawning an agent changes the child, not the
 parent.
 
-The legal values are model-dependent. In the live catalog verified with `codex-cli 0.153.0`, the
+The legal values are model-dependent. In the delegation tool declaration observed on 2026-09-24, the
 recognized models above expose:
 
 | Model | Values |
 | --- | --- |
-| `gpt-5.6-sol` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
-| `gpt-5.6-terra` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
-| `gpt-5.6-luna` | `low`, `medium`, `high`, `xhigh`, `max` |
+| `gpt-6-astra` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
+| `gpt-6-sol` | `low`, `medium`, `high`, `xhigh`, `max`, `ultra` |
+| `gpt-6-luna` | `low`, `medium`, `high`, `xhigh`, `max` |
 
 Do not treat that table as a permanent global ladder. The configuration schema also accepts `minimal`,
-but the verified catalog does not offer it for these three models; compatibility belongs to the selected
+but that declaration does not offer it for these three models; compatibility belongs to the selected
 model's live catalog. Re-verify after a Codex or model-catalog change rather than carrying these values
 forward on memory.
 

@@ -15,9 +15,9 @@ decisions. Record the settled result in Rationale.
 
 Create exactly six independent, terminal, read-only reviewers in addition to the Active Agent:
 
-- two Architects: Opus or Sol;
-- two Engineers: Sonnet or Terra; and
-- two Technicians: Haiku or Luna.
+- two Architects;
+- two Engineers; and
+- two Technicians.
 
 The Active Agent never occupies a seat. Failure of any seat invalidates the council.
 

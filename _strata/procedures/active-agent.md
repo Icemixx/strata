@@ -7,14 +7,14 @@ questions, final verification, and communication regardless of its model tier.
 
 The three roles are:
 
-| Role | Model mapping | Typical work |
-| --- | --- | --- |
-| Architect | Opus / Sol | Highest-impact direction, architecture, ambiguity, and hard review |
-| Engineer | Sonnet / Terra | Substantive implementation and deep technical review |
-| Technician | Haiku / Luna | Bounded mechanical work |
+| Role | Typical work |
+| --- | --- |
+| Architect | Highest-impact direction, architecture, ambiguity, and hard review |
+| Engineer | Substantive implementation and deep technical review |
+| Technician | Bounded mechanical work |
 
 The selected model remains Active Agent. Manual switching is unnecessary when the harness can invoke the
-needed role. Load the applicable harness dossier before using its mechanics.
+needed role. Model names and role-to-model mappings belong only in the harness dossiers; shared procedures use Architect, Engineer, and Technician. Load the applicable harness dossier to resolve a role to a model and before using its mechanics.
 
 - Delegate a substantive, bounded, independent subtask when its result can be verified without repeating
   the entire investigation. Use the lowest capable role.
