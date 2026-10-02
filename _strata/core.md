@@ -36,10 +36,10 @@ project-specific preference into a universal rule without cross-project justific
   delivers its assessment in the reply and creates or changes no file in the repository. Writing that
   assessment to a report file, or linking it from a record, is separate work the user authorizes.
   Working notes outside the repository are not a repository change.
-- Change, build, implementation, and fix requests authorize only the necessary in-scope local edits.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
-- Editing never implies authority to commit, publish, spend money, change external state, or expand
-  scope materially.
+- Editing never implies authority to commit, publish, spend money, or change external state.
+- Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other
+  work beyond what is needed to deliver and verify the requested result and meet applicable instructions.
 - Never ingest credentials, tokens, personal or machine-local settings, transcripts, generated memory,
   caches, raw logs, or administrator-managed policy into project authorities or the shared kit, and never
   commit, track, or log customer data, environment values, generated reports, or identifying financial
@@ -50,6 +50,32 @@ project-specific preference into a universal rule without cross-project justific
 - If the user asked to discuss, plan, or approve steps first, wait for that approval before editing.
 - Continue safe independent authorized work around one blocked item. Stop when the user changes scope,
   required authority is missing, or no safe authorized action remains.
+
+## Build scope
+
+A change, build, implementation, or fix request authorizes only the local edits its requested result
+needs. An edit is needed when without it the result would not work (including wiring and changes to
+existing code it depends on), something that works today would break, or a governing rule would go
+unmet — a project convention for what the change touches, or a test or record the instructions require.
+Build the result completely to that standard, then stop.
+
+Usefulness alone does not justify these additions; they must satisfy the inclusion test above.
+
+- features, options, settings, or modes nobody asked for, and parameters no caller sets;
+- abstractions, layers, or extension points for callers that do not exist yet; and
+- refactors, renames, or cleanup of anything the result does not need changed.
+
+Preventive changes must satisfy this scope test and the existing failure-mode rule under Evidence and
+changes.
+
+Prefer the simplest design that works, and change an existing place before adding a mechanism.
+Investigate until the next step is clear. If the request can be read as materially different results
+and the evidence does not settle which, ask before building; if only an addition is in doubt, leave it
+out. A worthwhile addition that is not a defect fix goes in the reply as a suggestion — not into the
+change, and not into the backlog unless the user accepts it.
+
+Before reporting completion, review your own changes against the inclusion test and remove unnecessary
+additions. Explain any change whose connection to the requested result would not be clear to the user.
 
 ## Evidence and changes
 
