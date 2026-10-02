@@ -62,15 +62,13 @@ Update each authority in the same meaningful transaction that changes its inform
 When Guide generation is requested, follow `_strata/procedures/guide-generation.md`.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
-next meaningful step, or exact blocker. A temporary handoff is needed only for important transient state
-that does not fit conveniently in the authorities, such as an in-flight command or exact uncommitted
-next action. It never overrides an authority.
+next meaningful step, or exact blocker.
 
 Before reporting completion or a blocker, requesting a decision after work occurred, pausing or changing
 harnesses, or when compaction or a runtime limit is imminent, check whether status, decisions,
 implementation, or evidence changed and update the owning authorities. Explicit stop, pause, handoff, or
-end-for-today language triggers the same check. Ordinary turn boundaries do not require a separate
-handoff file.
+end-for-today language triggers the same check. An ordinary turn boundary needs no additional record
+when the authorities are already current.
 
 ### Closing a work item
 

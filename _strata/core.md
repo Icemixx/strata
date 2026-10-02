@@ -47,6 +47,9 @@ project-specific preference into a universal rule without cross-project justific
   A relevant non-sensitive fact may be recorded independently in its owning authority; the protected
   source material itself is never ingested.
 - Preserve unrelated work and inspect an existing file completely before editing or removing it.
+- Never create or update a separate handoff file, including temporary or scratch handoffs. Save
+  continuity information in State for remaining work, next steps, blockers, and transient resume details,
+  or in Build Log for work performed and evidence. The next agent resumes from those records.
 - If the user asked to discuss, plan, or approve steps first, wait for that approval before editing.
 - Continue safe independent authorized work around one blocked item. Stop when the user changes scope,
   required authority is missing, or no safe authorized action remains.
