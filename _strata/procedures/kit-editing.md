@@ -38,9 +38,26 @@ routing a record, consolidating -- is ordinary shared-kit work and needs no seco
 
 ## Canonical change
 
+**Work from a temporary clone inside the project folder.** Clone the canonical repository into a
+git-ignored temporary folder inside the project the session works in — `.temp/strata/` unless the project
+names another — confirming first that the folder is ignored. Edit, commit, and push from that clone, verify
+the push, then delete the clone. Never keep a canonical checkout elsewhere, and never put the session's
+working material, such as a debate or a report, inside the clone.
+
 Audit source files and inbound references before relocation or removal. Update one normative owner per
 rule, run checks relevant to the shared payload, and distinguish a local edit from an authorized commit
 or publication.
+
+Before committing, read every changed payload file in full, not only the diff, for project-, product-,
+stack-, or user-specific content and private material. Any such content moves to a harness dossier when it
+is a harness difference, or out of the kit. Do not keep a list of private terms in the public kit to search
+for; the list would itself leak them.
+
+**Every rule the change removes, relocates, rewords, or weakens gets a disposition in the commit
+message**: the old obligation and where it was, whether it is kept, changed, relocated, or retired, where it
+lives now, and the reason for any weakening or retirement. Rules the change leaves untouched need no entry.
+Cover the substantive diff in both directions: every removed or weakened obligation has an entry, and every
+entry matches the diff. The commit message is public, so it follows the rule below.
 
 **The canonical repository is public and its history is permanent.** Commit to it with a GitHub
 `users.noreply` author address, never a personal one: check the checkout's `git config user.email` before
@@ -53,8 +70,16 @@ Before accepting a new or changed contract, ask where two competent agents follo
 produce different results, and pin every such point. Name the file, the format, and the location rather
 than the intent.
 
+When publication is authorized, push and verify the push in the same transaction; otherwise say the
+change is local only. Report the files changed and, for each changed rule, what it said before and what it
+says now.
+
 After a canonical payload change, tell the user which consuming repositories still require a separate
 sync. Do not retrofit them as part of the canonical transaction.
+
+Undo a published canonical change, or a committed sync in a consuming repository, with a
+history-preserving operation, normally `git revert`. A destructive reset needs the user's separate,
+explicit authorization.
 
 ## The payload is copied, never described
 
@@ -84,13 +109,16 @@ record the new commit.** That is the whole operation. Four steps:
 2. Read the live commit: the first 7 characters of
    `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If it equals the installed commit, stop;
    there is nothing to sync. No such heading at all means sync.
-3. Delete exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from canonical at the live
-   commit. Delete before copying, or a file canonical removed lingers. Replace nothing else under
-   `_strata/` — Project Instructions, the routers, and the authority directories are project-owned, and a
-   sync that rewrites one of them has overwritten the project with the kit.
-4. Append a Build Log entry headed `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the
-   sync date, for example `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry.
-   Report `git status`; that is the report.
+3. Clone canonical at the live commit into a temporary clone, as *Canonical change* describes. Delete
+   exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from the clone. Delete before
+   copying, or a file canonical removed lingers. Replace nothing else under `_strata/` — Project
+   Instructions, the routers, and the authority directories are project-owned, and a sync that rewrites one
+   of them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
+   stop and report the failure; do not go on to step 4.
+4. Append to `_strata/build-log/project_build_log.md` an entry headed
+   `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example
+   `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Report `git status`;
+   that is the report.
 
 Two syncs on the same date need no ordering rule. Canonical only moves forward, so reading the older of the
 pair costs at most one redundant sync, never a missed one.

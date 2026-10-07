@@ -106,6 +106,18 @@ runbooks as steps a person can follow.
 Prefer *what happens, why it happens that way, and what follows from it* over narrating implementation
 line by line.
 
+**Keep a subject ledger.** Before writing, list the subjects the code and records establish. Each one ends
+in the Guide or excluded with a reason, and the report states the count of each. Depth without this
+accounting drops subjects silently.
+
+**Explain; do not encode.** A table or diagram cites its source and says where it simplifies; it never
+carries business rules of its own, and the page never reimplements software logic in script. Do not mirror
+the records: no ticket lists, no dated history, no decision log — the records already hold them. Give each
+subject one home in the page and cross-link to it from elsewhere rather than repeating it.
+
+When several writers draft sections, one accountable composer writes the final page from claims checked
+against the sources. Parallel drafting is optional.
+
 **Never invent a fact.** Where neither code nor records establish something, say so in the text rather
 than filling the gap plausibly. **Read what implements, not what describes**: a docstring is a claim to
 verify, not a source to quote, and where it disagrees with the code the code wins and the disagreement is
@@ -126,6 +138,11 @@ State literally: citation counts and their verification result; that every `<a h
 anchor and no outbound hyperlink exists; that no external resource is loaded; that ids are unique and
 anchors resolve; that no credential reached the output. Report what you could not establish from either
 source, and every contradiction found.
+
+Say plainly, in the report and visibly in the Guide itself, that it is a snapshot: it describes the code
+at `generation_commit` and goes stale as the code changes. The provenance hashes show which cited files
+changed since; they cannot show a change to a file the Guide never cited, so name the uncited code a
+subject depends on when the Guide claims to cover that subject fully.
 
 Say plainly that mechanical correctness is not truth. The Guide corresponds to what you read; whether what
 you read is right about the application is a separate question that this procedure does not answer.

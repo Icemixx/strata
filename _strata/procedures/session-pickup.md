@@ -5,14 +5,16 @@ Load that harness's dossier for native transcript and session mechanics; load bo
 cross-harness continuity.
 
 1. Match candidate main sessions to the repository, accounting for a known repository rename when the
-   request supplies both paths.
+   request supplies both paths. Under a sandbox or a service account, the home directory the environment
+   reports may not be the real user's; resolve the real user's session store before concluding none
+   exists.
 2. Exclude subagent, approval-review, empty, and bootstrap-only sessions. Never select a transcript only
    because its file is newest.
 3. Read only enough to recover the last authorized request, completed work, changed artifacts, literal
    evidence, and exact unfinished step or blocker.
 4. Verify transcript claims against the current filesystem, Git state, and routed project authorities.
    Live evidence determines what actually landed.
-5. Report only what the task needs.
+5. Report only what the task needs, and never a secret, token, or credential a transcript contains.
 
 Before acting, announce the source harness, selected main-session identifier and timestamp, repository
 match, last completed work, and exact unfinished step or blocker.

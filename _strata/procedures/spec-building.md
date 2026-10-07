@@ -46,7 +46,9 @@ window when necessary. Stop when every such requirement has a verified source, a
 unavailable-evidence disposition, or a named unresolved decision. Record the sessions or other inputs
 inspected, their relevant time range, and any discovery limitation that could have hidden material context.
 
-This is a repair path for inherited specifications, not a normal implementation dependency.
+This is a repair path for inherited specifications, not a normal implementation dependency. Report
+recovered provenance separately from confirmation status: having recovered the decision path does not make
+the specification confirmed or implementation-ready.
 
 ## Draft and confirmation state
 

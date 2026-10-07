@@ -3,6 +3,14 @@
 The Active Agent is the model in the user-facing session. It owns scope control, routing, integration,
 questions, final verification, and communication regardless of its model tier.
 
+## Session start
+
+Once per session, compare the installed kit commit — the newest `## Strata sync <commit>` heading under
+`_strata/build-log/` — with the first 7 characters of
+`git ls-remote https://github.com/Icemixx/strata.git HEAD`. If they differ, say once that the installed
+kit is behind; if the check cannot run, say that. Then continue. This is a report only: never sync without
+authorization (`kit-editing.md`).
+
 ## Capability roles and delegation
 
 The three roles are:
@@ -17,9 +25,13 @@ The selected model remains Active Agent. Manual switching is unnecessary when th
 needed role. Model names and role-to-model mappings belong only in the harness dossiers; shared procedures use Architect, Engineer, and Technician. Load the applicable harness dossier to resolve a role to a model and before using its mechanics.
 
 - Delegate a substantive, bounded, independent subtask when its result can be verified without repeating
-  the entire investigation. Use the lowest capable role.
+  the entire investigation. Use the lowest capable role. Delegate only work whose result you can assess
+  independently.
 - Do not delegate deterministic commands, tiny edits, or source analysis you must personally reread to
-  decide.
+  decide. A delegated agent pays its own startup cost; batch compatible small work into one assignment
+  rather than spawning one agent per edit.
+- When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
+  capability — verify it in the current turn rather than from memory or an earlier session.
 - Architect and Engineer participation are required for substantive implementation. Technician
   participation is required only when genuine bounded mechanical work exists; never invent a task merely
   to occupy the role.
@@ -27,15 +39,22 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   Architect direction or review when required. A Technician obtains Architect direction and Engineer
   implementation or review for work outside Technician scope.
 - Each delegated assignment names the role, edit permission, file scope, task, routed context, completion
-  condition, and relevant checks. Delegated agents are terminal for that assignment; retrieve the final
-  report before relying on it.
+  condition, and relevant checks, and tells the agent to do the work directly, without delegating further
+  or invoking another agent unless separately authorized. Delegated agents are terminal for that
+  assignment, and they never load this file, so the assignment is the only place that instruction reaches
+  them. Retrieve the final report before relying on it.
+- An operational assignment — driving a device, a service, or a long-running process — names what to
+  observe, the checkpoints, and the artifacts to leave on disk. The agent reports literal observations;
+  acceptance is decided by whoever the assignment names, normally the Active Agent. Prefer inspectable
+  machine-readable data over screenshots when both exist.
 - Limit worker reports to files changed, decisions or assumptions, literal verification, and confirmed
   out-of-scope findings.
 - Workers update project authorities only when explicitly assigned; normally the Active Agent performs
   the integrated authority update.
 
-If a mapped model is unavailable, inspect current capability evidence and disclose the substitution.
-Substitute only within the same role. A DAP council is invalid if a required seat has no same-role model.
+If a mapped model is unavailable, inspect current capability evidence and disclose the substitution with
+its reason. Substitute only within the same role. A DAP council is invalid if a required seat has no
+same-role model.
 
 ## Work control and questions
 
@@ -44,11 +63,30 @@ Substitute only within the same role. A DAP council is invalid if a required sea
 - Continue safe independent work before asking. When an answer is required, stop and make the smallest
   necessary question set the final user-facing message. Do not send later progress that buries it.
 - Delegated agents return clarification needs to the Active Agent and do not question the user directly.
+- A meaningful implementation plan orders its steps by dependency and gives each independently executed
+  block its own completion condition and verification. Name a capability role only when the block will be
+  delegated.
+
+### Authorized work batches
+
+A batch is the finite set of items the user authorized, with its origin and order. A follow-up enters the
+batch only when it is a verified, separately ticketed sibling of a batch item, within the batch's approved
+scope and risk; record which item it came from and its verification. New product, security, destructive,
+cost, or external-authority work stays outside the batch until the user authorizes it. Admitting a
+follow-up is bookkeeping, never new user authorization. An item is ready when nothing it depends on is
+unfinished.
+
+Before reporting the batch finished, re-read the queue fresh: every completed item has its records and
+evidence, and every blocked or deferred item names its evidence, owner, unblock condition, and next action.
+A command or delegated agent still running is not completion.
 
 ## Decisions
 
 Use `_strata/procedures/dap.md` for consequential decisions. Coding-specific review lenses apply only to
 code-affecting decisions.
+
+For a material choice someone might later want to revisit, record the viable alternative that was
+rejected and why. Skip trivial mechanical choices and options the user already decided.
 
 ## Authority transaction and continuity
 
@@ -56,7 +94,8 @@ Update each authority in the same meaningful transaction that changes its inform
 
 - status and remaining work update State;
 - decisions update Rationale;
-- implementation and evidence update Build Log; and
+- implementation and evidence update Build Log, including the lesson when repeatable work exposes one —
+  what changed in the approach and why, or what went wrong — but never a stage-by-stage diary; and
 - Guide is generated only when the user explicitly asks to generate the Guide.
 
 When Guide generation is requested, follow `_strata/procedures/guide-generation.md`.
@@ -106,13 +145,19 @@ that has paid for one keeps that evidence in its own Rationale, not here.
   commit.
 - Preserve the user's configured authorship and add agent co-author attribution.
 - After an authorized push, verify remote receipt from the successful push result and local
-  upstream-tracking state.
+  upstream-tracking state. When that receipt is ambiguous or stale, query the live remote ref; a remote
+  tip that descends from the pushed commit is success. "The push was accepted" and "the remote tip equals
+  local `HEAD`" are different claims; state the one you verified.
+- When a push fails, alert the user with a message. That is all.
 - Run applicable implementation verification locally. Do not create, enable, dispatch, wait for, or
-  depend on remote automation unless the user explicitly authorizes it for that repository.
+  depend on remote automation unless the user explicitly authorizes it for that repository. When an
+  authorized remote verification does run, record its terminal result, or literally that it was
+  unavailable; never infer it from a local pass.
 
 ## Closing review
 
 Before closing meaningful work, confirm no required gate was weakened, discoveries were dispositioned,
-authority records are current, and omissions or unverified surfaces are stated plainly. Check whether the
+authority records are current, and omissions or unverified surfaces are stated plainly. Give each material
+uncertainty or possibly missed obligation the concrete check that would settle it. Check whether the
 evidence exposed a reusable Strata improvement that has not yet been reported. For long or high-stakes work,
 also load `_strata/procedures/self-critique.md`.

@@ -1,8 +1,10 @@
 # Decisions and Devil's Advocate Policy
 
 Use Level 1 for consequential decisions. Use Level 2 only for high-impact, hard-to-reverse, or genuinely
-disputed decisions. The user, Project Instructions, or the Active Agent may trigger Level 2; state the
-trigger before starting.
+disputed decisions, and only when the user explicitly asks for it or a Project Instruction the user
+approved expressly authorizes it for the current scope. A decision being hard is not authority to start a
+council. Standing permission is not asked for again. State the trigger before starting. When no council is
+authorized, Level 1 and any otherwise permitted independent verification remain available.
 
 ## Level 1
 
@@ -10,6 +12,15 @@ Re-read relevant context and prior reasoning. Compare viable alternatives and tr
 evidence from assumptions, revisit relevant prior mistakes, identify risks and reversibility, map the
 affected scope, and surface open questions. Apply coding-specific lenses only to code-affecting
 decisions. Record the settled result in Rationale.
+
+The coding-specific lenses, plus any the project adds:
+
+- Naming: descriptive, and following the project's naming conventions?
+- Boundaries: does it cross a layer or module boundary the project forbids?
+- Duplication: is equivalent logic already defined elsewhere?
+- Security: hardcoded secrets, unvalidated input, or data access outside the sanctioned layer?
+- Side effects: does it change other callers or startup behavior?
+- User-facing text: does it follow the project's text and localization conventions?
 
 ## Level 2 council
 

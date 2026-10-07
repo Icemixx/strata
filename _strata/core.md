@@ -14,7 +14,9 @@ Instructions is the only authority loaded merely because a session starts. Do no
 State, Rationale, Build Log, or the generated Guide. Route additional context under
 `_strata/procedures/context-routing.md` when the task needs it.
 
-Read routed procedures silently. Visible load announcements are not required. Announce a material new
+Read routed procedures silently. Visible load announcements are not required. After context compaction,
+re-read a procedure whose trigger still applies when its current text is no longer in context; never claim
+compliance from a remembered summary of it. Announce a material new
 discovery promptly when it changes an accepted conclusion, plan, risk, scope, or unresolved item. A
 delegated agent reports such a discovery to the Active Agent.
 
@@ -110,7 +112,11 @@ additions. Explain any change whose connection to the requested result would not
 - Before deleting text or removing behavior, identify the substantive statements or stated rules it
   carries. Confirm each survives at one named destination or implementation, or has an explicit,
   authorized removal reason. Bound the check to the removal target, its owners, its references, and
-  the relevant tests; it is not a proof that no conceivable rule applies.
+  the relevant tests; it is not a proof that no conceivable rule applies. The same applies to relocating,
+  consolidating, or rewording a rule in a way that changes its behavior, scope, audience, conditions, or
+  strength: moving a caveat, widening an exception, or moving a rule to an audience that never loads it
+  weakens it without deleting a line. "The file was simplified" is not a disposition. This makes an
+  omission a named, reviewable violation; it cannot guarantee that none occurs.
 - Before adding behavior whose sole or primary purpose is to prevent a failure, and which is not
   already required by governing text, name the credible failure mode and the evidence for it. Make
   that evidence proportional to the behavior's breadth, cost, reversibility, and maintenance burden,
@@ -123,20 +129,34 @@ For code changes only:
 
 - verify referenced imports, symbols, resources, and keys exist before relying on them;
 - reuse an existing implementation when it owns the same contract;
-- do not merge similar-looking implementations until their behavioral contracts are equivalent; and
+- do not merge similar-looking implementations until their behavioral contracts are equivalent; when a
+  consolidation could erase a necessary difference, keep a genuine behavior test of that difference in
+  the project's normal test location; and
 - run the project checks relevant to the changed files and behavior.
 
 Language, framework, architecture, test-command, naming, localization, database, and platform rules are
 project-specific.
 
-## Defect completion sweep
+## Sibling sweep
 
-Before a defect ticket becomes `DONE`, name the defect shape and perform one bounded search for semantic
-siblings. Use an independent search handle when one spelling could miss equivalent forms. Verify a
-suspected sibling before calling it a defect; record the scope, method, and result, including none found,
-in Build Log. Create separate tickets for confirmed out-of-scope siblings instead of silently expanding
-the current ticket. A delegated defect assignment carries the same requirement. A permanent gate is
-added only when it is useful for that project.
+Before a defect ticket becomes `DONE`, and after any implementation that changes a behavioral contract,
+name the shape — the defect, or the contract that changed — and perform one bounded search for semantic
+siblings. Declare the semantic set searched and its limits. Use an independent search handle when one
+spelling could miss equivalent forms, and when the result claims the set is complete, reconcile the
+independent enumeration against the first. Look where siblings usually hide: paths that bypass the fixed
+one, other callers of the changed code, the opposite direction of the same operation, and sibling fields
+of the same record. Choose the handles that fit; all four are not required every time.
+
+Verify a suspected sibling before calling it a defect; record the scope, method, and result, including
+none found, in Build Log. Reuse a recorded sweep rather than repeating it; repeat only for changed scope,
+new evidence, or a distinct newly fixed shape. The sweep is one layer: a sibling it finds is not swept in
+turn. Create separate tickets for confirmed out-of-scope siblings instead of silently expanding the current
+ticket. A delegated assignment carries the same requirement. A read-only request authorizes no sibling
+implementation.
+
+When the set can acquire new members and the project supports it, consider a durable check that fails on
+an unclassified member, demonstrated against a negative control. Add one only when it is useful for that
+project, and record why when it is not added.
 
 ## On-demand procedures
 

@@ -28,7 +28,7 @@ Find duplicates, overlapping or contradictory claims, superseded claims left liv
 
 ## Assess without changing anything
 
-The first pass delivers the assessment in the reply. For every finding, identify the claim or requirement, record and code or evidence locations (both records for a record conflict), observed result, verified or probable status, consequence, affected scope, missing evidence, and smallest correction. An absence finding names the searched scope and expected source. Deduplicate one cause while retaining affected occurrences. Refer an incidental structural opportunity to `refactor.md` without expanding this pass.
+The first pass delivers the assessment in the reply. For every finding, identify the claim or requirement, record and code or evidence locations (both records for a record conflict), observed result, verified or probable status, consequence, affected scope, missing evidence, and smallest correction. An absence finding names the searched scope and expected source. Severity follows demonstrated consequence and scope; never inflate it. Deduplicate one cause while retaining affected occurrences. Refer an incidental structural opportunity to `refactor.md` without expanding this pass.
 
 The assessment states revision, scope, coverage, prioritized findings, literal verification, exclusions, blockers, and supported strengths. It is **Complete for declared scope** when every required area was reviewed or explicitly excluded and findings were recorded; defects may remain unfixed. It is **Partial** when a required area was not assessed. Remediation status is separate. Do not claim whole-application correctness beyond the covered scope.
 

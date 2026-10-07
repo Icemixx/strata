@@ -26,7 +26,9 @@ Do not provide another transport prompt.
 
 A brief in `coordination.md` says the subject and question, names A and B by product, names A as the
 participant that opens rounds, and ends with `## Completion history`. It is fixed when A creates the debate;
-neither participant edits it afterwards. Completion records are appended beneath that heading.
+neither participant edits it afterwards. Completion records are appended beneath that heading. A brief that
+does not name both participants by product, or names one that cannot be a participant, is `Blocked`
+before any artifact is released.
 
 ## Phases
 
@@ -240,7 +242,8 @@ Close `rounds.md` with exactly one stamp:
 
 ## Recording
 
-While the debate runs, every artifact lives in `_sediment/debate-<subject>/` at the repository root. Both
+While the debate runs, every artifact lives in `_sediment/debate-<subject>/` at the root of the repository
+the session works in — never another repository's, whatever the debate is about. Both
 participants read and write that exact path: a rendezvous both sides must find is a path, not a
 description, and two participants who each pick their own scratch location run two monologues that never
 meet. A debate is deliberation, which is what `_sediment/` is for.

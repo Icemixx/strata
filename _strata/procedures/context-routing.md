@@ -73,6 +73,9 @@ clause governing its use. A file no record names is lost whether or not it exist
 `_sediment/` is not an authority. It has no `index.md`, is not routed, and is not traversed for Guide
 generation. Records link into it by ordinary relative path.
 
+A root `README.md` is a human entry point. It may describe the project and point to the authorities and
+the code; it must not become a competing status or architecture authority.
+
 ## Instruction audiences
 
 Every agent loads common Universal Instructions and common Project Instructions. The user-facing Active
@@ -82,7 +85,10 @@ their relevant context arrives through the delegation brief.
 
 Keep current rules in exactly one instruction audience. A rule needed by every agent belongs in common
 Instructions. Active-Agent-only integration and routing rules belong in Active Agent Instructions.
-Historical instruction reasoning belongs in Rationale. Common Instructions, universal and project alike, stay
+A durable reason for an instruction, and its reopening condition, belong in Rationale; spent narrative
+about how an instruction evolved belongs in the project's cold history, not in Rationale. When a rule
+rests on a user's ruling whose exact wording matters, keep the quoted ruling, its author and date with the
+rule. Common Instructions, universal and project alike, stay
 agent-agnostic: a rule that applies only under one harness belongs in that harness's dossier, never in a
 common Instructions file.
 
@@ -90,6 +96,11 @@ Root harness routers remain thin: they load common Universal and Project Instruc
 Instructions route the user-facing session to Active Agent Instructions. Harness adapters load on demand
 when their mechanics or cross-harness interoperability information is needed; they are not startup
 imports.
+
+A change to routers or to what loads at startup measures and reports the actual startup chain — the files
+each harness really loads — before and after. When it is uncertain whether a harness injects a file,
+record a zero-tool startup probe instead of assuming. Honor a startup budget the project has explicitly
+approved; there is no universal byte ceiling.
 
 ## Index contract
 
@@ -168,8 +179,14 @@ records require no backlinks or ticket metadata. Dependencies and blocker detail
 
 `state/current.md` contains `OPEN`, `IN PROGRESS`, and `BLOCKED` tickets. When every owned gate is
 complete, move the entry atomically to an appropriate indexed location under `state/completed/`, preserve
-its ID, description, and links, and ensure it appears exactly once. Completed storage is cold and loads
-only for historical need. Reopened work moves back to current storage.
+its ID, description, and links, and ensure it appears exactly once. The closed entry keeps its
+requirements, its acceptance results, its closure date, and its source evidence, so moving it cannot erase
+what `DONE` meant. Completed storage is cold and loads only for historical need. Reopened work moves back
+to current storage.
+
+When a closure claims a commit, resolve that commit in the local history, confirm it contains the shipped
+work, and match it to the dated evidence. When no commit can be established, say so with an evidence-only
+reason rather than citing a guessed, foreign, or self-referencing hash.
 
 ## Guide
 
@@ -193,7 +210,10 @@ Guide written over records known to contradict each other must leave a trace say
 The kit ships no validator. The agent that changes a record keeps the structure valid: required roots
 and indexes, links that resolve, reachability, exactly-one routing ownership, unique State IDs,
 exactly-one current/completed placement, approved statuses, required instruction-audience files, and
-thin-router edges. A structurally valid graph does not prove that its claims are correct.
+thin-router edges. Also: records are valid UTF-8 Markdown; each index has exactly one `## Contents`
+section; a route stays inside its owning authority and the routes form no cycle; two spellings of one path
+(case, separators, links) never create two owners; and a typed `Why:` or `How:` link targets a record owned
+by the authority it names. A structurally valid graph does not prove that its claims are correct.
 
 Check what the touched paths affect. Check the whole graph after a topology change, a conversion, or in
 an explicit full audit.
@@ -209,10 +229,10 @@ a Build Log entry records what was true on a day.
 **A Build Log entry is never edited to reflect later events.** A later decision, supersession or
 correction goes in a new entry that names the one it replaces; an entry may still be completed before its
 work item closes. Adding an entry therefore shows only added lines in that file's diff. Repairing
-accidental damage restores the original wording.
+accidental damage restores the original wording, and the repair is itself recorded in a new entry.
 
 Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
 
-An established repository's separately authorized conversion preserves its legacy material, records
-conflicting claims without choosing a winner, and asks the user for any decision the evidence cannot
-supply. A later audit or remediation is separately authorized.
+An established repository's separately authorized conversion preserves its legacy material, carries
+and validates it clause by clause, records conflicting claims without choosing a winner, and asks the user
+for any decision the evidence cannot supply. A later audit or remediation is separately authorized.
