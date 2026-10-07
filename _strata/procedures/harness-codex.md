@@ -100,6 +100,30 @@ Runtime sandbox and approval rules control execution; they do not grant task aut
 artifacts through shared files or explicit worker reports. Repository authorization to commit or publish
 still governs publication; a runtime escalation is an execution mechanism, not a second policy decision.
 
+**Pushing with execution approvals.** Once the repository's commit-and-push is authorized, execute the
+push without asking the user to authorize that repository operation again. Run it as a standalone command
+with the absolute repository path, exact destination and branch:
+
+```text
+git -c safe.directory=<absolute-repo> push <remote> <branch>
+```
+
+Use the current execution tool's declared approval mechanism; do not infer it from another runtime. The
+`exec_command` interface exposes `sandbox_permissions: "require_escalated"`, `justification`, and
+`prefix_rule`. When that interface requires escalation, submit the authorized push with a justification
+naming its destination and branch. If requesting a reusable prefix, include the full destination and
+branch, not merely the Git executable or shell:
+
+```text
+["git", "-c", "safe.directory=<absolute-repo>", "push", "<remote>", "<branch>"]
+```
+
+The request carries existing repository push authorization; it does not request new task consent or
+guarantee execution approval. If execution rejects it, keep the commit and report the literal platform
+blocker. Never describe that rejection as missing user authorization, broaden the approval, or bypass
+the reviewer. Verify an accepted push under `active-agent.md`'s publication rule; permission to execute
+and evidence that publication succeeded are separate.
+
 A yielded `exec_command` result with a `session_id` identifies a command that is still running, including
 when its `output` is empty. Empty output on a live session is not a completed command and must not be read
 as a finished check that found nothing. Preserve the complete result and collect that exact session with
