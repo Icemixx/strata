@@ -42,6 +42,13 @@ Audit source files and inbound references before relocation or removal. Update o
 rule, run checks relevant to the shared payload, and distinguish a local edit from an authorized commit
 or publication.
 
+**The canonical repository is public and its history is permanent.** Commit to it with a GitHub
+`users.noreply` author address, never a personal one: check the checkout's `git config user.email` before
+the first commit. Keep the message about the rule and the shape of the failure — never the private
+repository it was found in, its ticket ids, its internal tool names, or the user's words. The incident
+that motivates a kit rule is by construction a private-repository incident; say what the rule prevents,
+not where it was learned.
+
 Before accepting a new or changed contract, ask where two competent agents following the same text would
 produce different results, and pin every such point. Name the file, the format, and the location rather
 than the intent.
