@@ -87,7 +87,8 @@ sessions. Then:
 - Turn anything found-but-not-fixed **in this project's own work** into its own queue item immediately. A
   finding is a queue event, not a reason to report. A Strata recommendation is the exception and goes the
   other way: common Instructions say to report it and not create backlog work, because it is the user's to
-  accept before it is anyone's to schedule.
+  accept before it is anyone's to schedule. Audit and refactor-review findings are a second exception: the
+  saved report holds them, and they become tickets only when the user says so (`audit.md`).
 - Return to the **authorized** queue rather than reporting. Report once, when no ready or in-flight item
   remains within it. Backlog presence is not authorization, so an empty authorized queue ends the run even
   where the backlog holds more.

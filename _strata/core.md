@@ -33,9 +33,10 @@ project-specific preference into a universal rule without cross-project justific
 ## Scope and authority
 
 - Answer, explanation, review, audit, diagnosis, and planning requests are read-only. The first pass
-  delivers its assessment in the reply and creates or changes no file in the repository. Writing that
-  assessment to a report file, or linking it from a record, is separate work the user authorizes.
-  Working notes outside the repository are not a repository change.
+  delivers its assessment in the reply and creates or changes no file in the repository, except that an
+  audit or refactor review saves its report and a Build Log entry linking it, without asking, as
+  `audit.md` directs. Any other report file or record link, tickets, and remediation are separate work
+  the user authorizes. Working notes outside the repository are not a repository change.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
 - Editing never implies authority to commit, publish, spend money, or change external state.
 - Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other
