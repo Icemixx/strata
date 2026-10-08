@@ -76,6 +76,8 @@ concluded survives in this kit and in those repositories' records; the working m
 ## Canonical editing
 
 Read `_strata/procedures/kit-editing.md` before changing or synchronizing the shared payload. Canonical
-editing, consuming-repository synchronization, and commit are separate authorization boundaries. Push is
+editing, consuming-repository synchronization, and commit are separate authorization boundaries, except
+that a published canonical change is installed in the repository it was made from as part of the same
+change. Push is
 not a fourth: Active Agent Instructions own that rule, and they say an authorized commit carries its push
 unless the user asks for a local-only one.

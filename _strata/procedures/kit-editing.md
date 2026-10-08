@@ -13,7 +13,8 @@ Instructions or project records.
 The canonical repository, `https://github.com/Icemixx/strata.git`, is the source. Consuming repositories
 hold copies, and each records the canonical commit it installed in its own Build Log. Never edit a
 consuming copy incidentally during project work. A canonical change or a consuming-repository sync
-requires deliberate authorization for that scope.
+requires deliberate authorization for that scope; an authorized, published canonical change includes its
+sync into the repository it was made from (*Canonical change*).
 
 Each `harness-<product>.md` is owned by an agent running that product. **Do not write a claim about
 another harness's runtime into its dossier.** How it identifies its model, where its sessions live, what
@@ -41,7 +42,7 @@ routing a record, consolidating -- is ordinary shared-kit work and needs no seco
 **Work from a temporary clone inside the project folder.** Clone the canonical repository into a
 git-ignored temporary folder inside the project the session works in — `.temp/strata/` unless the project
 names another — confirming first that the folder is ignored. Edit, commit, and push from that clone, verify
-the push, then delete the clone. Never keep a canonical checkout elsewhere, and never put the session's
+the push, install the change locally as the end of this section describes, then delete the clone. Never keep a canonical checkout elsewhere, and never put the session's
 working material, such as a debate or a report, inside the clone.
 
 Audit source files and inbound references before relocation or removal. Update one normative owner per
@@ -74,8 +75,12 @@ When publication is authorized, push and verify the push in the same transaction
 change is local only. Report the files changed and, for each changed rule, what it said before and what it
 says now.
 
-After a canonical payload change, tell the user which consuming repositories still require a separate
-sync. Do not retrofit them as part of the canonical transaction.
+**A published change installs itself where it was made.** Once the push is verified, run *Consuming-copy
+sync* in the repository the session works in, against the commit just pushed, as part of the same
+transaction: step 3 copies from the clone already in place instead of cloning again, and the clone is
+deleted after that copy. The authorization for the canonical change covers this one sync. A change left
+local only installs nothing. Every other consuming repository still requires its own, separately
+authorized sync; tell the user which ones, and do not sync them as part of the canonical transaction.
 
 Undo a published canonical change, or a committed sync in a consuming repository, with a
 history-preserving operation, normally `git revert`. A destructive reset needs the user's separate,
