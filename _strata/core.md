@@ -134,6 +134,17 @@ For code changes only:
   the project's normal test location; and
 - run the project checks relevant to the changed files and behavior.
 
+A final implementation review records the source revision, worktree state and reviewed scope in its
+report. A test result reused instead of rerunning the test records the same information for the tested
+scope, plus the test command, in its evidence record. For a clean worktree, use the full commit ID. For
+uncommitted changes within that scope, use the base commit's full ID, repository-relative paths and
+SHA-256 hashes of changed or untracked files, and the paths of deleted files.
+
+Before accepting the final review, verify that the final source within its scope still matches that
+record; later changes require review of the affected scope. Reuse a test result only when its tested
+code, tests, generated source and dependency definitions still match the recorded version. This never
+waives an explicitly required fresh run or the artifact-verification obligations above.
+
 Language, framework, architecture, test-command, naming, localization, database, and platform rules are
 project-specific.
 
