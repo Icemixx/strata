@@ -173,6 +173,10 @@ in the description rather than minting a second ID:
   - How: [Device implementation](../build-log/drive-sync/BUG-110.md)
 ```
 
+A ticket entry stays short: its status, the remaining work or next step, any blocker, and its links.
+Evidence, receipts, hashes, and the history of how the work progressed belong in Build Log, which the
+entry links; State is read whole before it is changed, so every line there is paid for on every edit.
+
 The first line is required. `Why:` and `How:` links are optional, may contain multiple targets, and are
 the only **declared** associations between a ticket and its Rationale and Build Log records. Those target
 records require no backlinks or ticket metadata. Dependencies and blocker details are optional.

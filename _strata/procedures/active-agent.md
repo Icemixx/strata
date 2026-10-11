@@ -11,6 +11,20 @@ Once per session, compare the installed kit commit — the newest `## Strata syn
 kit is behind; if the check cannot run, say that. Then continue. This is a report only: never sync without
 authorization (`kit-editing.md`).
 
+## Strata recommendations
+
+During any task, when direct evidence shows that Strata would benefit from adding, changing, simplifying,
+replacing, or removing an instruction, safeguard, procedure, or other shared-kit behavior, report it promptly
+as a separate Strata recommendation. First search the kit, and the records of the project the evidence came
+from, for a rule or ruling that already owns the behavior, using more than one handle when a single spelling
+could miss an equivalent form, and state the result — including none found — as part of the recommendation. A
+rule found in some form turns the proposal from adding one into extending it, which is what one normative
+owner per rule requires; a rule reported absent on a single literal search is a finding about that search.
+Then state the evidence, affected procedure, proposed kind of change, likely consequence, and urgency. Do not
+silently expand the current task, modify the kit, or create backlog work. An accepted recommendation becomes
+separately authorized kit work routed through `_strata/procedures/kit-editing.md`. Do not promote a
+project-specific preference into a universal rule without cross-project justification.
+
 ## Capability roles and delegation
 
 The three roles are:
@@ -29,12 +43,17 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   independently.
 - Do not delegate deterministic commands, tiny edits, or source analysis you must personally reread to
   decide. A delegated agent pays its own startup cost; batch compatible small work into one assignment
-  rather than spawning one agent per edit.
+  rather than spawning one agent per edit. For consecutive steps of one run, continue the same delegated
+  agent rather than starting a fresh one, unless its context is exhausted or the next step needs another
+  role.
 - When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
   capability — verify it in the current turn rather than from memory or an earlier session.
-- Architect and Engineer participation are required for substantive implementation. Technician
-  participation is required only when genuine bounded mechanical work exists; never invent a task merely
-  to occupy the role.
+- A high-risk change (synchronization or merging, schema or stored data, money, deletion, security or
+  privacy) is reviewed at Architect level by an agent other than its implementer; when an Engineer
+  implements it, the Active Agent's own review satisfies this if the Active Agent runs the Architect model.
+  Other changes need no second role. Hand implementation to an Engineer when the work is large enough that
+  the cheaper model saves more than the delegated agent's startup costs. Technician participation is
+  required only when genuine bounded mechanical work exists; never invent a task merely to occupy the role.
 - An Architect Active Agent may delegate downward. An Engineer delegates Technician work and obtains
   Architect direction or review when required. A Technician obtains Architect direction and Engineer
   implementation or review for work outside Technician scope.

@@ -20,17 +20,9 @@ compliance from a remembered summary of it. Announce a material new
 discovery promptly when it changes an accepted conclusion, plan, risk, scope, or unresolved item. A
 delegated agent reports such a discovery to the Active Agent.
 
-During any task, when direct evidence shows that Strata would benefit from adding, changing, simplifying,
-replacing, or removing an instruction, safeguard, procedure, or other shared-kit behavior, report it promptly
-as a separate Strata recommendation. First search the kit, and the records of the project the evidence came
-from, for a rule or ruling that already owns the behavior, using more than one handle when a single spelling
-could miss an equivalent form, and state the result — including none found — as part of the recommendation. A
-rule found in some form turns the proposal from adding one into extending it, which is what one normative
-owner per rule requires; a rule reported absent on a single literal search is a finding about that search.
-Then state the evidence, affected procedure, proposed kind of change, likely consequence, and urgency. Do not
-silently expand the current task, modify the kit, or create backlog work. An accepted recommendation becomes
-separately authorized kit work routed through `_strata/procedures/kit-editing.md`. Do not promote a
-project-specific preference into a universal rule without cross-project justification.
+When direct evidence shows that a shared-kit instruction, safeguard, or procedure should be added, changed,
+simplified, replaced, or removed, report it as a Strata recommendation: the user-facing agent follows
+`active-agent.md`; a delegated agent reports the evidence to the Active Agent. Never silently modify the kit.
 
 ## Scope and authority
 
@@ -43,6 +35,8 @@ project-specific preference into a universal rule without cross-project justific
 - Editing never implies authority to commit, publish, spend money, or change external state.
 - Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other
   work beyond what is needed to deliver and verify the requested result and meet applicable instructions.
+  Spend only where work can produce new information or better quality; never reproduce a result that
+  already exists for the same code.
 - Run an expensive check once over the combined result of every item that needs it, not once per item.
   A check is expensive when it needs an environment prepared for it (a device or emulator session, seeded
   services), runs longer than ten minutes, or costs money. Run it earlier for one item only when later
@@ -96,7 +90,9 @@ additions. Explain any change whose connection to the requested result would not
   say what was attempted. Reserve escalation for judgement the evidence cannot supply.
 - Distinguish what was observed, what was inferred, and what remains unverified.
 - Treat another agent's, transcript's, or report's claim as unverified until you confirm the artifact or
-  literal result yourself. For a multi-step setup, one check of the end state the following work needs
+  literal result yourself. Reading the literal result and checking that it belongs to the current code
+  confirms it; repeat the check only when the result is missing, comes from different code, or contradicts
+  what the code shows. For a multi-step setup, one check of the end state the following work needs
   confirms every step's report. Check a step on its own only when it failed, the end state is wrong, or
   its effect does not show in that end state, as with deleting, overwriting, sharing, or publishing.
 - Use checks relevant to the files and behavior changed. A passing unrelated check is not evidence.
@@ -112,7 +108,8 @@ additions. Explain any change whose connection to the requested result would not
   it can still detect its target failure.
 - When a check's empty result is itself the finding, demonstrate that the check can detect its target
   failure before reporting clean. A check that finds nothing is indistinguishable from one that cannot
-  find anything.
+  find anything. A standing self-test or companion test that exercises that failure is the demonstration;
+  repeat it only when the check or its target changed.
 - An edit that targets existing text must fail when that text is absent. An operation that returns its
   input unchanged on a miss reports success while doing nothing; never pair one with a removal.
 - Before deleting text or removing behavior, identify the substantive statements or stated rules it
@@ -140,11 +137,11 @@ For code changes only:
   the project's normal test location; and
 - run the project checks relevant to the changed files and behavior.
 
-A final implementation review records the source revision, worktree state and reviewed scope in its
-report. A test result reused instead of rerunning the test records the same information for the tested
-scope, plus the test command, in its evidence record. For a clean worktree, use the full commit ID. For
-uncommitted changes within that scope, use the base commit's full ID, repository-relative paths and
-SHA-256 hashes of changed or untracked files, and the paths of deleted files.
+A final implementation review records the source revision and reviewed scope in its report; a test result
+reused instead of rerunning the test records the same for the tested scope, plus the test command. Review
+and test a commit and cite its full ID, committing first when commit is authorized. Only when it is not,
+record the base commit's full ID, repository-relative paths and SHA-256 hashes of changed or untracked
+files, and the paths of deleted files.
 
 Before accepting the final review, verify that the final source within its scope still matches that
 record; later changes require review of the affected scope. Reuse a test result only when its tested
