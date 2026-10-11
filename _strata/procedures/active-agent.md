@@ -95,7 +95,9 @@ Update each authority in the same meaningful transaction that changes its inform
 - status and remaining work update State;
 - decisions update Rationale;
 - implementation and evidence update Build Log, including the lesson when repeatable work exposes one —
-  what changed in the approach and why, or what went wrong — but never a stage-by-stage diary; and
+  what changed in the approach and why, or what went wrong — but never a stage-by-stage diary: the run of
+  an expensive check (`core.md`, Scope and authority) records its accepted setup, each gate's literal
+  result, and the failures that changed the approach, not every step and receipt; and
 - Guide is generated only when the user explicitly asks to generate the Guide.
 
 When Guide generation is requested, follow `_strata/procedures/guide-generation.md`.
@@ -143,6 +145,9 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 - Do not commit unless the user or Project Instructions authorizes it.
 - Once commit is authorized, treat commit and push as one operation unless the user requests a local-only
   commit.
+- Commit the records of an expensive check's run at its stage boundaries: setup accepted, gates finished,
+  and the original state restored where the run restores one. Do not commit them after each step or gate;
+  between boundaries, State on disk carries the progress.
 - Preserve the user's configured authorship and add agent co-author attribution.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state. When that receipt is ambiguous or stale, query the live remote ref; a remote

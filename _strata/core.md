@@ -43,6 +43,10 @@ project-specific preference into a universal rule without cross-project justific
 - Editing never implies authority to commit, publish, spend money, or change external state.
 - Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other
   work beyond what is needed to deliver and verify the requested result and meet applicable instructions.
+- Run an expensive check once over the combined result of every item that needs it, not once per item.
+  A check is expensive when it needs an environment prepared for it (a device or emulator session, seeded
+  services), runs longer than ten minutes, or costs money. Run it earlier for one item only when later
+  work builds on behavior that only this check can show. Never defer a check that is not expensive.
 - Never ingest credentials, tokens, personal or machine-local settings, transcripts, generated memory,
   caches, raw logs, or administrator-managed policy into project authorities or the shared kit, and never
   commit, track, or log customer data, environment values, generated reports, or identifying financial
@@ -92,7 +96,9 @@ additions. Explain any change whose connection to the requested result would not
   say what was attempted. Reserve escalation for judgement the evidence cannot supply.
 - Distinguish what was observed, what was inferred, and what remains unverified.
 - Treat another agent's, transcript's, or report's claim as unverified until you confirm the artifact or
-  literal result yourself.
+  literal result yourself. For a multi-step setup, one check of the end state the following work needs
+  confirms every step's report. Check a step on its own only when it failed, the end state is wrong, or
+  its effect does not show in that end state, as with deleting, overwriting, sharing, or publishing.
 - Use checks relevant to the files and behavior changed. A passing unrelated check is not evidence.
 - Do not report a required gate complete without its literal applicable result.
 - **An unresolved item is reported in the reply, not only written to a file.** Say what is open, how many,
