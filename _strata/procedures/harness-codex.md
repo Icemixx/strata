@@ -100,6 +100,41 @@ Runtime sandbox and approval rules control execution; they do not grant task aut
 artifacts through shared files or explicit worker reports. Repository authorization to commit or publish
 still governs publication; a runtime escalation is an execution mechanism, not a second policy decision.
 
+**Selective routine execution.** Keep `approval_policy = "on-request"` and
+`approvals_reviewer = "auto_review"` when remaining approval requests need automatic review. Ordinary
+workspace reads already run inside the sandbox. For trusted commands needing host execution, place
+`prefix_rule(pattern=[...], decision="allow")` in a `.rules` file beside an active configuration layer,
+for example `~/.codex/rules/default.rules`, then restart Codex. Project-local rules require a trusted
+project configuration layer; managed restrictions still win. Changing the reviewer only selects who
+handles a request, not which operations create one.
+
+Allow only reviewed, fixed-purpose read/inspection, screenshot, local-build, host-test and checker
+entry points. A host-test runner must exclude device integration, and an inspection runner must exclude
+input actions, installs, resets and data writes. Generated build/test/capture artifacts are part of those
+routine operations; restoring persistent data is a separate entry point. Do not allow a general shell,
+interpreter, `adb shell` or unrestricted test prefix. Prefixes permit trailing arguments: validate the
+runner's accepted arguments, rather than assuming a prefix describes every possible side effect.
+
+For a profile keeping mutations reviewed, give delete, persistent-data-overwrite, upload and push entry
+points explicit `decision="prompt"` rules, including the exact executable/argument spelling actually used.
+For example, `prefix_rule(pattern=["git", "status", "--short"], decision="allow")` permits that read form,
+while `prefix_rule(pattern=["git", "push"], decision="prompt")` keeps that push form reviewed; adapt both
+to the actual invocation. Matching prompt rules override
+allow rules. This is a command filter, not a semantic guarantee about arbitrary script contents or other
+write tools; keep mutating entry points separate. Neither this dossier nor a proposed tool-call prefix
+installs an active policy. Policy changes remain user/admin configuration work.
+
+Check candidate rules without executing their commands:
+`codex execpolicy check --rules <candidate.rules> -- <executable> <arguments>`. Demonstrate allow for each
+routine form and prompt for delete, overwrite, upload and push forms before adopting the configuration.
+Local native checks on 2026-10-12 confirmed those decisions for separate synthetic entry points; they did
+not test an active session's reviewer invocation count. Use literal executable paths or the installed
+host-executable resolution mechanism when a basename rule does not match a Windows invocation.
+
+Sources: [Rules](https://learn.chatgpt.com/docs/agent-configuration/rules),
+[Configuration Reference](https://learn.chatgpt.com/docs/config-file/config-reference),
+[Auto-review](https://learn.chatgpt.com/docs/sandboxing/auto-review).
+
 **Pushing with execution approvals.** Once the repository's commit-and-push is authorized, execute the
 push without asking the user to authorize that repository operation again. Run it as a standalone command
 with the absolute repository path, exact destination and branch:
@@ -117,6 +152,9 @@ branch, not merely the Git executable or shell:
 ```text
 ["git", "-c", "safe.directory=<absolute-repo>", "push", "<remote>", "<branch>"]
 ```
+
+When the selected profile keeps pushes reviewed, omit a reusable allow-prefix request for a push;
+use its prompt rule instead. The reusable-prefix example applies only when the user's policy permits it.
 
 The request carries existing repository push authorization; it does not request new task consent or
 guarantee execution approval. If execution rejects it, keep the commit and report the literal platform
