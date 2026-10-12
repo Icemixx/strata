@@ -11,7 +11,8 @@ authorized, Level 1 and any otherwise permitted independent verification remain 
 Re-read relevant context and prior reasoning. Compare viable alternatives and trade-offs. Separate
 evidence from assumptions, revisit relevant prior mistakes, identify risks and reversibility, map the
 affected scope, and surface open questions. Apply coding-specific lenses only to code-affecting
-decisions. Record the settled result in Rationale.
+decisions. Record the settled result where `context-routing.md` places it: Rationale for a decision that
+outlasts the current run, that run's Build Log entry for one that does not.
 
 The coding-specific lenses, plus any the project adds:
 

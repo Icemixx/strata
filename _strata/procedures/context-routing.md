@@ -8,7 +8,9 @@ instruction audiences, routed indexes, State lifecycle storage, Guide generation
 Instructions governs conduct and routing. Project information has three authorities:
 
 - **State** owns WHAT is current, including work status.
-- **Rationale** owns WHY decisions were made.
+- **Rationale** owns WHY decisions that outlast the current run were made. A choice about how one run is
+  carried out, such as a recovery step, an ordering or a tool workaround, is one line in that run's Build
+  Log entry instead.
 - **Build Log** owns HOW work was performed and the evidence observed.
 
 There are four authorities: Instructions, State, Rationale, Build Log. **The code is what makes technical
@@ -149,8 +151,8 @@ deeper record. Read every activated index completely without implicitly loading 
 links relevant to the task.
 
 A narrow read-only request may use a targeted section or small leaf. Read the complete target file before
-editing it, changing status, resolving a conflict, or making a consequential decision. If in doubt, read
-the rest of the file.
+editing it, changing status, resolving a conflict, or making a consequential decision; `state/current.md`
+is the exception, read as *State contract* directs. If in doubt, read the rest of the file.
 
 Search the complete relevant authority tree before concluding information is absent when routing is
 ambiguous, expected information is missing, records conflict, or the task is cross-cutting.
@@ -175,7 +177,14 @@ in the description rather than minting a second ID:
 
 A ticket entry stays short: its status, the remaining work or next step, any blocker, and its links.
 Evidence, receipts, hashes, and the history of how the work progressed belong in Build Log, which the
-entry links; State is read whole before it is changed, so every line there is paid for on every edit.
+entry links.
+
+Before changing `state/current.md`, read the first line of every ticket, which one search for lines that
+begin with `- ` and a ticket ID returns; the text before the first ticket; any batch or checkpoint note;
+and, in full, every entry the change touches. An entry runs from its first line to the next ticket's
+first line, including any retained legacy record. Read the whole file before creating, closing, merging,
+or re-scoping a ticket, and whenever a first line shows that another entry depends on the change. This
+reading rule is the kit's: Project Instructions say where State is, not how much of it to read.
 
 The first line is required. `Why:` and `How:` links are optional, may contain multiple targets, and are
 the only **declared** associations between a ticket and its Rationale and Build Log records. Those target

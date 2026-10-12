@@ -112,7 +112,8 @@ rejected and why. Skip trivial mechanical choices and options the user already d
 Update each authority in the same meaningful transaction that changes its information:
 
 - status and remaining work update State;
-- decisions update Rationale;
+- decisions that outlast the current run update Rationale; a choice about carrying out one run is a line
+  in its Build Log entry (`context-routing.md`);
 - implementation and evidence update Build Log, including the lesson when repeatable work exposes one —
   what changed in the approach and why, or what went wrong — but never a stage-by-stage diary: the run of
   an expensive check (`core.md`, Scope and authority) records its accepted setup, each gate's literal
