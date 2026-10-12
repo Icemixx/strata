@@ -43,17 +43,21 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   independently.
 - Do not delegate deterministic commands, tiny edits, or source analysis you must personally reread to
   decide. A delegated agent pays its own startup cost; batch compatible small work into one assignment
-  rather than spawning one agent per edit. For consecutive steps of one run, continue the same delegated
-  agent rather than starting a fresh one, unless its context is exhausted or the next step needs another
-  role.
+  rather than spawning one agent per edit. For consecutive steps of one ticket, or of one operational
+  session such as driving a device, continue the same delegated agent rather than starting a fresh one,
+  unless its context is exhausted or the next step needs another role. Give the next ticket a new
+  delegated agent unless it works on the same files: carried-over context is re-sent on every later turn
+  and soon costs more than a fresh start.
 - When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
   capability — verify it in the current turn rather than from memory or an earlier session.
 - A high-risk change (synchronization or merging, schema or stored data, money, deletion, security or
   privacy) is reviewed at Architect level by an agent other than its implementer; when an Engineer
   implements it, the Active Agent's own review satisfies this if the Active Agent runs the Architect model.
-  Other changes need no second role. Hand implementation to an Engineer when the work is large enough that
-  the cheaper model saves more than the delegated agent's startup costs. Technician participation is
-  required only when genuine bounded mechanical work exists; never invent a task merely to occupy the role.
+  That review tries to break the change: worst-case ordering of operations, stale or diverged copies,
+  concurrent edits, and malformed or hostile input. Other changes need no second role. Hand
+  implementation to an Engineer when the work is large enough that the cheaper model saves more than the
+  delegated agent's startup costs. Technician participation is required only when genuine bounded
+  mechanical work exists; never invent a task merely to occupy the role.
 - An Architect Active Agent may delegate downward. An Engineer delegates Technician work and obtains
   Architect direction or review when required. A Technician obtains Architect direction and Engineer
   implementation or review for work outside Technician scope.
@@ -81,6 +85,11 @@ same-role model.
 - Ask every user-facing question in normal chat, never in a pop-up, form, or selection widget.
 - Continue safe independent work before asking. When an answer is required, stop and make the smallest
   necessary question set the final user-facing message. Do not send later progress that buries it.
+- Put every decision a message needs from the user into one closing block headed `Needs you:`; a
+  message that needs nothing has no such block.
+- In messages to the user, use no invented abbreviations, and give every ticket, ruling or finding
+  number a short plain label the first time it appears in that message, such as
+  `BUG-110 (retry keeps settled status)`. Records keep their bare cross-references.
 - Delegated agents return clarification needs to the Active Agent and do not question the user directly.
 - A meaningful implementation plan orders its steps by dependency and gives each independently executed
   block its own completion condition and verification. Name a capability role only when the block will be

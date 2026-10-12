@@ -134,7 +134,11 @@ For code changes only:
 - reuse an existing implementation when it owns the same contract;
 - do not merge similar-looking implementations until their behavioral contracts are equivalent; when a
   consolidation could erase a necessary difference, keep a genuine behavior test of that difference in
-  the project's normal test location; and
+  the project's normal test location;
+- keep a comment you add or change to why the code is as it is, in one or two lines, linking the record
+  that holds any longer reasoning; history, incidents, dates and ticket trails belong in Build Log or
+  Rationale, not in comments, and rewriting comments you do not otherwise change is cleanup the build
+  scope excludes; and
 - run the project checks relevant to the changed files and behavior.
 
 A final implementation review records the source revision and reviewed scope in its report; a test result
@@ -171,6 +175,10 @@ implementation.
 When the set can acquire new members and the project supports it, consider a durable check that fails on
 an unclassified member, demonstrated against a negative control. Add one only when it is useful for that
 project, and record why when it is not added.
+
+When a review finding has the same shape as a mistake the project's records show was found before,
+propose to the user a durable check for that shape, whether or not a defect ticket owns the finding. A
+delegated agent reports the recurrence to the Active Agent.
 
 ## On-demand procedures
 
