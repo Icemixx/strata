@@ -143,15 +143,16 @@ when the authorities are already current.
 ### Closing a work item
 
 **A work item is not finished when its code is committed. It is finished when its records are.** Both
-happen in the same sitting and follow the grouping rule under Commit and publication. Then:
+happen in the same sitting and are committed under Commit and publication. Then:
 
 - Retitle the item to what actually shipped, not to what was planned.
 - Record the decisions taken *during* the work, not only its outcome.
 - Date the record by when the work happened. A session spanning days keeps the original dates; correcting
   them on resume rewrites history that was right.
-- Put the literal verification output and its source identification in the record. When the record is
-  part of the verified commit, identify that containing commit and give its final full ID in the final
-  reply; do not create another commit just to insert its own hash. A summary of a result is not the result.
+- Put the literal verification output and the commit it ran on in the record. When the verified changes
+  and their record share one commit, the record identifies that containing commit and the final reply
+  gives its full ID; do not create another commit just to insert its own hash. A summary of a result is
+  not the result.
 - Correct any contradiction the work created, now, in the same change.
 - Never let "shipped" imply "observed". Say which one you have.
 - Turn anything found-but-not-fixed **in this project's own work** into its own queue item immediately. A
@@ -171,20 +172,24 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 
 ## Commit and publication
 
-- **One coherent task produces one commit per repository by default.** Include its implementation,
-  instruction changes, authority updates, sync marker, and verification evidence together. Group by the
-  purpose of the change; file types and work phases are not reasons to split commits. Split only when
-  changes need independent review or rollback, or the user requests it.
-- If verification requires a commit first, create a provisional local commit, then amend that task's
-  unpublished commit with its completed records before pushing. Repeat verification only if the relevant
-  verified content changed, subject to `core.md`'s requirements for applicable evidence and fresh runs.
-  This does not authorize amending published commits or unrelated work. Finish verification and records
-  before publication. Report the successful push in the final reply; do not create another commit solely
-  to record that push.
+- **Commit and push project file changes at two points.** Project files are the repository's tracked
+  files: code, instructions, and records; ignored and temporary artifacts are not committed.
+  1. When a work item is done and checked: its changes and records are written, and the checks it needs
+     now have run, with any deliberately deferred check recorded as owed. When a check must run against
+     a commit, commit first and record the result in a later commit.
+  2. Before stopping for any reason — the end of the session, a pause, an approaching usage limit, or a
+     handover to another agent — whether or not the work is finished. The commit message says what is
+     unfinished.
+- **Never rewrite history.** Do not amend, squash, or rebase commits, published or not; when the
+  destination has moved ahead, merge it. Fix a mistake with a new commit or a revert, so the earlier
+  version stays in history. An attempt abandoned before it was committed leaves its trail in the Build Log
+  (Authority transaction and continuity). Only the user can authorize a rewrite, such as removing
+  protected data that was committed.
 - An authorized change, build, implementation, fix, sync, or commit request includes committing its
-  scoped changes and pushing them to an approved destination. Complete each coherent portion of the
-  authorized work with its required checks and records, then commit and push in the same sitting.
-  A turn ending is not itself a checkpoint. Do not ask again for permission already granted.
+  scoped changes and pushing them to an approved destination at those points. A turn ending is not
+  itself a commit point; the end of the session is. Do not ask again for permission already granted.
+  Report the successful push in the final reply; do not create another commit solely to record that
+  push.
 - Explicit local-only instructions prevent pushing; explicit no-commit instructions prevent committing
   too. Discussion, planning, and other read-only requests gain no commit or push authority. Where a
   procedure requires saving a report, saving it alone does not authorize publication.
@@ -194,12 +199,13 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 - Keep commits focused. Inspect staged changes and every outgoing commit for authorized scope,
   unrelated work, and protected data before publication; a focused new commit does not authorize older
   outgoing commits. These checks require no repeated user approval and add no separate test suite.
-- Use ordinary pushes that preserve published history. Force pushes, remote deletion, new destinations,
-  releases, deployments, and bypassing branch protections require separate authorization. Runtime
-  execution restrictions still apply; repository permission does not override them.
+- Force pushes, remote deletion, new destinations, releases, deployments, and bypassing branch
+  protections require separate authorization. Runtime execution restrictions still apply; repository
+  permission does not override them.
 - Save the records of an expensive check's run at its stage boundaries: setup accepted, gates finished,
   and the original state restored where the run restores one. Between boundaries, State on disk carries
-  the progress. These recording boundaries do not require separate commits; apply the grouping rule above.
+  the progress. The run itself needs no commits: its records are project files, committed at the next
+  commit point.
 - Preserve the user's configured authorship and add agent co-author attribution.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state. When that receipt is ambiguous or stale, query the live remote ref; a remote
