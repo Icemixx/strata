@@ -100,7 +100,9 @@ additions. Explain any change whose connection to the requested result would not
 - Use checks relevant to the files and behavior changed. A passing unrelated check is not evidence.
 - Do not report a required gate complete without its literal applicable result.
 - **An unresolved item is reported in the reply, not only written to a file.** Say what is open, how many,
-  and where each one lives. A file the user has to know to open is not a report, and work that continues
+  and where each one lives. For each, say what it is waiting for; when that can no longer happen because
+  its trigger or setup is gone or ruled out, bring it to the user to close or re-scope instead of carrying it.
+  A file the user has to know to open is not a report, and work that continues
   over a known-open item without naming it presents a clean result built on something nobody decided.
   Where a later step consumes those records — generating a Guide over them, most of all — that step says
   how many were open when it ran.
