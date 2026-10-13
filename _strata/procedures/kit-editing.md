@@ -123,7 +123,7 @@ record the new commit, and finish under `active-agent.md`, Commit and publicatio
 4. Append to `_strata/build-log/project_build_log.md` an entry headed
    `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example
    `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Commit and push the sync
-   under `active-agent.md`, Commit and publication, including its local-only and destination rules.
+   under `active-agent.md`, Commit and publication, including its local-only rule.
    Report `git status` and the publication result or concrete blocker.
 
 Two syncs on the same date need no ordering rule. Canonical only moves forward, so reading the older of the
@@ -137,8 +137,8 @@ nor a control demonstrating that such a comparison works.
 
 Deleting before copying is what makes the inventories equal, so nothing has to confirm afterwards that
 they are. The evidence rules in `core.md` govern work that *authors* a change; a sync authors nothing, it
-installs bytes canonical already reviewed. The publication checks cover the destination and outgoing
-scope; they do not repeat the payload review. `git status` and the publication result are the literal
+installs bytes canonical already reviewed. The publication checks cover the outgoing commits; they do
+not repeat the payload review. `git status` and the publication result are the literal
 results. One consuming repository's sync took thirty-three tool calls for an operation of a few steps,
 because this section
 read as a comparison problem and every clause above was absent.

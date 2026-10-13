@@ -181,27 +181,23 @@ that has paid for one keeps that evidence in its own Rationale, not here.
      handover to another agent — whether or not the work is finished. The commit message says what is
      unfinished.
 - **Never rewrite history.** Do not amend, squash, or rebase commits, published or not; when the
-  destination has moved ahead, merge it. Fix a mistake with a new commit or a revert, so the earlier
+  remote has moved ahead, merge it. Fix a mistake with a new commit or a revert, so the earlier
   version stays in history. An attempt abandoned before it was committed leaves its trail in the Build Log
   (Authority transaction and continuity). Only the user can authorize a rewrite, such as removing
   protected data that was committed.
 - An authorized change, build, implementation, fix, sync, or commit request includes committing its
-  scoped changes and pushing them to an approved destination at those points. A turn ending is not
-  itself a commit point; the end of the session is. Do not ask again for permission already granted.
-  Report the successful push in the final reply; do not create another commit solely to record that
-  push.
+  scoped changes and pushing them to the repository's remote at those points. A turn ending is not
+  itself a commit point; the end of the session is. Commits and pushes need no further permission; do
+  not ask for it. Report the successful push in the final reply; do not create another commit solely
+  to record that push.
 - Explicit local-only instructions prevent pushing; explicit no-commit instructions prevent committing
   too. Discussion, planning, and other read-only requests gain no commit or push authority. Where a
   procedure requires saving a report, saving it alone does not authorize publication.
-- An approved destination identifies the repository URL and branch in the user's authorization or
-  Project Instructions. A configured remote or upstream alone is not approval. Confirm the actual push
-  destination matches that authorization; ask only when the destination is missing or would change.
-- Keep commits focused. Inspect staged changes and every outgoing commit for authorized scope,
-  unrelated work, and protected data before publication; a focused new commit does not authorize older
-  outgoing commits. These checks require no repeated user approval and add no separate test suite.
-- Force pushes, remote deletion, new destinations, releases, deployments, and bypassing branch
-  protections require separate authorization. Runtime execution restrictions still apply; repository
-  permission does not override them.
+- Keep commits focused. Inspect staged changes and every outgoing commit for protected data before
+  publication. This check requires no user approval and adds no separate test suite.
+- Force pushes, remote deletion, pushing to another remote or branch, releases, deployments, and
+  bypassing branch protections require separate authorization. Runtime execution restrictions still
+  apply; repository permission does not override them.
 - Save the records of an expensive check's run at its stage boundaries: setup accepted, gates finished,
   and the original state restored where the run restores one. Between boundaries, State on disk carries
   the progress. The run itself needs no commits: its records are project files, committed at the next
