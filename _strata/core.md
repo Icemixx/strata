@@ -32,7 +32,8 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
   `audit.md` directs. Any other report file or record link, tickets, and remediation are separate work
   the user authorizes. Working notes outside the repository are not a repository change.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
-- Editing never implies authority to commit, publish, spend money, or change external state.
+- The Active Agent handles Git commits and pushes under `active-agent.md`, Commit and publication.
+  Other external changes, spending, releases, and deployments require their own authorization.
 - Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other
   work beyond what is needed to deliver and verify the requested result and meet applicable instructions.
   Spend only where work can produce new information or better quality; never reproduce a result that
@@ -57,10 +58,11 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
 
 ## Build scope
 
-A change, build, implementation, or fix request authorizes only the local edits its requested result
-needs. An edit is needed when without it the result would not work (including wiring and changes to
-existing code it depends on), something that works today would break, or a governing rule would go
-unmet — a project convention for what the change touches, or a test or record the instructions require.
+A change, build, implementation, or fix request authorizes the edits its requested result needs, plus
+the Git publication permitted by `active-agent.md`, Commit and publication. An edit is needed when
+without it the result would not work (including wiring and changes to existing code it depends on),
+something that works today would break, or a governing rule would go unmet — a project convention for
+what the change touches, or a test or record the instructions require.
 Build the result completely to that standard, then stop.
 
 Usefulness alone does not justify these additions; they must satisfy the inclusion test above.

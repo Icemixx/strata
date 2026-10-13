@@ -171,9 +171,22 @@ that has paid for one keeps that evidence in its own Rationale, not here.
 
 ## Commit and publication
 
-- Do not commit unless the user or Project Instructions authorizes it.
-- Once commit is authorized, treat commit and push as one operation unless the user requests a local-only
-  commit.
+- An authorized change, build, implementation, fix, sync, or commit request includes committing its
+  scoped changes and pushing them to an approved destination. Complete each coherent portion of the
+  authorized work with its required checks and records, then commit and push in the same sitting.
+  A turn ending is not itself a checkpoint. Do not ask again for permission already granted.
+- Explicit local-only instructions prevent pushing; explicit no-commit instructions prevent committing
+  too. Discussion, planning, and other read-only requests gain no commit or push authority. Where a
+  procedure requires saving a report, saving it alone does not authorize publication.
+- An approved destination identifies the repository URL and branch in the user's authorization or
+  Project Instructions. A configured remote or upstream alone is not approval. Confirm the actual push
+  destination matches that authorization; ask only when the destination is missing or would change.
+- Keep commits focused. Inspect staged changes and every outgoing commit for authorized scope,
+  unrelated work, and protected data before publication; a focused new commit does not authorize older
+  outgoing commits. These checks require no repeated user approval and add no separate test suite.
+- Use ordinary pushes that preserve published history. Force pushes, remote deletion, new destinations,
+  releases, deployments, and bypassing branch protections require separate authorization. Runtime
+  execution restrictions still apply; repository permission does not override them.
 - Commit the records of an expensive check's run at its stage boundaries: setup accepted, gates finished,
   and the original state restored where the run restores one. Do not commit them after each step or gate;
   between boundaries, State on disk carries the progress.
@@ -182,11 +195,14 @@ that has paid for one keeps that evidence in its own Rationale, not here.
   upstream-tracking state. When that receipt is ambiguous or stale, query the live remote ref; a remote
   tip that descends from the pushed commit is success. "The push was accepted" and "the remote tip equals
   local `HEAD`" are different claims; state the one you verified.
-- When a push fails, alert the user with a message. That is all.
+- When a push fails or execution is blocked, retain the local commits, report the concrete failure and
+  continue safe independent authorized work. Do not request the same task permission again or bypass
+  execution restrictions.
 - Run applicable implementation verification locally. Do not create, enable, dispatch, wait for, or
   depend on remote automation unless the user explicitly authorizes it for that repository. When an
   authorized remote verification does run, record its terminal result, or literally that it was
-  unavailable; never infer it from a local pass.
+  unavailable; never infer it from a local pass. This applies to automation triggered by a push too:
+  retain established authorization, and resolve unapproved effects before pushing.
 
 ## Closing review
 
