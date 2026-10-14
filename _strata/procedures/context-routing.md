@@ -57,7 +57,9 @@ _sediment/
 **Deliberation goes in the `_sediment/` root.** Discussions, decision trails, brainstorming, plans and
 undecided questions are not current truth, settled reason, or dated evidence. Placing them in an
 authority makes provisional thinking read as decided. A discussion stays after its outcome ships: the
-authority records what was decided, the discussion records how it was reached.
+authority records what was decided, the discussion records how it was reached. Deliberation whose outcome
+has shipped, a debate included, may be removed only when the user decides to, never automatically; a record
+that still cites it then cites it at a commit that contains it.
 
 **Retained specifications go in `_sediment/specs/`.** A specification is neither deliberation nor
 reference: it is a cold-start implementation contract, and `spec-building.md` owns its shape and its
