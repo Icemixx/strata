@@ -168,8 +168,11 @@ that requires an explicit user-approved scope redefinition.
 
 Every State ticket has a globally unique ID, one status, and a short contextual description. An ID is an
 uppercase letter followed by any uppercase letters or digits, a hyphen, then digits: `BUG-110`, `TA-8`,
-`R-8`. An identifier of any other shape is a validation finding. When converting, keep a legacy identifier
-in the description rather than minting a second ID:
+`R-8`. An identifier of any other shape is a validation finding. Before giving a ticket a new ID, search
+every file under `state/`, including `state/completed/`, for that ID as a whole word, and choose another
+on any match. Closed tickets keep their IDs and completed storage is cold, so reading current tickets
+cannot show that an ID is free. When converting, keep a legacy identifier in the description rather than
+minting a second ID:
 
 ```markdown
 - BUG-110 — IN PROGRESS — Retry behavior is implemented; device verification remains.
