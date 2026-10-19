@@ -154,7 +154,10 @@ links relevant to the task.
 
 A narrow read-only request may use a targeted section or small leaf. Read the complete target file before
 editing it, changing status, resolving a conflict, or making a consequential decision; `state/current.md`
-is the exception, read as *State contract* directs. If in doubt, read the rest of the file.
+is the exception, read as *State contract* directs. Adding a Build Log entry, or completing one before its
+work item closes, is the other exception: read the file's last entry and each entry that a search of the
+file for the work's ticket ID or subject finds, not the whole file, because the change touches no other
+entry. If in doubt, read the rest of the file.
 
 Search the complete relevant authority tree before concluding information is absent when routing is
 ambiguous, expected information is missing, records conflict, or the task is cross-cutting.

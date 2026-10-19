@@ -48,7 +48,8 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
   data, including anything derived from them. This prohibition is absolute and cannot be authorized away.
   A relevant non-sensitive fact may be recorded independently in its owning authority; the protected
   source material itself is never ingested.
-- Preserve unrelated work and inspect an existing file completely before editing or removing it.
+- Preserve unrelated work and inspect an existing file completely before editing or removing it, apart
+  from the narrower reads `context-routing.md` sets for `state/current.md` and for Build Log entries.
 - Never create or update a separate handoff file, including temporary or scratch handoffs. Save
   continuity information in State for remaining work, next steps, blockers, and transient resume details,
   or in Build Log for work performed and evidence. The next agent resumes from those records.
