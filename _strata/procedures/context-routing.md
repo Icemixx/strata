@@ -203,7 +203,8 @@ complete, move the entry atomically to an appropriate indexed location under `st
 its ID, description, and links, and ensure it appears exactly once. The closed entry keeps its
 requirements, its acceptance results, its closure date, and its source evidence, so moving it cannot erase
 what `DONE` meant. Completed storage is cold and loads only for historical need. Reopened work moves back
-to current storage.
+to current storage. On either move, rewrite the path of each relative link in the entry so it still
+resolves from the entry's new location.
 
 When a closure claims a commit, resolve that commit in the local history, confirm it contains the shipped
 work, and match it to the dated evidence. When no commit can be established, say so with an evidence-only
