@@ -16,7 +16,7 @@ and its staleness cannot corrupt an agent's work. An agent needing technical con
 implementation and the records — the same sources the Guide is written from.
 
 Generation is explicitly user-triggered. Never generate because code changed, because an authority
-changed, or as part of initialization or conversion.
+changed, or as part of initialization or conversion. It needs no audit first and offers none.
 
 ## Sources
 
@@ -35,7 +35,7 @@ that reads its own last output compounds drift until nothing traces to anything.
 output, never input.
 
 **Delete the previous Guide before generating, and keep no copy of it.** Remove
-`_sediment/project_guide.html`, and any draft, fragment or backup of an earlier generation, wherever it sits.
+the previous Guide, and any draft, fragment or backup of an earlier generation, wherever it sits.
 The new Guide replaces the old one; it is never kept beside it.
 
 A manual the project archived before it adopted this kit is preserved history, not an earlier generation:
@@ -121,8 +121,8 @@ against the sources. Parallel drafting is optional.
 **Never invent a fact.** Where neither code nor records establish something, say so in the text rather
 than filling the gap plausibly. **Read what implements, not what describes**: a docstring is a claim to
 verify, not a source to quote, and where it disagrees with the code the code wins and the disagreement is
-reported. **Report contradictions rather than resolving them** — between two parts of the code, or between
-a record and the code. A dated record is evidence of what was true then.
+reported. **Report contradictions rather than resolving them** — between two parts of the code, between two
+records, or between a record and the code. A dated record is evidence of what was true then.
 
 Never carry a credential, token or personal setting into the Guide.
 

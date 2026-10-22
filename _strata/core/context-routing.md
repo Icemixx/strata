@@ -16,10 +16,6 @@ Instructions governs conduct and routing. Project information has three authorit
 There are four authorities: Instructions, State, Rationale, Build Log. **The code is what makes technical
 claims true**, so no authority owns the explanation of how the software behaves — the implementation does.
 
-`_sediment/project_guide.html` is not an authority. It is written by an agent from the code and these
-records, for people, at the user's explicit request. It owns nothing, and nothing is true because it says
-so. Agents read the code and the records rather than the Guide.
-
 ## Project layout
 
 `_strata/` holds only two folders. `core/` is the shared kit: `instructions.md`, always read, and the
@@ -196,23 +192,6 @@ resolves from the entry's new location.
 When a closure claims a commit, resolve that commit in the local history, confirm it contains the shipped
 work, and match it to the dated evidence. When no commit can be established, say so with an evidence-only
 reason rather than citing a guessed, foreign, or self-referencing hash.
-
-## Guide
-
-`_sediment/project_guide.html` is written by an agent from the code and the records at the user's explicit
-request, under `_strata/core/guide-generation.md`. Nothing generates it mechanically, nothing renders
-an authority into it, and no composition source exists.
-
-Guide generation is intentionally user-triggered and **never part of initialization or conversion**. A
-newly initialized repository has no software explained yet and no Guide; that is the correct state, not a
-gap to fill.
-
-Generation has no audit prerequisite and offers no audit. The failure an audit offer once guarded —
-prose recomposed from records during generation — cannot occur, because nothing is recomposed. A later
-audit remains separately authorized and is not a gate on writing the Guide.
-
-State in the generation report how many findings were open when it ran and where they are recorded. A
-Guide written over records known to contradict each other must leave a trace saying so.
 
 ## Validation and authority updates
 

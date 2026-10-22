@@ -41,7 +41,7 @@ cutover.
 
 ## Guide
 
-`_sediment/project_guide.html` is written by an agent from the code and the records, only when the user asks,
+The Guide is written by an agent from the code and the records, only when the user asks,
 under `_strata/core/guide-generation.md`. Ordinary code and authority changes do not regenerate it.
 
 ## Validation
