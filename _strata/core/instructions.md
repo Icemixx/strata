@@ -1,10 +1,10 @@
 # Universal Instructions
 
-Shared, project-agnostic instructions for every supported agent. This file and `_strata/procedures/`
+Shared, project-agnostic instructions for every supported agent. This file and `_strata/core/`
 are copied unchanged between repositories. Project-specific rules belong in
-`_strata/project_instructions.md` and win on conflict.
+`_strata/project/project_instructions.md` and win on conflict.
 
-If you are the user-facing agent, read `_strata/procedures/active-agent.md` before substantive work. A
+If you are the user-facing agent, read `_strata/core/active-agent.md` before substantive work. A
 delegated agent does not read Active Agent Instructions; its assignment supplies the routed context it
 needs.
 
@@ -12,7 +12,7 @@ needs.
 
 Instructions is the only authority loaded merely because a session starts. Do not automatically load
 State, Rationale, Build Log, or the generated Guide. Route additional context under
-`_strata/procedures/context-routing.md` when the task needs it.
+`_strata/core/context-routing.md` when the task needs it.
 
 Read routed procedures silently. Visible load announcements are not required. After context compaction,
 re-read a procedure whose trigger still applies when its current text is no longer in context; never claim
@@ -196,7 +196,7 @@ Read the mapped file before acting when its trigger applies:
 | `context-routing.md` | Route or change project authorities, instruction audiences, indexes, State lifecycle, Guide, or context validation |
 | `initialize.md` | Initialize the kit in a new repository |
 | `consolidation.md` | Consolidate duplicated or superseded documentation |
-| `guide-generation.md` | Generate or regenerate `_strata/project_guide.html` at the user's request |
+| `guide-generation.md` | Generate or regenerate `_sediment/project_guide.html` at the user's request |
 | `dap.md` | Make a consequential decision or run an explicitly triggered six-seat council |
 | `debate.md` | Reconcile independently-derived work with an agent from another provider |
 | `spec-building.md` | Create, revise, review, confirm, or hand off a retained specification |

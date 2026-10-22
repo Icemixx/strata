@@ -4,8 +4,8 @@ Use this procedure when changing the canonical Strata payload or synchronizing a
 
 ## Boundary
 
-The shared payload is exactly `_strata/core.md` plus every regular file under
-`_strata/procedures/`. It remains project-, product-, stack-, and repository-agnostic, and agent-agnostic
+The shared payload is exactly `_strata/core/instructions.md` plus every regular file under
+`_strata/core/`. It remains project-, product-, stack-, and repository-agnostic, and agent-agnostic
 apart from the `harness-<product>.md` dossiers, which exist to carry exactly those differences. Generalize a
 project discovery before proposing it for the shared kit; keep project-specific realization in Project
 Instructions or project records.
@@ -109,18 +109,18 @@ its own payload from the canonical repository and records the commit it installe
 record the new commit, and finish under `active-agent.md`, Commit and publication.** Four steps:
 
 1. Read the installed commit: the newest-dated Build Log heading of the form
-   `## Strata sync <commit> (<YYYY-MM-DD>)`, anywhere under `_strata/build-log/`. `<commit>` is the
+   `## Strata sync <commit> (<YYYY-MM-DD>)`, anywhere under `_strata/project/build-log/`. `<commit>` is the
    canonical commit's 7-character short hash, as GitHub shows it.
 2. Read the live commit: the first 7 characters of
    `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If it equals the installed commit, stop;
    there is nothing to sync. No such heading at all means sync.
 3. Clone canonical at the live commit into a temporary clone, as *Canonical change* describes. Delete
-   exactly `_strata/core.md` and `_strata/procedures/`, then copy both in from the clone. Delete before
+   exactly `_strata/core/instructions.md` and `_strata/core/`, then copy both in from the clone. Delete before
    copying, or a file canonical removed lingers. Replace nothing else under `_strata/` — Project
    Instructions, the routers, and the authority directories are project-owned, and a sync that rewrites one
    of them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
    stop and report the failure; do not go on to step 4.
-4. Append to `_strata/build-log/project_build_log.md` an entry headed
+4. Append to `_strata/project/build-log/project_build_log.md` an entry headed
    `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example
    `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Commit and push the sync
    under `active-agent.md`, Commit and publication, including its local-only rule.
@@ -136,7 +136,7 @@ already guarantees a consuming repository never needs an edit for one. Not a re-
 nor a control demonstrating that such a comparison works.
 
 Deleting before copying is what makes the inventories equal, so nothing has to confirm afterwards that
-they are. The evidence rules in `core.md` govern work that *authors* a change; a sync authors nothing, it
+they are. The evidence rules in `instructions.md` govern work that *authors* a change; a sync authors nothing, it
 installs bytes canonical already reviewed. The publication checks cover the outgoing commits; they do
 not repeat the payload review. `git status` and the publication result are the literal
 results. One consuming repository's sync took thirty-three tool calls for an operation of a few steps,

@@ -30,8 +30,8 @@ _strata/
 `-- procedures/           # every regular file in it, whatever they are today
 ```
 
-**The payload is whatever `_strata/procedures/` contains**, plus
-`_strata/core.md`. This README used to enumerate it, and by the time anyone
+**The payload is whatever `_strata/core/` contains**, plus
+`_strata/core/instructions.md`. This README used to enumerate it, and by the time anyone
 noticed, the list had drifted two files behind the directory — omitting `guide-composition.md` and
 `spec-building.md`, so "copy exactly" would have installed a kit whose routers point at procedures that
 are not there. `kit-editing.md` states the rule this violated: *a declared list is a stale copy of the
@@ -40,11 +40,11 @@ to the README all along.
 
 The payload is copied unchanged. Project rules and authorities remain project-owned. A consuming
 repository records each canonical commit it installs as a `## Strata sync <commit> (<YYYY-MM-DD>)` entry
-in its own Build Log; `_strata/procedures/kit-editing.md` owns that format and the sync procedure.
+in its own Build Log; `_strata/core/kit-editing.md` owns that format and the sync procedure.
 
 ## Initialize a new repository
 
-Read `_strata/procedures/initialize.md`. It creates thin root routers, Project Instructions, and the State,
+Read `_strata/core/initialize.md`. It creates thin root routers, Project Instructions, and the State,
 Rationale, and Build Log roots and indexes. **It does not generate a Guide.** A new repository's
 authorities are empty, and a Guide over them explains nothing while looking finished; having no Guide is
 the correct state until there are records and the user asks.
@@ -55,13 +55,13 @@ cutover.
 
 ## Guide
 
-`_strata/project_guide.html` is written by an agent from the code and the records, only when the user asks,
-under `_strata/procedures/guide-generation.md`. Ordinary code and authority changes do not regenerate it.
+`_sediment/project_guide.html` is written by an agent from the code and the records, only when the user asks,
+under `_strata/core/guide-generation.md`. Ordinary code and authority changes do not regenerate it.
 
 ## Validation
 
 The kit is Markdown only. It ships no scripts, validator, or test suite. The agent that changes a record
-keeps the authority graph valid; `_strata/procedures/context-routing.md` lists what that covers.
+keeps the authority graph valid; `_strata/core/context-routing.md` lists what that covers.
 
 ## What this repository holds
 
@@ -75,7 +75,7 @@ concluded survives in this kit and in those repositories' records; the working m
 
 ## Canonical editing
 
-Read `_strata/procedures/kit-editing.md` before changing or synchronizing the shared payload. Canonical
+Read `_strata/core/kit-editing.md` before changing or synchronizing the shared payload. Canonical
 editing, consuming-repository synchronization, and commit are separate authorization boundaries, except
 that a published canonical change is installed in the repository it was made from as part of the same
 change. Push is

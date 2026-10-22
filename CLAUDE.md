@@ -1,3 +1,3 @@
 # Agent Instructions Router
 
-@_strata/core.md
+@_strata/core/instructions.md

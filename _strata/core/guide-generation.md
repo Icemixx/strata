@@ -4,7 +4,7 @@ Use this procedure when the user asks to generate or regenerate the project Guid
 
 ## What the Guide is
 
-**One self-contained offline HTML file at `_strata/project_guide.html`, written for people.** It explains
+**One self-contained offline HTML file at `_sediment/project_guide.html`, written for people.** It explains
 the software: architecture, behaviour, workflows, operational runbooks, invariants and limitations.
 
 **It is not an authority, because the code is.** Nothing is true because the Guide says it; it is true
@@ -35,7 +35,7 @@ that reads its own last output compounds drift until nothing traces to anything.
 output, never input.
 
 **Delete the previous Guide before generating, and keep no copy of it.** Remove
-`_strata/project_guide.html`, and any draft, fragment or backup of an earlier generation, wherever it sits.
+`_sediment/project_guide.html`, and any draft, fragment or backup of an earlier generation, wherever it sits.
 The new Guide replaces the old one; it is never kept beside it.
 
 A manual the project archived before it adopted this kit is preserved history, not an earlier generation:
@@ -68,13 +68,13 @@ code.
 The Guide must open correctly with no repository present — from a copy, an attachment, a memory stick. A
 relative hyperlink resolves only inside a checkout, so hyperlinking silently trades that away.
 
-Write a record reference as literal text, and only to paths the layout guarantees: `_strata/state/index.md`,
-`_strata/state/current.md`, `_strata/rationale/index.md`, `_strata/build-log/index.md`.
+Write a record reference as literal text, and only to paths the layout guarantees: `_strata/project/state/index.md`,
+`_strata/project/state/current.md`, `_strata/project/rationale/index.md`, `_strata/project/build-log/index.md`.
 
 **Never reference an individual ticket, decision or record.** Tickets move to completed storage when they
 close and the Guide is regenerated rather than maintained, so nothing repairs the reference in between.
 Where a specific decision matters, name it in prose — "decided 2026-08-03, recorded in
-`_strata/rationale/index.md`" — which a reader can follow and which cannot rot.
+`_strata/project/rationale/index.md`" — which a reader can follow and which cannot rot.
 
 Every `<a href>` in the output is an internal anchor beginning with `#`.
 

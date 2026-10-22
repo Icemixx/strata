@@ -11,9 +11,9 @@ procedure without overwriting anything.
 
 ## Create the topology
 
-1. Copy the complete shared payload as `_strata/procedures/kit-editing.md` defines it.
-2. Create `_strata/project_instructions.md` with only project-specific conduct, constraints, and routes.
-   Create `_strata/project_instructions_active_agent.md` only for genuinely Active-Agent-only rules.
+1. Copy the complete shared payload as `_strata/core/kit-editing.md` defines it.
+2. Create `_strata/project/project_instructions.md` with only project-specific conduct, constraints, and routes.
+   Create `_strata/project/project_active-agent.md` only for genuinely Active-Agent-only rules.
 3. Create these mandatory authority roots and indexes:
 
    ```text
@@ -29,7 +29,7 @@ procedure without overwriting anything.
        `-- index.md
    ```
 
-   Indexes follow the index contract in `_strata/procedures/context-routing.md`. An empty index keeps its
+   Indexes follow the index contract in `_strata/core/context-routing.md`. An empty index keeps its
    `## Contents` heading with no invented records.
 4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
@@ -39,8 +39,8 @@ procedure without overwriting anything.
    explains nothing while looking like a finished document; generation is the user's to ask for, once
    records exist. A new repository correctly has no Guide until then.
 6. Record the copied canonical commit as a Build Log entry headed `## Strata sync <commit> (<YYYY-MM-DD>)`,
-   in the form `_strata/procedures/kit-editing.md` defines, in a Build Log leaf listed in
-   `_strata/build-log/index.md`.
+   in the form `_strata/core/kit-editing.md` defines, in a Build Log leaf listed in
+   `_strata/project/build-log/index.md`.
 
 Project-owned or harness-native procedures may be routed from Project Instructions. Do not create a
 universal project-skill directory, trigger-map format, or audit addendum merely to satisfy Strata.
@@ -57,8 +57,8 @@ Active Agent instruction files.
 
 Read and follow:
 
-1. `_strata/core.md`
-2. `_strata/project_instructions.md`
+1. `_strata/core/instructions.md`
+2. `_strata/project/project_instructions.md`
 
 Project Instructions win on conflict. This file is only a router.
 ```
@@ -68,9 +68,9 @@ Project Instructions win on conflict. This file is only a router.
 ```markdown
 # Agent Instructions Router
 
-@_strata/core.md
+@_strata/core/instructions.md
 
-@_strata/project_instructions.md
+@_strata/project/project_instructions.md
 ```
 
 Before reporting initialization complete, verify the shared payload, required files, router edges,

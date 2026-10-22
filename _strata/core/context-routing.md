@@ -16,7 +16,7 @@ Instructions governs conduct and routing. Project information has three authorit
 There are four authorities: Instructions, State, Rationale, Build Log. **The code is what makes technical
 claims true**, so no authority owns the explanation of how the software behaves — the implementation does.
 
-`_strata/project_guide.html` is not an authority. It is written by an agent from the code and these
+`_sediment/project_guide.html` is not an authority. It is written by an agent from the code and these
 records, for people, at the user's explicit request. It owns nothing, and nothing is true because it says
 so. Agents read the code and the records rather than the Guide.
 
@@ -83,8 +83,8 @@ the code; it must not become a competing status or architecture authority.
 ## Instruction audiences
 
 Every agent loads common Universal Instructions and common Project Instructions. The user-facing Active
-Agent additionally loads `_strata/procedures/active-agent.md` and, when present,
-`_strata/project_instructions_active_agent.md`. Delegated agents do not load either Active Agent file;
+Agent additionally loads `_strata/core/active-agent.md` and, when present,
+`_strata/project/project_active-agent.md`. Delegated agents do not load either Active Agent file;
 their relevant context arrives through the delegation brief.
 
 Keep current rules in exactly one instruction audience. A rule needed by every agent belongs in common
@@ -212,8 +212,8 @@ reason rather than citing a guessed, foreign, or self-referencing hash.
 
 ## Guide
 
-`_strata/project_guide.html` is written by an agent from the code and the records at the user's explicit
-request, under `_strata/procedures/guide-generation.md`. Nothing generates it mechanically, nothing renders
+`_sediment/project_guide.html` is written by an agent from the code and the records at the user's explicit
+request, under `_strata/core/guide-generation.md`. Nothing generates it mechanically, nothing renders
 an authority into it, and no composition source exists.
 
 Guide generation is intentionally user-triggered and **never part of initialization or conversion**. A

@@ -6,7 +6,7 @@ questions, final verification, and communication regardless of its model tier.
 ## Session start
 
 Once per session, compare the installed kit commit — the newest `## Strata sync <commit>` heading under
-`_strata/build-log/` — with the first 7 characters of
+`_strata/project/build-log/` — with the first 7 characters of
 `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If they differ, say once that the installed
 kit is behind; if the check cannot run, say that. Then continue. This is a report only: never sync without
 authorization (`kit-editing.md`).
@@ -22,7 +22,7 @@ rule found in some form turns the proposal from adding one into extending it, wh
 owner per rule requires; a rule reported absent on a single literal search is a finding about that search.
 Then state the evidence, affected procedure, proposed kind of change, likely consequence, and urgency. Do not
 silently expand the current task, modify the kit, or create backlog work. An accepted recommendation becomes
-separately authorized kit work routed through `_strata/procedures/kit-editing.md`. Do not promote a
+separately authorized kit work routed through `_strata/core/kit-editing.md`. Do not promote a
 project-specific preference into a universal rule without cross-project justification.
 
 ## Capability roles and delegation
@@ -116,7 +116,7 @@ A command or delegated agent still running is not completion.
 
 ## Decisions
 
-Use `_strata/procedures/dap.md` for consequential decisions. Coding-specific review lenses apply only to
+Use `_strata/core/dap.md` for consequential decisions. Coding-specific review lenses apply only to
 code-affecting decisions.
 
 For a material choice someone might later want to revisit, record the viable alternative that was
@@ -131,11 +131,11 @@ Update each authority in the same meaningful transaction that changes its inform
   in its Build Log entry (`context-routing.md`);
 - implementation and evidence update Build Log, including the lesson when repeatable work exposes one —
   what changed in the approach and why, or what went wrong — but never a stage-by-stage diary: the run of
-  an expensive check (`core.md`, Scope and authority) records its accepted setup, each gate's literal
+  an expensive check (`instructions.md`, Scope and authority) records its accepted setup, each gate's literal
   result, and the failures that changed the approach, not every step and receipt; and
 - Guide is generated only when the user explicitly asks to generate the Guide.
 
-When Guide generation is requested, follow `_strata/procedures/guide-generation.md`.
+When Guide generation is requested, follow `_strata/core/guide-generation.md`.
 
 State is the rolling durable handoff. An `IN PROGRESS` or `BLOCKED` entry retains the remaining work,
 next meaningful step, or exact blocker.
@@ -228,4 +228,4 @@ Before closing meaningful work, confirm no required gate was weakened, discoveri
 authority records are current, and omissions or unverified surfaces are stated plainly. Give each material
 uncertainty or possibly missed obligation the concrete check that would settle it. Check whether the
 evidence exposed a reusable Strata improvement that has not yet been reported. For long or high-stakes work,
-also load `_strata/procedures/self-critique.md`.
+also load `_strata/core/self-critique.md`.
