@@ -1,8 +1,8 @@
 # Universal Instructions
 
-Shared, project-agnostic instructions for every supported agent. This file and `_strata/core/`
-are copied unchanged between repositories. Project-specific rules belong in
-`_strata/project/project_instructions.md` and win on conflict.
+Shared, project-agnostic instructions for every supported agent. This file and the rest of
+`_strata/core/` are copied unchanged between repositories. Project-specific rules belong in
+`_strata/project/` and win on conflict.
 
 If you are the user-facing agent, read `_strata/core/active-agent.md` before substantive work. A
 delegated agent does not read Active Agent Instructions; its assignment supplies the routed context it
@@ -15,7 +15,7 @@ State, Rationale, Build Log, or the generated Guide. Route additional context un
 `_strata/core/context-routing.md` when the task needs it.
 
 Read routed procedures silently. Visible load announcements are not required. After context compaction,
-re-read a procedure whose trigger still applies when its current text is no longer in context; never claim
+re-read an item that is still relevant when its current text is no longer in context; never claim
 compliance from a remembered summary of it. Announce a material new
 discovery promptly when it changes an accepted conclusion, plan, risk, scope, or unresolved item. A
 delegated agent reports such a discovery to the Active Agent.
@@ -186,26 +186,36 @@ When a review finding has the same shape as a mistake the project's records show
 propose to the user a durable check for that shape, whether or not a defect ticket owns the finding. A
 delegated agent reports the recurrence to the Active Agent.
 
-## On-demand procedures
+## Contents
 
-Read the mapped file before acting when its trigger applies:
+Open each item below that is relevant to your task. When you open one, also open its partner in
+`_strata/project/` — the file with the same name plus `project_` — if there is one.
+`_strata/project/project_instructions.md` lists the project's own items the same way.
 
-| File | Trigger |
-| --- | --- |
-| `active-agent.md` | You are the user-facing agent |
-| `context-routing.md` | Route or change project authorities, instruction audiences, indexes, State lifecycle, Guide, or context validation |
-| `initialize.md` | Initialize the kit in a new repository |
-| `consolidation.md` | Consolidate duplicated or superseded documentation |
-| `guide-generation.md` | Generate or regenerate `_sediment/project_guide.html` at the user's request |
-| `dap.md` | Make a consequential decision or run an explicitly triggered six-seat council |
-| `debate.md` | Reconcile independently-derived work with an agent from another provider |
-| `spec-building.md` | Create, revise, review, confirm, or hand off a retained specification |
-| `session-pickup.md` | Examine or continue another harness session |
-| `self-critique.md` | Review long or high-stakes work, or when the user requests deeper critique |
-| `audit.md` | Audit authority truth or application correctness — unqualified, seasonal, or full-application |
-| `kit-editing.md` | Change the shared kit or synchronize a consuming copy |
-| `refactor.md` | Review code structure, simplification, maintainability, or optimization opportunities when explicitly requested |
-| `harness-codex.md` | Codex mechanics or Codex cross-harness continuity are needed |
-| `harness-claude-code.md` | Claude Code mechanics or Claude cross-harness continuity are needed |
+- [active-agent.md](active-agent.md) — rules for the user-facing agent: delegation, questions, records,
+  commits and publication.
+- [context-routing.md](context-routing.md) — the layout of `_strata/`, the authorities and their indexes,
+  instruction items, State's lifecycle and context validation.
+- [initialize.md](initialize.md) — installing Strata in a new repository.
+- [consolidation.md](consolidation.md) — consolidating duplicated or superseded documentation.
+- [guide-generation.md](guide-generation.md) — generating the project Guide for people, at the user's
+  request.
+- [dap.md](dap.md) — consequential decisions, and the six-agent council the user can ask for.
+- [debate.md](debate.md) — reconciling independently derived work with an agent from another provider.
+- [spec-building.md](spec-building.md) — creating, revising, reviewing, confirming and handing off
+  retained specifications.
+- [session-pickup.md](session-pickup.md) — examining or continuing another harness session.
+- [self-critique.md](self-critique.md) — deeper review of long or high-stakes work, or when the user asks
+  for it.
+- [audit.md](audit.md) — audits of authority truth or application correctness: unqualified, seasonal or
+  full-application.
+- [kit-editing.md](kit-editing.md) — changing the shared kit and updating a project's copy.
+- [refactor.md](refactor.md) — reviews of code structure, simplification, maintainability or
+  optimization, when explicitly requested.
+- [harness-claude-code.md](harness-claude-code.md) — Claude Code's mechanics and continuity with Claude
+  sessions.
+- [harness-codex.md](harness-codex.md) — Codex's mechanics and continuity with Codex sessions.
 
-An explicit refactor review uses `refactor.md`; it does not require an audit first. When both reviews are requested, they are separately scoped passes with cross-referenced findings. Explicit user scope wins over these trigger terms.
+An explicit refactor review uses `refactor.md`; it does not require an audit first. When both reviews are
+requested, they are separately scoped passes with cross-referenced findings. Explicit user scope wins over
+this list.
