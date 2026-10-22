@@ -29,23 +29,24 @@ project-specific preference into a universal rule without cross-project justific
 
 The three roles are:
 
-| Role | Typical work |
+| Role | Strength |
 | --- | --- |
-| Architect | Highest-impact direction, architecture, ambiguity, and hard review |
-| Engineer | Substantive implementation and deep technical review |
-| Technician | Bounded mechanical work |
+| Architect | The strongest judgment |
+| Engineer | Solid implementation and technical judgment |
+| Technician | Reliable execution of clear instructions |
 
 The selected model remains Active Agent. Manual switching is unnecessary when the harness can invoke the
 needed role. Model names and role-to-model mappings belong only in the harness dossiers; shared procedures use Architect, Engineer, and Technician. Load the applicable harness dossier before starting any agent, to resolve its role to a model, and before using the harness's other mechanics.
 
 - Before doing any task yourself — whether the user asked for it, you chose it, an automatic trigger
-  started it, or the harness's own workflow calls for it — check whether a cheaper role can do it. If one
-  can, hand it off to the lowest capable role whenever that is cheaper than doing it yourself: each step
-  you take re-sends your whole context, while a new agent costs its startup, its own steps on a cheaper
-  model, and your brief and check. Batch small tasks into one hand-off. Hand off only work whose result
-  you can assess without repeating the investigation. Scope control, routing, integration, questions,
-  final verification and communication stay with you. When you set up work to run later or
-  automatically, give it its role's model the same way.
+  started it, or the harness's own workflow calls for it — choose the cheapest role whose judgment is
+  good enough for it, or the stronger role when you are not sure. Hand it up if that role is above yours;
+  hand it down if it is below yours and that is cheaper than doing it yourself: each step you take
+  re-sends your whole context, while a new agent costs its startup, its own steps on a cheaper model, and
+  your brief and check. Batch small tasks into one hand-off. Hand off only work whose result you can
+  assess without repeating the investigation. Scope control, routing, integration, questions, final
+  verification and communication stay with you. When you set up work to run later or automatically, give
+  it its role's model the same way.
 - For consecutive steps of one ticket, or of one operational session such as driving a device, continue
   the same delegated agent rather than starting a fresh one, unless its context is exhausted or the next
   step needs another role. Give the next ticket a new delegated agent unless it works on the same files:
@@ -56,16 +57,12 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   privacy) is reviewed at Architect level by an agent other than its implementer; when an Engineer
   implements it, the Active Agent's own review satisfies this if the Active Agent runs the Architect model.
   That review tries to break the change: worst-case ordering of operations, stale or diverged copies,
-  concurrent edits, and malformed or hostile input. Other changes need no second role. Technician
-  participation is required only when genuine bounded mechanical work exists; never invent a task merely
-  to occupy the role.
-- An Architect Active Agent may delegate downward. An Engineer delegates Technician work and obtains
-  Architect direction or review when required. A Technician obtains Architect direction and Engineer
-  implementation or review for work outside Technician scope.
+  concurrent edits, and malformed or hostile input. Other changes need no second role. Never invent a
+  task merely to occupy a role.
 - The agent type and the role are separate choices: the type sets the tools and how the agent reads, the
-  role sets the model. A search-only helper locates material, which is Technician work; it does not review
-  or decide. Give review work to an agent that reads whole files, with no edit permission when the review
-  is read-only, in the role the review needs.
+  role sets the model. A search-only helper locates material; it does not review or decide. Give review
+  work to an agent that reads whole files, with no edit permission when the review is read-only, in the
+  role the review needs.
 - Each delegated assignment names the role, edit permission, file scope, task, routed context, completion
   condition, and relevant checks, and tells the agent to do the work directly, without delegating further
   or invoking another agent unless separately authorized. Delegated agents are terminal for that
