@@ -32,14 +32,7 @@ Each record folder always has its `index.md`; `state/` also always has `current.
 ## Supporting material: `_sediment/`
 
 Project material that is neither an authority nor an instruction lives in `_sediment/` at the repository
-root:
-
-```text
-_sediment/
-|-- <deliberation>.md      # discussions, decision trails, plans, open questions
-|-- specs/                 # retained specifications, draft and confirmed
-`-- reference/             # evidence ledgers, external specifications, source data
-```
+root.
 
 **Deliberation goes in the `_sediment/` root.** Discussions, decision trails, brainstorming, plans and
 undecided questions are not current truth, settled reason, or dated evidence. Placing them in an

@@ -4,8 +4,7 @@ Use this procedure when changing the canonical Strata payload or synchronizing a
 
 ## Boundary
 
-The shared payload is exactly `_strata/core/instructions.md` plus every regular file under
-`_strata/core/`. It remains project-, product-, stack-, and repository-agnostic, and agent-agnostic
+The shared payload is exactly the folder `_strata/core/`. It remains project-, product-, stack-, and repository-agnostic, and agent-agnostic
 apart from the `harness-<product>.md` dossiers, which exist to carry exactly those differences. Generalize a
 project discovery before proposing it for the shared kit; keep project-specific realization in Project
 Instructions or project records.
@@ -115,10 +114,9 @@ record the new commit, and finish under `active-agent.md`, Commit and publicatio
    `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If it equals the installed commit, stop;
    there is nothing to sync. No such heading at all means sync.
 3. Clone canonical at the live commit into a temporary clone, as *Canonical change* describes. Delete
-   exactly `_strata/core/instructions.md` and `_strata/core/`, then copy both in from the clone. Delete before
-   copying, or a file canonical removed lingers. Replace nothing else under `_strata/` — Project
-   Instructions, the routers, and the authority directories are project-owned, and a sync that rewrites one
-   of them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
+   exactly `_strata/core/`, then copy it in from the clone. Delete before copying, or a file canonical
+   removed lingers. Replace nothing else — `_strata/project/` and the routers are project-owned, and a sync
+   that rewrites them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
    stop and report the failure; do not go on to step 4.
 4. Append to `_strata/project/build-log/project_build_log.md` an entry headed
    `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example

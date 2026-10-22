@@ -22,15 +22,7 @@ only described links inside `## Contents` define ownership and traversal.
 
 ## Shared payload
 
-Copy exactly this, and copy it by the directory rather than by the list below:
-
-**The payload is whatever `_strata/core/` contains**, plus
-`_strata/core/instructions.md`. This README used to enumerate it, and by the time anyone
-noticed, the list had drifted two files behind the directory — omitting `guide-composition.md` and
-`spec-building.md`, so "copy exactly" would have installed a kit whose routers point at procedures that
-are not there. `kit-editing.md` states the rule this violated: *a declared list is a stale copy of the
-directory it claims to describe, so it fails on the next release instead of on a real defect.* It applied
-to the README all along.
+**The payload is the folder `_strata/core/`.**
 
 The payload is copied unchanged. Project rules and authorities remain project-owned. A consuming
 repository records each canonical commit it installs as a `## Strata sync <commit> (<YYYY-MM-DD>)` entry
