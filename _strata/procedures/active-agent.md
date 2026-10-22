@@ -40,18 +40,16 @@ needed role. Model names and role-to-model mappings belong only in the harness d
 
 - Before doing any task yourself — whether the user asked for it, you chose it, an automatic trigger
   started it, or the harness's own workflow calls for it — check whether a cheaper role can do it. If one
-  can, hand it off to the lowest capable role whenever that saves more than the new agent's startup cost:
-  what it must read before it can work, plus your cost to brief it and check its result. Hand off only
-  work whose result you can assess without repeating the investigation. Scope control, routing,
-  integration, questions, final verification and communication stay with you. When you set up work to
-  run later or automatically, give it its role's model the same way.
-- Do not delegate deterministic commands, tiny edits, or source analysis you must personally reread to
-  decide. A delegated agent pays its own startup cost; batch compatible small work into one assignment
-  rather than spawning one agent per edit. For consecutive steps of one ticket, or of one operational
-  session such as driving a device, continue the same delegated agent rather than starting a fresh one,
-  unless its context is exhausted or the next step needs another role. Give the next ticket a new
-  delegated agent unless it works on the same files: carried-over context is re-sent on every later turn
-  and soon costs more than a fresh start.
+  can, hand it off to the lowest capable role whenever that is cheaper than doing it yourself: each step
+  you take re-sends your whole context, while a new agent costs its startup, its own steps on a cheaper
+  model, and your brief and check. Batch small tasks into one hand-off. Hand off only work whose result
+  you can assess without repeating the investigation. Scope control, routing, integration, questions,
+  final verification and communication stay with you. When you set up work to run later or
+  automatically, give it its role's model the same way.
+- For consecutive steps of one ticket, or of one operational session such as driving a device, continue
+  the same delegated agent rather than starting a fresh one, unless its context is exhausted or the next
+  step needs another role. Give the next ticket a new delegated agent unless it works on the same files:
+  carried-over context is re-sent on every later turn and soon costs more than a fresh start.
 - When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
   capability — verify it in the current turn rather than from memory or an earlier session.
 - A high-risk change (synchronization or merging, schema or stored data, money, deletion, security or
@@ -64,9 +62,6 @@ needed role. Model names and role-to-model mappings belong only in the harness d
 - An Architect Active Agent may delegate downward. An Engineer delegates Technician work and obtains
   Architect direction or review when required. A Technician obtains Architect direction and Engineer
   implementation or review for work outside Technician scope.
-- Request the role's model explicitly for every agent you start, including a helper the harness's workflow
-  tells you to start, such as a search or planning agent; never leave it to the harness's default, which
-  can be the session's model.
 - The agent type and the role are separate choices: the type sets the tools and how the agent reads, the
   role sets the model. A search-only helper locates material, which is Technician work; it does not review
   or decide. Give review work to an agent that reads whole files, with no edit permission when the review
@@ -75,7 +70,11 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   condition, and relevant checks, and tells the agent to do the work directly, without delegating further
   or invoking another agent unless separately authorized. Delegated agents are terminal for that
   assignment, and they never load this file, so the assignment is the only place that instruction reaches
-  them. Retrieve the final report before relying on it.
+  them. Request the role's model explicitly for every agent you start, including a helper the harness's
+  workflow tells you to start, such as a search or planning agent; never leave it to the harness's
+  default, which can be the session's model. When the change is already decided, the assignment gives the
+  exact text or commands, and you check the result against them before it is committed. Retrieve the
+  final report before relying on it.
 - An operational assignment — driving a device, a service, or a long-running process — names what to
   observe, the checkpoints, and the artifacts to leave on disk. The agent reports literal observations;
   acceptance is decided by whoever the assignment names, normally the Active Agent. Prefer inspectable

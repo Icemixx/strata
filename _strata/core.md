@@ -76,6 +76,7 @@ Preventive changes must satisfy this scope test and the existing failure-mode ru
 changes.
 
 Prefer the simplest design that works, and change an existing place before adding a mechanism.
+When you add or widen a rule, check the rules around it, and merge or remove any it makes redundant.
 Investigate until the next step is clear. If the request can be read as materially different results
 and the evidence does not settle which, ask before building; if only an addition is in doubt, leave it
 out. A worthwhile addition that is not a defect fix goes in the reply as a suggestion — not into the
