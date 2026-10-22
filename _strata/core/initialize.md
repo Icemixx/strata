@@ -14,22 +14,8 @@ procedure without overwriting anything.
 1. Copy the complete shared payload as `_strata/core/kit-editing.md` defines it.
 2. Create `_strata/project/project_instructions.md` with only project-specific conduct, constraints, and routes.
    Create `_strata/project/project_active-agent.md` only for genuinely Active-Agent-only rules.
-3. Create these mandatory authority roots and indexes:
-
-   ```text
-   _strata/
-   |-- state/
-   |   |-- index.md
-   |   |-- current.md
-   |   `-- completed/
-   |       `-- index.md
-   |-- rationale/
-   |   `-- index.md
-   `-- build-log/
-       `-- index.md
-   ```
-
-   Indexes follow the index contract in `_strata/core/context-routing.md`. An empty index keeps its
+3. Create the record folders and indexes that `_strata/core/context-routing.md`, Project layout,
+   requires, under `_strata/project/`. Indexes follow its index contract. An empty index keeps its
    `## Contents` heading with no invented records.
 4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
    discussion, plan or open question at its root, or an evidence ledger, external specification or source
@@ -42,8 +28,8 @@ procedure without overwriting anything.
    in the form `_strata/core/kit-editing.md` defines, in a Build Log leaf listed in
    `_strata/project/build-log/index.md`.
 
-Project-owned or harness-native procedures may be routed from Project Instructions. Do not create a
-universal project-skill directory, trigger-map format, or audit addendum merely to satisfy Strata.
+Project items follow `context-routing.md`, Instruction audiences, and harness-native procedures may be
+listed among them. Do not create a project-skill directory or an audit addendum merely to satisfy Strata.
 
 ## Thin harness routers
 

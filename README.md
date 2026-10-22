@@ -24,12 +24,6 @@ only described links inside `## Contents` define ownership and traversal.
 
 Copy exactly this, and copy it by the directory rather than by the list below:
 
-```text
-_strata/
-|-- core.md
-`-- procedures/           # every regular file in it, whatever they are today
-```
-
 **The payload is whatever `_strata/core/` contains**, plus
 `_strata/core/instructions.md`. This README used to enumerate it, and by the time anyone
 noticed, the list had drifted two files behind the directory — omitting `guide-composition.md` and

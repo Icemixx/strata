@@ -22,29 +22,16 @@ so. Agents read the code and the records rather than the Guide.
 
 ## Project layout
 
-```text
-_strata/
-|-- project_instructions.md
-|-- project_instructions_active_agent.md   # optional
-|-- state/
-|   |-- index.md
-|   |-- current.md
-|   `-- completed/
-|       `-- index.md
-|-- rationale/
-|   `-- index.md
-|-- build-log/
-|   `-- index.md
-`-- project_guide.html                      # generated for people on request; not an authority
-```
+`_strata/` holds only two folders. `core/` is the shared kit: `instructions.md`, always read, and the
+items it lists. `project/` is everything the project owns: `project_instructions.md`, always read, the
+project items it lists, and the record folders `state/`, `rationale/` and `build-log/`.
 
-State, Rationale, and Build Log roots and their `index.md` files always exist. Deeper branches are
-project-defined. Authority records use ordinary Markdown.
+Each record folder always has its `index.md`; `state/` also always has `current.md` and
+`completed/index.md`. Deeper branches are project-defined. Authority records use ordinary Markdown.
 
 ## Supporting material: `_sediment/`
 
-`_strata/` holds the shared payload, the project's own authorities, and the Guide pair that is generated
-from them. Nothing else. Project material that is not an authority lives in `_sediment/` at the repository
+Project material that is neither an authority nor an instruction lives in `_sediment/` at the repository
 root:
 
 ```text
@@ -96,6 +83,13 @@ rule. Common Instructions, universal and project alike, stay
 agent-agnostic: a rule that applies only under one harness belongs in that harness's dossier, never in a
 common Instructions file.
 
+**Instructions branch like records.** Each always-read file — `core/instructions.md` and
+`project/project_instructions.md` — keeps what most tasks need and lists its folder's other files under
+`## Contents`. A group of related rules most tasks don't need becomes its own item with a line in that
+list. A project item that adds to a core item carries the core item's name plus `project_`; any other
+project item gets its own `project_` name. The index contract below applies, with the always-read file in
+place of `index.md`.
+
 Root harness routers remain thin: they load common Universal and Project Instructions only. Common
 Instructions route the user-facing session to Active Agent Instructions. Harness adapters load on demand
 when their mechanics or cross-harness interoperability information is needed; they are not startup
@@ -131,7 +125,7 @@ applicable project taxonomy already defines it.
 
 Inspect the touched parent index for related siblings whenever an indexed record is added or moved. If
 ten or more direct, related, ungrouped leaf files exist, automatically create a cohesive branch. This
-ceiling applies to Rationale, Build Log, and completed-State leaf files, not ticket entries inside
+ceiling applies to Rationale, Build Log, completed-State leaf files and instruction items, not ticket entries inside
 `state/current.md`. Follow the project's directory naming convention; if none exists, use a short
 lowercase hyphenated subject name such as `drive-sync/`.
 
