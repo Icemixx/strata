@@ -8,7 +8,7 @@ the task needs it.
 
 - **Instructions** govern conduct and routing. They are the only general startup context.
 - **State** records WHAT is current, using compact ticket entries and routed completed history.
-- **Rationale** records WHY decisions were made.
+- **Rationale** records WHY decisions that outlast the current run were made.
 - **Build Log** records HOW work was performed and the evidence observed.
 - **Guide** is a self-contained HTML explanation of the software, written by an agent from the code and
   those records when the user asks for it. It is not an authority, because the code is what makes a
@@ -17,8 +17,8 @@ the task needs it.
   specifications under `specs/`, stable domain material under `reference/`. It is not routed, and every
   file a record still needs is named by that record.
 
-Each authority is a recursively indexed Markdown tree. Every routed directory has an `index.md`, and
-only described links inside `## Contents` define ownership and traversal.
+The authority and instruction routing contracts are defined in
+`_strata/core/context-routing.md`.
 
 ## Shared payload
 
@@ -61,9 +61,6 @@ concluded survives in this kit and in those repositories' records; the working m
 
 ## Canonical editing
 
-Read `_strata/core/kit-editing.md` before changing or synchronizing the shared payload. Canonical
-editing, consuming-repository synchronization, and commit are separate authorization boundaries, except
-that a published canonical change is installed in the repository it was made from as part of the same
-change. Push is
-not a fourth: Active Agent Instructions own that rule, and they say an authorized commit carries its push
-unless the user asks for a local-only one.
+Read `_strata/core/kit-editing.md` before changing or synchronizing the shared payload. It defines
+canonical-change and consuming-sync scope. `_strata/core/active-agent.md`, Commit and publication,
+owns commit and push authorization, including local-only and no-commit instructions.

@@ -75,7 +75,7 @@ completion history or append from a snapshot taken before a failed attempt.
 
 Publication order is strict. A publishes `report-complete`; B may then publish `report-complete`. A may
 publish `cross-complete` only after both report records exist; B may publish `cross-complete` only after A.
-After both cross records exist, A opens Round 1. These dependencies serialize completion publication without
+After both cross records are valid, A opens Round 1. These dependencies serialize completion publication without
 serializing the independent work.
 
 ## Automatic waiting and liveness
@@ -216,7 +216,7 @@ settlement is recorded exactly once and carries who accepted it and when.
 - **Void** — the premise failed: one provider on both sides, or no shared verifiable ground. Nothing
   produced is usable.
 
-A debate ends only by convergence or by the user declaring it terminated. No count of rounds or exchanges
+A debate ends only by convergence, void, or the user declaring it terminated. No count of rounds or exchanges
 closes it, no elapsed time closes it, and no disagreement resolves itself by lasting. Either participant
 may call void on provider identity or absent verifiable ground.
 

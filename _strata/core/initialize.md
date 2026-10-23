@@ -17,10 +17,9 @@ procedure without overwriting anything.
 3. Create the record folders and indexes that `_strata/core/context-routing.md`, Project layout,
    requires, under `_strata/project/`. Indexes follow its index contract. An empty index keeps its
    `## Contents` heading with no invented records.
-4. Do not create `_sediment/` empty. Create it when the repository first has material for it — a
-   discussion, plan or open question at its root, or an evidence ledger, external specification or source
-   data file under `_sediment/reference/`. In an established repository, existing deliberation and
-   reference material moves there during conversion rather than into `_strata/`.
+4. Do not create `_sediment/` empty. Create it when the repository first has material for it, using the
+   locations in `context-routing.md`, Supporting material. In an established repository, existing
+   deliberation and reference material moves there during conversion rather than into `_strata/`.
 5. **Do not generate a Guide.** Initialization creates empty authority roots, and a Guide over them
    explains nothing while looking like a finished document; generation is the user's to ask for, once
    records exist. A new repository correctly has no Guide until then.

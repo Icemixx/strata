@@ -11,8 +11,8 @@ needs.
 ## Startup and context
 
 Instructions is the only authority loaded merely because a session starts. Do not automatically load
-State, Rationale, Build Log, or the generated Guide. Route additional context under
-`_strata/core/context-routing.md` when the task needs it.
+State, Rationale, or Build Log. Route additional context under `_strata/core/context-routing.md` when
+the task needs it. Never load the generated Guide as agent context; read the code and records instead.
 
 Read routed procedures silently. Visible load announcements are not required. After context compaction,
 re-read an item that is still relevant when its current text is no longer in context; never claim
@@ -188,9 +188,11 @@ delegated agent reports the recurrence to the Active Agent.
 
 ## Contents
 
-Open each item below that is relevant to your task. When you open one, also open its partner in
-`_strata/project/` — the file with the same name plus `project_` — if there is one.
-`_strata/project/project_instructions.md` lists the project's own items the same way.
+Open each item below that is relevant to your task. The project's Contents routes in
+`_strata/project/project_instructions.md` identify its own items and any `project_` partner of a core
+item. When opening a core item, follow its partner's project route if one exists, and load that partner
+only within the scope and audience the route states. Follow the route's link, including through branch
+indexes; do not infer a partner's location from the core item's folder.
 
 - [active-agent.md](active-agent.md) — rules for the user-facing agent: delegation, questions, records,
   commits and publication.

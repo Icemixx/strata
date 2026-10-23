@@ -11,10 +11,6 @@ the software: architecture, behaviour, workflows, operational runbooks, invarian
 because the implementation does, and the Guide explains it. A Guide that disagrees with the code is
 regenerated, not reconciled.
 
-**Agents read the code, not the Guide.** It is never loaded as agent context, so its size costs nothing
-and its staleness cannot corrupt an agent's work. An agent needing technical context reads the
-implementation and the records — the same sources the Guide is written from.
-
 Generation is explicitly user-triggered. Never generate because code changed, because an authority
 changed, or as part of initialization or conversion. It needs no audit first and offers none.
 

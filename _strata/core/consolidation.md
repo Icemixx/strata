@@ -20,6 +20,6 @@ Its purpose is one clear current truth, not shorter files at any cost.
    - a still-true description of current behavior: record it as a dated observed snapshot in Build Log
      rather than leaving it in a retired document;
    - unresolved conflict: surface the competing claims and ask the user rather than choosing precedence.
-4. Preserve useful evolution as a compact Rationale explanation or Build Log history when it still helps
-   future decisions. Historical context must not remain as a competing current rule.
+4. Preserve a still-useful decision reason in Rationale and dated evolution in Build Log, following
+   `context-routing.md`, Authority model. Historical context must not remain as a competing current rule.
 5. Repair inbound references, affected checks, and indexes.

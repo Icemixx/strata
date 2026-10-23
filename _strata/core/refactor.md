@@ -8,7 +8,7 @@ The review reports proposals and structures to leave unchanged. It does not chan
 
 ## Declare coverage
 
-Record revision and worktree state, roots, project constraints, runtime targets, integrations, unavailable checks, and actual reasoning depth. Read Project Instructions, the routed audit supplement, relevant architecture decisions, and intentional exceptions. Classify first-party, generated, vendor, archive, and fixture code by role. Every declared area ends reviewed, excluded with a reason, or not assessed with a named blocker.
+Record revision and worktree state, roots, project constraints, runtime targets, integrations, unavailable checks, and actual reasoning depth. Read Project Instructions, any audit supplement applicable under their routes, relevant architecture decisions, and intentional exceptions. Classify first-party, generated, vendor, archive, and fixture code by role. Every declared area ends reviewed, excluded with a reason, or not assessed with a named blocker.
 
 Map actual imports and calls, entry points, state and resource ownership, persistence boundaries, and compatibility obligations. Dynamic discovery or external consumers limit conclusions; state that limit rather than treating a zero textual caller count as proof of dead code.
 

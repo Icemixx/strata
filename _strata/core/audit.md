@@ -10,7 +10,7 @@ Record the actual reasoning depth for each pass when it is available; otherwise 
 
 ## Declare coverage
 
-Record the revision and worktree state, requested roots, records and flows, exclusions, available environments, selected checks, and gates that cannot run. Read Project Instructions and their routed audit supplement. Inventory material first-party surfaces and classify generated, vendor, archive, and test material by role. Every declared area ends reviewed, excluded with a reason, or not assessed with a named blocker. The archive is provenance only when the requested audit includes it.
+Record the revision and worktree state, requested roots, records and flows, exclusions, available environments, selected checks, and gates that cannot run. Read Project Instructions and any audit supplement applicable under their routes. Inventory material first-party surfaces and classify generated, vendor, archive, and test material by role. Every declared area ends reviewed, excluded with a reason, or not assessed with a named blocker. The archive is provenance only when the requested audit includes it.
 
 ## Establish governing claims
 

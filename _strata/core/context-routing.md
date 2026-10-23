@@ -66,9 +66,9 @@ their relevant context arrives through the delegation brief.
 Keep current rules in exactly one instruction audience. A rule needed by every agent belongs in common
 Instructions. Active-Agent-only integration and routing rules belong in Active Agent Instructions.
 A durable reason for an instruction, and its reopening condition, belong in Rationale; spent narrative
-about how an instruction evolved belongs in the project's cold history, not in Rationale. When a rule
-rests on a user's ruling whose exact wording matters, keep the quoted ruling, its author and date with the
-rule. Common Instructions, universal and project alike, stay
+about how an instruction evolved belongs in Build Log, not in Rationale. When a project rule rests on
+a user's ruling whose exact wording matters, keep the quoted ruling, its author and date with the rule.
+Shared-kit rules retain only generalized reasoning, under `kit-editing.md`, Canonical change. Common Instructions, universal and project alike, stay
 agent-agnostic: a rule that applies only under one harness belongs in that harness's dossier, never in a
 common Instructions file.
 
@@ -76,8 +76,10 @@ common Instructions file.
 `project/project_instructions.md` — keeps what most tasks need and lists its folder's other files under
 `## Contents`. A group of related rules most tasks don't need becomes its own item with a line in that
 list. A project item that adds to a core item carries the core item's name plus `project_`; any other
-project item gets its own `project_` name. The index contract below applies, with the always-read file in
-place of `index.md`.
+project item gets its own `project_` name. Its project route names the core item it extends and states
+any narrower scope or audience. Common Instructions, Contents, owns partner loading. Branching changes
+storage, not a rule's audience or scope. The index contract below applies, with the always-read file in
+place of `index.md` at each instruction root.
 
 Root harness routers remain thin: they load common Universal and Project Instructions only. Common
 Instructions route the user-facing session to Active Agent Instructions. Harness adapters load on demand
@@ -219,7 +221,7 @@ correction goes in a new entry that names the one it replaces; an entry may stil
 work item closes. Adding an entry therefore shows only added lines in that file's diff. Repairing
 accidental damage restores the original wording, and the repair is itself recorded in a new entry.
 
-Completion finalizes and moves the State entry. Add typed State links when corresponding records exist.
+Add typed State links when corresponding records exist.
 
 An established repository's separately authorized conversion preserves its legacy material, carries
 and validates it clause by clause, records conflicting claims without choosing a winner, and asks the user

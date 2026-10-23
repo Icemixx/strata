@@ -5,10 +5,11 @@ questions, final verification, and communication regardless of its model tier.
 
 ## Session start
 
-Once per session, compare the installed kit commit — the newest `## Strata sync <commit>` heading under
+Once per session, compare the installed kit commit — the newest-dated `## Strata sync <commit>` heading under
 `_strata/project/build-log/` — with the first 7 characters of
-`git ls-remote https://github.com/Icemixx/strata.git HEAD`. If they differ, say once that the installed
-kit is behind; if the check cannot run, say that. Then continue. This is a report only: never sync without
+`git ls-remote https://github.com/Icemixx/strata.git HEAD`. If no sync heading exists, report the installed
+version as unknown. Otherwise, if the hashes differ, say once that the installed kit differs from
+canonical. If the check cannot run, say that. Then continue. This is a report only: never sync without
 authorization (`kit-editing.md`).
 
 ## Strata recommendations
@@ -44,8 +45,7 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   hand it down if it is below yours and that is cheaper than doing it yourself: each step you take
   re-sends your whole context, while a new agent costs its startup, its own steps on a cheaper model, and
   your brief and check. Batch small tasks into one hand-off. Hand off only work whose result you can
-  assess without repeating the investigation. Scope control, routing, integration, questions, final
-  verification and communication stay with you. When you set up work to run later or automatically, give
+  assess without repeating the investigation. The responsibilities listed in this file's introduction stay with you. When you set up work to run later or automatically, give
   it its role's model the same way.
 - For consecutive steps of one ticket, or of one operational session such as driving a device, continue
   the same delegated agent rather than starting a fresh one, unless its context is exhausted or the next
@@ -89,7 +89,7 @@ same-role model.
 
 - Record new work separately; do not absorb it silently.
 - Ask every user-facing question in normal chat, never in a pop-up, form, or selection widget.
-- Continue safe independent work before asking. When an answer is required, stop and make the smallest
+- Continue safe independent authorized work before asking. When an answer is required, stop and make the smallest
   necessary question set the final user-facing message. Do not send later progress that buries it.
 - Put every decision a message needs from the user into one closing block headed `Needs you:`; a
   message that needs nothing has no such block.
@@ -116,8 +116,7 @@ A command or delegated agent still running is not completion.
 
 ## Decisions
 
-Use `_strata/core/dap.md` for consequential decisions. Coding-specific review lenses apply only to
-code-affecting decisions.
+Use `_strata/core/dap.md` for consequential decisions.
 
 For a material choice someone might later want to revisit, record the viable alternative that was
 rejected and why. Skip trivial mechanical choices and options the user already decided.
@@ -155,17 +154,17 @@ happen in the same sitting and are committed under Commit and publication. Then:
 - Record the decisions taken *during* the work, not only its outcome.
 - Date the record by when the work happened. A session spanning days keeps the original dates; correcting
   them on resume rewrites history that was right.
-- Put the literal verification output and the commit it ran on in the record. When the verified changes
-  and their record share one commit, the record identifies that containing commit and the final reply
-  gives its full ID; do not create another commit just to insert its own hash. A summary of a result is
-  not the result.
+- Put the literal verification output and its source identity in the record under `instructions.md`,
+  Evidence and changes. The evidence record's own containing commit need not name itself; the final
+  reply gives its full ID. Do not create another commit just to insert that record's own hash. A summary
+  of a result is not the result.
 - Correct any contradiction the work created, now, in the same change.
 - Never let "shipped" imply "observed". Say which one you have.
-- Turn anything found-but-not-fixed **in this project's own work** into its own queue item immediately. A
-  finding is a queue event, not a reason to report. A Strata recommendation is the exception and goes the
-  other way: common Instructions say to report it and not create backlog work, because it is the user's to
-  accept before it is anyone's to schedule. Audit and refactor-review findings are a second exception: the
-  saved report holds them, and they become tickets only when the user says so (`audit.md`).
+- Turn confirmed defects found-but-not-fixed **in this project's own work** into their own queue items
+  immediately. Non-defect additions follow common Instructions, Build scope: suggest them in the reply,
+  and create backlog work only if the user accepts them. Strata recommendations follow this file's
+  Strata recommendations section. Audit and refactor-review findings stay in their saved report and
+  become tickets only when the user says so (`audit.md`).
 - Return to the **authorized** queue rather than reporting. Report once, when no ready or in-flight item
   remains within it. Backlog presence is not authorization, so an empty authorized queue ends the run even
   where the backlog holds more.
@@ -208,7 +207,8 @@ that has paid for one keeps that evidence in its own Rationale, not here.
   and the original state restored where the run restores one. Between boundaries, State on disk carries
   the progress. The run itself needs no commits: its records are project files, committed at the next
   commit point.
-- Preserve the user's configured authorship and add agent co-author attribution.
+- Preserve the user's configured authorship and add agent co-author attribution. Public canonical-kit
+  commits use the author-address requirement in `kit-editing.md`, Canonical change.
 - After an authorized push, verify remote receipt from the successful push result and local
   upstream-tracking state. When that receipt is ambiguous or stale, query the live remote ref; a remote
   tip that descends from the pushed commit is success. "The push was accepted" and "the remote tip equals

@@ -96,8 +96,8 @@ on-demand procedures, or hardcode a procedure filename in a rule or test fixture
 from the payload directory and let the canonical comparison own set equality: a declared list is a stale
 copy of the directory it claims to describe, so it fails on the next release instead of on a real defect.
 
-Express router rules as what a router may import - the shared core and project-owned files - rather than
-as a list of payload files it may not.
+Express router rules as the two common Instructions imports defined by `context-routing.md`,
+Instruction audiences, rather than as a list of payload files a router may not import.
 
 ## Consuming-copy sync
 
@@ -118,7 +118,7 @@ record the new commit, and finish under `active-agent.md`, Commit and publicatio
    removed lingers. Replace nothing else — `_strata/project/` and the routers are project-owned, and a sync
    that rewrites them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
    stop and report the failure; do not go on to step 4.
-4. Append to `_strata/project/build-log/project_build_log.md` an entry headed
+4. Append to a Build Log leaf owned by the project's Build Log index an entry headed
    `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example
    `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Commit and push the sync
    under `active-agent.md`, Commit and publication, including its local-only rule.
