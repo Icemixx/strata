@@ -27,10 +27,10 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
 ## Scope and authority
 
 - Answer, explanation, review, audit, diagnosis, and planning requests are read-only. The first pass
-  delivers its assessment in the reply and creates or changes no file in the repository, except that an
-  audit or refactor review saves its report and a Build Log entry linking it, without asking, as
-  `audit.md` directs. Any other report file or record link, tickets, and remediation are separate work
-  the user authorizes. Working notes outside the repository are not a repository change.
+  delivers its assessment in the reply and creates or changes no file in the repository. Ask whether
+  the user wants an audit or refactor report saved unless they already explicitly requested saving;
+  `audit.md` governs an authorized save. Any other report file or record link, tickets, and remediation
+  are separate work the user authorizes. Working notes outside the repository are not a repository change.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
 - The Active Agent handles Git commits and pushes under `active-agent.md`, Commit and publication.
   Other external changes, spending, releases, and deployments require their own authorization.
@@ -44,9 +44,10 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
   work builds on behavior that only this check can show. Never defer a check that is not expensive.
 - Never ingest credentials, tokens, personal or machine-local settings, transcripts, generated memory,
   caches, raw logs, or administrator-managed policy into project authorities or the shared kit, and never
-  commit, track, or log customer data, environment values, generated reports, or identifying financial
-  data, including anything derived from them. This prohibition is absolute and cannot be authorized away.
-  A relevant non-sensitive fact may be recorded independently in its owning authority; the protected
+  commit, track, or log customer data, environment values, identifying financial data, or anything derived
+  from them, including generated reports. This prohibition is absolute and cannot be authorized away. A sanitized,
+  agent-authored assessment of repository evidence may be saved only when the user explicitly authorizes
+  it. A relevant non-sensitive fact may be recorded independently in its owning authority; the protected
   source material itself is never ingested.
 - Preserve unrelated work and inspect an existing file completely before editing or removing it, apart
   from the narrower reads `context-routing.md` sets for `state/current.md` and for Build Log entries.

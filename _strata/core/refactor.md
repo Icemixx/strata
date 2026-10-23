@@ -4,7 +4,7 @@ Use this procedure for an explicit code refactor review, refactor audit, simplif
 
 This is a review of application code, architecture, data-access structure, dependency usage, and test maintainability. It is not documentation consolidation. `consolidation.md` owns authorized record repair; `audit.md` owns governing-claim and behavioral correctness findings. A demonstrated correctness, security, or data-integrity failure is reported under its own classification rather than presented as a refactor; project hard constraints are not tradeable against refactor economics.
 
-The review reports proposals and structures to leave unchanged. It does not change production code, records, tests, dependencies, configuration, or project authorities unless the user separately authorizes that remediation; the one exception is the report and the Build Log entry that *Save the report* requires. The first pass delivers its proposals in the reply.
+The review reports proposals and structures to leave unchanged. Its first pass is read-only and delivers its proposals in the reply. Saving the report requires explicit authorization; changing production code, records, tests, dependencies, configuration, or project authorities as remediation requires separate authorization.
 
 ## Declare coverage
 
@@ -42,4 +42,4 @@ The review is **Complete for declared scope** when every required area was revie
 
 ## Save the report
 
-Save the report as `audit.md` *Save the report* directs. Its default path here is `_sediment/code-refactor-review-YYYY-MM-DD.md`. Proposals, like findings, become tickets only when the user says so.
+Ask whether to save the report unless the user already explicitly requested saving. An authorized save follows `audit.md` *Save the report*. Its default path here is `_sediment/code-refactor-review-YYYY-MM-DD.md`. Proposals, like findings, become tickets only when the user says so.

@@ -163,8 +163,8 @@ happen in the same sitting and are committed under Commit and publication. Then:
 - Turn confirmed defects found-but-not-fixed **in this project's own work** into their own queue items
   immediately. Non-defect additions follow common Instructions, Build scope: suggest them in the reply,
   and create backlog work only if the user accepts them. Strata recommendations follow this file's
-  Strata recommendations section. Audit and refactor-review findings stay in their saved report and
-  become tickets only when the user says so (`audit.md`).
+  Strata recommendations section. Audit and refactor-review findings are reported in chat, saved only
+  when the user authorizes it, and become tickets only when the user says so (`audit.md`).
 - Return to the **authorized** queue rather than reporting. Report once, when no ready or in-flight item
   remains within it. Backlog presence is not authorization, so an empty authorized queue ends the run even
   where the backlog holds more.
@@ -196,8 +196,8 @@ that has paid for one keeps that evidence in its own Rationale, not here.
   not ask for it. Report the successful push in the final reply; do not create another commit solely
   to record that push.
 - Explicit local-only instructions prevent pushing; explicit no-commit instructions prevent committing
-  too. Discussion, planning, and other read-only requests gain no commit or push authority. Where a
-  procedure requires saving a report, saving it alone does not authorize publication.
+  too. Discussion, planning, and other read-only requests gain no commit or push authority. An
+  authorized report save alone does not authorize publication.
 - Keep commits focused. Inspect staged changes and every outgoing commit for protected data before
   publication. This check requires no user approval and adds no separate test suite.
 - Force pushes, remote deletion, pushing to another remote or branch, releases, deployments, and
