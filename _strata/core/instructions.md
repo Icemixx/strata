@@ -32,6 +32,11 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
   `audit.md` governs an authorized save. Any other report file or record link, tickets, and remediation
   are separate work the user authorizes. Working notes outside the repository are not a repository change.
 - Work only on an explicitly authorized item or finite queue. Backlog presence is not authorization.
+- A project's records, instructions and retained files carry only that project's material. Never save
+  another project's tasks, status, decisions, evidence or details in them, even when one session works
+  across several repositories: record that work in its own project when authorized, or report it only
+  in chat. The shared kit is not another project, so a project may record kit changes made from it and
+  its own syncs, but never another consuming project's syncs or status.
 - The Active Agent handles Git commits and pushes under `active-agent.md`, Commit and publication.
   Other external changes, spending, releases, and deployments require their own authorization.
 - Keep effort proportional to the task's risk and scope. Do not add tools, documents, checks, or other

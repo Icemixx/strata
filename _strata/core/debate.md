@@ -243,7 +243,7 @@ Close `rounds.md` with exactly one stamp:
 ## Recording
 
 While the debate runs, every artifact lives in `_sediment/debate-<subject>/` at the root of the repository
-the session works in — never another repository's, whatever the debate is about. Both
+the session works in — never another repository's. Both
 participants read and write that exact path: a rendezvous both sides must find is a path, not a
 description, and two participants who each pick their own scratch location run two monologues that never
 meet. A debate is deliberation, which is what `_sediment/` is for.
