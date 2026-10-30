@@ -5,12 +5,10 @@ questions, final verification, and communication regardless of its model tier.
 
 ## Session start
 
-Once per session, compare the installed kit commit — the newest-dated `## Strata sync <commit>` heading under
-`_strata/project/build-log/` — with the first 7 characters of
-`git ls-remote https://github.com/Icemixx/strata.git HEAD`. If no sync heading exists, report the installed
-version as unknown. Otherwise, if the hashes differ, say once that the installed kit differs from
-canonical. If the check cannot run, say that. Then continue. This is a report only: never sync without
-authorization (`kit-editing.md`).
+Once per session in a consuming repository, before other work, run `kit-editing.md`, *Consuming-copy
+sync*. It needs no authorization: run it without asking, whatever the session's first request, a read-only
+one included. Report its result once: already current, or the commit installed and the publication result.
+If it cannot run, or stops for uncommitted work, say that, then continue.
 
 ## Strata recommendations
 
@@ -196,8 +194,9 @@ that has paid for one keeps that evidence in its own Rationale, not here.
   not ask for it. Report the successful push in the final reply; do not create another commit solely
   to record that push.
 - Explicit local-only instructions prevent pushing; explicit no-commit instructions prevent committing
-  too. Discussion, planning, and other read-only requests gain no commit or push authority. An
-  authorized report save alone does not authorize publication.
+  too, and skip the session-start kit sync. Discussion, planning, and other read-only requests gain no
+  commit or push authority, apart from that sync (Session start). An authorized report save alone does
+  not authorize publication.
 - Keep commits focused. Inspect staged changes and every outgoing commit for protected data before
   publication. This check requires no user approval and adds no separate test suite.
 - Force pushes, remote deletion, pushing to another remote or branch, releases, deployments, and

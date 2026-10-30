@@ -27,7 +27,8 @@ simplified, replaced, or removed, report it as a Strata recommendation: the user
 ## Scope and authority
 
 - Answer, explanation, review, audit, diagnosis, and planning requests are read-only. The first pass
-  delivers its assessment in the reply and creates or changes no file in the repository. Ask whether
+  delivers its assessment in the reply and creates or changes no file in the repository, apart from the
+  Active Agent's session-start kit sync (`active-agent.md`). Ask whether
   the user wants an audit or refactor report saved unless they already explicitly requested saving;
   `audit.md` governs an authorized save. Any other report file or record link, tickets, and remediation
   are separate work the user authorizes. Working notes outside the repository are not a repository change.

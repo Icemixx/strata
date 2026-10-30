@@ -11,9 +11,10 @@ Instructions or project records.
 
 The canonical repository, `https://github.com/Icemixx/strata.git`, is the source. Consuming repositories
 hold copies, and each records the canonical commit it installed in its own Build Log. Never edit a
-consuming copy incidentally during project work. A canonical change or a consuming-repository sync
-requires deliberate authorization for that scope; an authorized, published canonical change includes its
-sync into the repository it was made from (*Canonical change*).
+consuming copy incidentally during project work. A canonical change requires deliberate authorization for
+that scope. A consuming-repository sync requires none: each session runs it at start (`active-agent.md`,
+Session start), and a published canonical change runs it in the repository it was made from
+(*Canonical change*).
 
 Each `harness-<product>.md` is owned by an agent running that product. **Do not write a claim about
 another harness's runtime into its dossier.** How it identifies its model, where its sessions live, what
@@ -77,9 +78,8 @@ says now.
 **A published change installs itself where it was made.** Once the push is verified, run *Consuming-copy
 sync* in the repository the session works in, against the commit just pushed, as part of the same
 transaction: step 3 copies from the clone already in place instead of cloning again, and the clone is
-deleted after that copy. The authorization for the canonical change covers this one sync. A change left
-local only installs nothing. Every other consuming repository still requires its own, separately
-authorized sync; tell the user which ones, and do not sync them as part of the canonical transaction.
+deleted after that copy. A change left local only installs nothing. Every other consuming repository
+installs it at the start of its own next session; do not sync them as part of the canonical transaction.
 
 Undo a published canonical change, or a committed sync in a consuming repository, with a
 history-preserving operation, normally `git revert`. A destructive reset needs the user's separate,
@@ -113,22 +113,25 @@ record the new commit, and finish under `active-agent.md`, Commit and publicatio
 2. Read the live commit: the first 7 characters of
    `git ls-remote https://github.com/Icemixx/strata.git HEAD`. If it equals the installed commit, stop;
    there is nothing to sync. No such heading at all means sync.
-3. Clone canonical at the live commit into a temporary clone, as *Canonical change* describes. Delete
-   exactly `_strata/core/`, then copy it in from the clone. Delete before copying, or a file canonical
+3. If `git status --porcelain` lists anything under `_strata/core/` or in the Build Log leaf step 4
+   appends to, stop and report it: the copy would delete uncommitted kit edits, and the commit would carry
+   unrelated record changes. Otherwise clone canonical at the live commit into a temporary clone, as
+   *Canonical change* describes. Delete exactly `_strata/core/`, then copy it in from the clone. Delete before copying, or a file canonical
    removed lingers. Replace nothing else — `_strata/project/` and the routers are project-owned, and a sync
    that rewrites them has overwritten the project with the kit. Then delete the clone. If the clone or the copy fails,
    stop and report the failure; do not go on to step 4.
 4. Append to a Build Log leaf owned by the project's Build Log index an entry headed
    `## Strata sync <commit> (<YYYY-MM-DD>)` with the live commit and the sync date, for example
-   `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Commit and push the sync
-   under `active-agent.md`, Commit and publication, including its local-only rule.
-   Report `git status` and the publication result or concrete blocker.
+   `## Strata sync a3872f6 (2026-09-22)`. The heading is the whole required entry. Commit only
+   `_strata/core/` and that leaf, and push the sync under `active-agent.md`, Commit and publication,
+   including its local-only rule. Report `git status` and the publication result or concrete blocker.
 
 Two syncs on the same date need no ordering rule. Canonical only moves forward, so reading the older of the
 pair costs at most one redundant sync, never a missed one.
 
 **Do not add a verification pass.** Not a drift check before overwriting, because the copy is about to
-replace whatever it would find. Not a review of the incoming diff, because canonical reviewed it when it
+replace whatever it would find and history keeps every committed version; step 3's stop for uncommitted
+work is the only look before copying. Not a review of the incoming diff, because canonical reviewed it when it
 was committed. Not a search for inbound references to renamed payload headings, because the section above
 already guarantees a consuming repository never needs an edit for one. Not a re-comparison after copying,
 nor a control demonstrating that such a comparison works.
