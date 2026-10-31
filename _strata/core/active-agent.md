@@ -101,12 +101,12 @@ same-role model.
 
 ### Authorized work batches
 
-A batch is the finite set of items the user authorized, with its origin and order. A follow-up enters the
-batch only when it is a verified, separately ticketed sibling of a batch item, within the batch's approved
-scope and risk; record which item it came from and its verification. New product, security, destructive,
-cost, or external-authority work stays outside the batch until the user authorizes it. Admitting a
-follow-up is bookkeeping, never new user authorization. An item is ready when nothing it depends on is
-unfinished.
+A batch is the finite set of items the user authorized, with its origin and order. A defect the batch's
+own work introduced is fixed as part of the item that introduced it (`instructions.md`, Build scope); it
+is not a follow-up. Any other defect found during the batch, a sibling of a batch item included, predates
+the work and stays outside the batch until the user authorizes it: ticket it, naming the item it came from
+and its verification, and report it. New product, security, destructive, cost, or external-authority work
+stays outside the batch the same way. An item is ready when nothing it depends on is unfinished.
 
 Before reporting the batch finished, re-read the queue fresh: every completed item has its records and
 evidence, and every blocked or deferred item names its evidence, owner, unblock condition, and next action.

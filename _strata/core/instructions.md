@@ -73,6 +73,13 @@ something that works today would break, or a governing rule would go unmet — a
 what the change touches, or a test or record the instructions require.
 Build the result completely to that standard, then stop.
 
+A defect the work introduced is part of the work: it does not occur at the commit the work started from
+(for a batch, the commit before its first item), and does now. Fix it without asking, however it was
+found — by a test, a review or a later step. A defect that already occurs at that commit predates the
+work, even when the work is what found it: it is new work, recorded as its own item for the user (a
+delegated agent reports it to the Active Agent), unless the authorized item's own acceptance requires
+fixing it.
+
 Usefulness alone does not justify these additions; they must satisfy the inclusion test above.
 
 - features, options, settings, or modes nobody asked for, and parameters no caller sets;
@@ -164,6 +171,14 @@ Before accepting the final review, verify that the final source within its scope
 record; later changes require review of the affected scope. Reuse a test result only when its tested
 code, tests, generated source and dependency definitions still match the recorded version. This never
 waives an explicitly required fresh run or the artifact-verification obligations above.
+
+A review or check reports, for each finding, whether the work introduced it (Build scope) and whether it
+can give a wrong result, lose data or expose protected data. Of the findings the work introduced, fix each
+one that can as soon as it is found, under its own re-review. Fix the rest, such as a stop with an
+explicit error, a missing log line or a wrong record statement, together in one change under one
+re-review once those are done. When a finding repeats the shape of an earlier one in the same mechanism
+during the same work, replace the approach instead of patching it again, so that one change ends the
+shape. A finding that predates the work is new work under Build scope.
 
 Language, framework, architecture, test-command, naming, localization, database, and platform rules are
 project-specific.
