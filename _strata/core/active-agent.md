@@ -49,6 +49,11 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   the same delegated agent rather than starting a fresh one, unless its context is exhausted or the next
   step needs another role. Give the next ticket a new delegated agent unless it works on the same files:
   carried-over context is re-sent on every later turn and soon costs more than a fresh start.
+- Start no more than four delegated agents at once, unless the user or the procedure they are started
+  under names another number. Where delegated agents draw on the same usage allowance as the session,
+  exhausting it stops every running agent together, and resuming an agent re-sends its whole context,
+  so a large simultaneous launch can end with nothing finished. Retrieve each batch's final reports
+  before starting the next batch, and resume interrupted agents in batches of the same size.
 - When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
   capability — verify it in the current turn rather than from memory or an earlier session.
 - A high-risk change (synchronization or merging, schema or stored data, money, deletion, security or
