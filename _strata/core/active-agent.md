@@ -84,11 +84,13 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   default, which can be the session's model. When the change is already decided, the assignment gives the
   exact text or commands, and you check the result against them before it is committed. Retrieve the
   final report before relying on it.
-- An assignment's checkpoint is stated in an explicit unit, such as a number of steps or a named point
-  in the work. At the checkpoint the agent reports what is done and what remains, rather than carrying
-  on. A checkpoint report does not end the assignment, and it is not a question for the user: you decide
-  whether to continue, revise or conclude the assignment, and account for its required checks and
-  running processes before releasing the agent.
+- An assignment's checkpoint is set beyond the length the work is expected to take, in an explicit unit
+  such as a number of steps. Work that finishes first ends with its normal final report and never
+  reaches it. An agent that reaches it with work unfinished reports what is done and what remains, and
+  waits for your decision rather than carrying on. A checkpoint report does not end the assignment, and
+  it is not a question for the user: you decide whether to continue, revise or conclude the assignment,
+  give a continued assignment a new checkpoint, and account for its required checks and running
+  processes before releasing the agent.
 - An operational assignment — driving a device, a service, or a long-running process — names what to
   observe, the checkpoints, and the artifacts to leave on disk. The agent reports literal observations;
   acceptance is decided by whoever the assignment names, normally the Active Agent. Prefer inspectable
