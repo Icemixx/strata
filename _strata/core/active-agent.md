@@ -45,29 +45,38 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   your brief and check. Batch small tasks into one hand-off. Hand off only work whose result you can
   assess without repeating the investigation. The responsibilities listed in this file's introduction stay with you. When you set up work to run later or automatically, give
   it its role's model the same way.
-- For consecutive steps of one ticket, or of one operational session such as driving a device, continue
-  the same delegated agent rather than starting a fresh one, unless its context is exhausted or the next
-  step needs another role. Give the next ticket a new delegated agent unless it works on the same files:
+- For consecutive steps of one ticket, or of one operational session such as driving a device, a step
+  that needs another role goes to that role. Otherwise choose between continuing the same delegated
+  agent and replacing it by the expected total cost of the remaining work, including retained knowledge,
+  context, startup, rediscovery and verification, and give a replacement the relevant findings and
+  outstanding obligations. Give the next ticket a new delegated agent unless it works on the same files:
   carried-over context is re-sent on every later turn and soon costs more than a fresh start.
 - Start no more than four delegated agents at once, unless the user or the procedure they are started
   under names another number. Where delegated agents draw on the same usage allowance as the session,
   exhausting it stops every running agent together, and resuming an agent re-sends its whole context,
   so a large simultaneous launch can end with nothing finished. Retrieve each batch's final reports
   before starting the next batch, and resume interrupted agents in batches of the same size.
+- Name the single owner of each exclusive resource — one that two agents cannot safely use at once,
+  such as a shared test database, a device or a build folder — and when it is handed over, in every
+  assignment that could reach it. No other agent, you included, touches it until then, directly or
+  through test fixtures or processes its commands start. Before handover, finish or safely stop
+  processes using the resource, or explicitly transfer responsibility for them to the new owner. A
+  checkpoint report does not release the resource.
 - When routing depends on a fact that drifts — model availability, quota, reset time, environment or tool
   capability — verify it in the current turn rather than from memory or an earlier session.
 - A high-risk change (synchronization or merging, schema or stored data, money, deletion, security or
   privacy) is reviewed at Architect level by an agent other than its implementer; when an Engineer
   implements it, the Active Agent's own review satisfies this if the Active Agent runs the Architect model.
   That review tries to break the change: worst-case ordering of operations, stale or diverged copies,
-  concurrent edits, and malformed or hostile input. Other changes need no second role. Never invent a
-  task merely to occupy a role.
+  concurrent edits, and malformed or hostile input. Its brief names the scope and the failures most
+  likely for this change; the reviewer may still follow an unexpected risk. Other changes need no second
+  role. Never invent a task merely to occupy a role.
 - The agent type and the role are separate choices: the type sets the tools and how the agent reads, the
   role sets the model. A search-only helper locates material; it does not review or decide. Give review
   work to an agent that reads whole files, with no edit permission when the review is read-only, in the
   role the review needs.
-- Each delegated assignment names the role, edit permission, file scope, task, routed context, completion
-  condition, and relevant checks, and tells the agent to do the work directly, without delegating further
+- Each delegated assignment names the role, edit permission, file scope, task, routed context, checkpoint,
+  completion condition, and relevant checks, and tells the agent to do the work directly, without delegating further
   or invoking another agent unless separately authorized. Delegated agents are terminal for that
   assignment, and they never load this file, so the assignment is the only place that instruction reaches
   them. Request the role's model explicitly for every agent you start, including a helper the harness's
@@ -75,12 +84,20 @@ needed role. Model names and role-to-model mappings belong only in the harness d
   default, which can be the session's model. When the change is already decided, the assignment gives the
   exact text or commands, and you check the result against them before it is committed. Retrieve the
   final report before relying on it.
+- An assignment's checkpoint is stated in an explicit unit, such as a number of steps or a named point
+  in the work. At the checkpoint the agent reports what is done and what remains, rather than carrying
+  on. A checkpoint report does not end the assignment, and it is not a question for the user: you decide
+  whether to continue, revise or conclude the assignment, and account for its required checks and
+  running processes before releasing the agent.
 - An operational assignment — driving a device, a service, or a long-running process — names what to
   observe, the checkpoints, and the artifacts to leave on disk. The agent reports literal observations;
   acceptance is decided by whoever the assignment names, normally the Active Agent. Prefer inspectable
   machine-readable data over screenshots when both exist.
 - Limit worker reports to files changed, decisions or assumptions, literal verification, and confirmed
-  out-of-scope findings.
+  out-of-scope findings, and keep your own context small: check delegated work by that report, its
+  literal results and targeted reads, and read a whole diff when a review or integration needs it, not
+  by default. When your context is large and the remaining work could resume from State, record it
+  there and recommend a fresh session to the user.
 - Workers update project authorities only when explicitly assigned; normally the Active Agent performs
   the integrated authority update.
 
